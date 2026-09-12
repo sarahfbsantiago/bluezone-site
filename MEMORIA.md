@@ -1,7 +1,7 @@
 # Bluezone — memória do projeto
 
 Registro do que foi decidido e construído nas sessões, para retomar o trabalho de onde parou.
-Leia junto com `README.md` (arquitetura e como rodar) e `apps-script/README.md` (formulário).
+Leia junto com `README.md` (arquitetura e como rodar), `ARQUITETURA.txt` (plano de arquitetura e crescimento, documento vivo por etapas) e `apps-script/README.md` (formulário).
 
 ## Estado atual (12/09/2026, fim do dia)
 

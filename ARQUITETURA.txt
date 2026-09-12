@@ -1,0 +1,119 @@
+BLUEZONE - PLANO DE ARQUITETURA E CRESCIMENTO
+Documento vivo: atualizar a cada etapa concluida. (criado em 12/09/2026)
+=====================================================================
+
+1. VISAO GERAL
+--------------
+Um projeto Firebase (bluezone-d2757, conta contato@abluezone.com.br) concentra tudo:
+site, banco, login, backend e, depois, os apps Android e iOS. Nada precisa ser
+refeito quando os apps chegarem: eles usam as mesmas Functions, o mesmo banco e as
+mesmas regras.
+
+Regra de ouro: o navegador e os apps NUNCA escrevem dados sensiveis direto no banco.
+Toda escrita passa pelo backend (Cloud Functions), que valida, limita e registra.
+
+
+2. O QUE JA EXISTE (etapa 0 - concluida)
+----------------------------------------
+[x] Site publico (Vite + React + Three.js), 3 paginas: /, /bluenews, /blueprint
+[x] Hospedagem:
+    - Firebase Hosting producao: bluezone-d2757 -> abluezone.com.br (npm run deploy)
+    - Firebase Hosting teste: bluezone-teste.web.app (npm run deploy:teste)
+    - GitHub Pages: previa automatica a cada push (sarahfbsantiago/bluezone-site)
+[x] Dominio abluezone.com.br no Registro.br apontando para o Firebase (A + TXT)
+[x] E-mail oficial contato@abluezone.com.br (Google Workspace)
+[x] Formularios (contato, BlueNews, pop-up Blueprint) -> Google Apps Script na conta
+    contato@ -> planilha "Bluezone - contatos" (uma aba por origem) + e-mail de aviso.
+    Codigo em apps-script/ (um arquivo por formulario).
+[x] Seguranca atual: CSP/HSTS no Hosting, validacao e limite de envios no Apps Script,
+    anti-formula na planilha, honeypot no site, .env fora do Git.
+
+
+3. ETAPA 1 - BANCO E BACKEND (proxima)
+--------------------------------------
+Objetivo: leads e "registro de eventos" (timeline do que acontece com cada lead/aluno)
+no Firestore, com a planilha mantida como espelho para a equipe.
+
+Pecas:
+- Cloud Firestore (banco)
+- Cloud Functions (backend; exige plano Blaze - pago por uso, custo ~zero no volume atual)
+- App Check (so o nosso site/app consegue chamar o backend)
+- Security Rules (nega tudo por padrao)
+
+Colecoes (esboco):
+  leads/{leadId}          nome, email, telefone, origem, criadoEm, atualizadoEm, status
+  events/{eventId}        leadId ou uid, tipo (contato | email | ligacao | reuniao |
+                          proposta | compra | inscricao ...), origem, detalhes, data, autor
+  users/{uid}             perfil de quem tem login (criado no primeiro login)
+  courses/{courseId}      cursos (Blueprint, futuros)
+  enrollments/{uid_curso} acesso liberado a um curso (por compra ou manual)
+  products/{productId}    catalogo (Blueprint, IA automacao, IA conteudo, BlueCast, plataforma)
+
+Fluxo do formulario:
+  site -> Function submitLead (App Check + validacao + limite) -> leads + events
+       -> e-mail para contato@ -> espelho na planilha (opcional, via API do Sheets)
+
+Passos:
+[ ] Ativar plano Blaze na conta contato@ (cartao)
+[ ] Criar Firestore (regiao southamerica-east1 / Sao Paulo) e regras "nega tudo"
+[ ] Function submitLead substituindo o Apps Script (mesmas origens e assuntos)
+[ ] Espelho na planilha (para a equipe continuar usando)
+[ ] Registrar o "app Web" no projeto (config publica do Firebase no site)
+[ ] Site passa a chamar a Function (VITE_CONTACT_ENDPOINT -> URL da Function)
+[ ] App Check com reCAPTCHA Enterprise
+[ ] Testes de ponta a ponta por origem
+
+
+4. ETAPA 2 - LOGIN E AREA DO ALUNO
+----------------------------------
+[ ] Firebase Authentication (e-mail/senha + Google)
+[ ] Webhook da Kiwify -> Function verifica assinatura -> enrollments + event "compra"
+[ ] Area do aluno no site (/aluno): cursos liberados, aulas, materiais
+[ ] Cloud Storage para videos/materiais com regras por matricula
+[ ] Papeis: claim "admin" para a equipe (definida por Function, nunca por campo editavel)
+
+
+5. ETAPA 3 - PAINEL DA EQUIPE
+-----------------------------
+[ ] Painel interno (/painel) para ver leads, timeline de eventos e registrar novos eventos
+[ ] Filtros por origem, status e periodo; exportacao
+[ ] Notificacoes (e-mail/WhatsApp) para novos leads
+
+
+6. ETAPA 4 - PRODUTOS E CONTEUDO
+--------------------------------
+[ ] BlueNews: artigos (Markdown no repositorio ou CMS), newsletter com envio
+[ ] BlueCast: paginas dos episodios
+[ ] Plataforma propria de cursos + comunidade
+[ ] Analytics com aviso de privacidade (LGPD)
+
+
+7. ETAPA 5 - APPS ANDROID E iOS
+-------------------------------
+[ ] Registrar apps no mesmo projeto Firebase
+[ ] Mesmo Auth, mesmo Firestore, mesmas Functions e regras
+[ ] Notificacoes push (Cloud Messaging)
+
+
+8. SEGURANCA (vale para todas as etapas)
+----------------------------------------
+- Segredos so nas Functions (config/secret manager); nada no site nem no GitHub
+- Regras do Firestore/Storage: nega tudo; abre por uid e por papel
+- App Check em Functions, Firestore e Storage
+- Validacao e limite de envios no servidor; logs de auditoria em "events"
+- LGPD: dados minimos, finalidade clara, canal para exclusao (contato@)
+- Backups/exportacao periodica do Firestore
+
+
+9. DECISOES REGISTRADAS
+-----------------------
+- Banco: Firestore (nunca Supabase) - decisao da cliente
+- Dominio oficial: abluezone.com.br (site e e-mail)
+- Conta dona de tudo: contato@abluezone.com.br (Firebase, Apps Script, planilha)
+- GitHub: sarahfbsantiago/bluezone-site
+- Deploy oficial no dominio so com autorizacao da cliente
+
+
+10. HISTORICO
+-------------
+12/09/2026 - Site, formularios, hosting (prod/teste/previa), dominio e este plano.
