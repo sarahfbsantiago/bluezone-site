@@ -9,7 +9,7 @@
 5. No site, crie um arquivo `.env` na raiz do projeto com:
 
    ```
-   VITE_CONTACT_ENDPOINT=https://script.google.com/macros/s/SEU_ID/exec
+   VITE_CONTACT_ENDPOINT=https://script.google.com/macros/s/<id-da-implantacao>/exec
    ```
 
    (ou cole a URL em `src/features/home/config/siteConfig.ts`). Rode `npm run build` de novo.
