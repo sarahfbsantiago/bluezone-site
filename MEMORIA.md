@@ -24,7 +24,7 @@ Site de página única em `src/features/home`, com cena WebGL fixa atrás do con
 
 Header de vidro fixo: marca · história · quem somos · soluções · clientes · produtos · nosso time (sem "/parceiros" no header, para caber; a seção continua "07 — nosso time/parceiros") · bluenews · botão **contato** · sol/lua. Clicar no logotipo (Bluezone ou BlueNews) sempre volta ao topo do site (`/#top`); chegando com âncora de outra página, a Home repete a rolagem depois de montar. Logo do header e títulos das páginas (page-title, page-text, page-strong, solution-title, nomes do time) têm brilho de letreiro de LED com leve cintilar: azul no escuro, azul mais claro no claro (pedido em 12/09/2026). Ícone do WhatsApp brilha só no escuro. Links do header são absolutos (`/#id`) para funcionarem também na página do blog.
 Footer: mesmos links + WhatsApp + ícones Instagram (instagram.com/abluezone), TikTok (tiktok.com/@bluezon_e), Facebook (facebook.com/people/Bluezone-Marketing-Vendas/61553804584166) e LinkedIn (linkedin.com/company/bluezone-marketing-vendas) ativos; só o ícone de link/site segue vazio em `siteConfig.social` (desativado).
-WhatsApp flutuante: ícone em pontilhismo (verde vivo com brilho verde no escuro — a cliente achou o branco apagado, 12/09/2026; colorido no claro; laranja no Blueprint) com "chame a gente!" digitando em cima. Número: 5531993341543.
+WhatsApp flutuante: ícone em pontilhismo (no escuro: branco puro, sem degradê, com luz azul de LED atrás — pedido final da cliente em 12/09/2026, depois de testar verde; colorido no claro; laranja no Blueprint) com "chame a gente!" digitando em cima. Número: 5531993341543.
 
 ## Decisões de design que não devem ser revertidas sem combinar
 

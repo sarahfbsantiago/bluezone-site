@@ -65,7 +65,7 @@ describe('contato', () => {
     const fetchMock = vi.fn(async () => new Response(JSON.stringify({ ok: true }), { status: 200 }))
     vi.stubGlobal('fetch', fetchMock)
     vi.spyOn(Date, 'now').mockReturnValue(1_000_000)
-    render(<BlueprintPopup open />)
+    render(<BlueprintPopup open endpoint="https://script.google.com/macros/s/x/exec" />)
     expect(screen.getByRole('dialog', { name: /Postar não é o problema/ })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'conhecer o Blueprint' })).toHaveAttribute('href', '/blueprint')
     fireEvent.click(screen.getByRole('button', { name: /quero receber promoções/ }))

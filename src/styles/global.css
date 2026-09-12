@@ -539,8 +539,8 @@ html[data-theme='dark'] { background: #050609; }
 [data-theme='dark'] .contact-feedback.is-success { color: #7fe6c4; }
 [data-theme='dark'] .site-footer { border-top-color: rgba(255, 255, 255, .14); }
 [data-theme='dark'] .video-placeholder svg { filter: grayscale(1) brightness(1.6) drop-shadow(0 0 8px rgba(255, 255, 255, .25)); }
-[data-theme='dark'] .whatsapp svg { filter: saturate(1.5) brightness(1.2) contrast(1.15) drop-shadow(0 0 3px rgba(120, 255, 170, .95)) drop-shadow(0 0 10px rgba(37, 211, 102, .8)) drop-shadow(0 0 26px rgba(37, 211, 102, .5)); animation: led-glow 4.5s ease-in-out infinite; }
-[data-theme='dark'] .whatsapp { color: #ffffff; text-shadow: 0 0 10px rgba(37, 211, 102, .6), 0 0 16px rgba(0, 0, 0, .6); }
+[data-theme='dark'] .whatsapp svg { filter: grayscale(1) brightness(0) invert(1) drop-shadow(0 0 3px rgba(120, 170, 255, .95)) drop-shadow(0 0 12px rgba(31, 109, 255, .9)) drop-shadow(0 0 30px rgba(20, 70, 200, .7)); animation: led-glow 4.5s ease-in-out infinite; }
+[data-theme='dark'] .whatsapp { color: #ffffff; text-shadow: 0 0 10px rgba(31, 109, 255, .7), 0 0 16px rgba(0, 0, 0, .6); }
 [data-theme='dark'] .whatsapp:hover { color: #ffffff; }
 [data-theme='dark'] .arrow:focus-visible, [data-theme='dark'] .header-cta:focus-visible, [data-theme='dark'] .site-header a:focus-visible, [data-theme='dark'] .explore:focus-visible, [data-theme='dark'] .hero-progress button:focus-visible, [data-theme='dark'] .theme-toggle:focus-visible, [data-theme='dark'] .whatsapp:focus-visible, [data-theme='dark'] .contact-submit:focus-visible, [data-theme='dark'] .site-footer a:focus-visible { outline-color: #ffffff; }
 

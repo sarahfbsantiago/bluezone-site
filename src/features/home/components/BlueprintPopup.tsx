@@ -8,7 +8,7 @@ import { withBase } from '../../../lib/paths'
  * Três saídas: conhecer o curso, deixar nome/e-mail/telefone (origem "popup-blueprint" na planilha) ou fechar (X, Esc, clique fora).
  * Fechado, não volta até a próxima atualização da página (pedido da cliente: sem pausa de dias).
  */
-export function BlueprintPopup({ triggerId = 'page-three', open: forced = false }: { triggerId?: string; open?: boolean }) {
+export function BlueprintPopup({ triggerId = 'page-three', open: forced = false, endpoint }: { triggerId?: string; open?: boolean; endpoint?: string }) {
   const [open, setOpen] = useState(forced)
   const [mode, setMode] = useState<'intro' | 'form'>('intro')
   const dialog = useRef<HTMLDivElement>(null)
@@ -47,7 +47,7 @@ export function BlueprintPopup({ triggerId = 'page-three', open: forced = false 
         ) : (
           <>
             <p className="bp-popup-text">Deixe seus dados e a gente manda promoções do Blueprint e conteúdo exclusivo por e-mail.</p>
-            <ContactForm variant="popup" />
+            <ContactForm variant="popup" endpoint={endpoint} />
           </>
         )}
       </div>
