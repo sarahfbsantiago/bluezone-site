@@ -901,3 +901,21 @@ html[data-theme='dark'] { background: #050609; }
   .admin-sections { grid-template-columns: 1fr; }
   .admin-config { grid-template-columns: 1fr; }
 }
+
+/* Painel no celular */
+@media (max-width: 900px) {
+  .admin { padding: 16px 14px 40px; }
+  .admin-header { gap: 10px; margin-bottom: 16px; }
+  .admin-header .header-brand { --brand-w: 100px; width: 100px; }
+  .admin-toolbar { flex-wrap: wrap; }
+  .admin-toolbar .solution-title { font-size: 20px; }
+  .admin-list { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .admin-table { min-width: 640px; }
+  .admin-table th:nth-child(4), .admin-table td:nth-child(4) { display: none; }
+  .admin-actions { flex-wrap: wrap; gap: 8px 12px; }
+  .admin-filters { flex-direction: column; }
+  .admin-filters input { min-width: 0; }
+  .admin-fields .field textarea { min-height: 160px; }
+  .admin-postpreview { padding: 24px 16px; }
+  .admin-sidebar.is-open { padding: 12px; margin-bottom: 12px; background: #fff; border-radius: 14px; box-shadow: 0 1px 0 rgba(16, 36, 58, .08); }
+}

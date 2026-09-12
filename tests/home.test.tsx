@@ -144,13 +144,13 @@ describe('Bluezone home hero', () => {
   })
 
   it('alterna entre modo claro e escuro e lembra a escolha', () => {
-    window.localStorage.removeItem('bluezone-theme')
+    window.localStorage.removeItem('bluezone-theme-v2')
     render(<HomePage />)
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
     expect(document.querySelector('.home-page')).toHaveClass('theme-dark')
     fireEvent.click(screen.getByRole('button', { name: 'Ativar modo claro' }))
     expect(document.documentElement.getAttribute('data-theme')).toBe('light')
-    expect(window.localStorage.getItem('bluezone-theme')).toBe('light')
+    expect(window.localStorage.getItem('bluezone-theme-v2')).toBe('light')
     fireEvent.click(screen.getByRole('button', { name: 'Ativar modo escuro' }))
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
   })

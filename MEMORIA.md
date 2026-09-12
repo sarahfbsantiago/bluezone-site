@@ -29,6 +29,10 @@ WhatsApp flutuante: ícone em pontilhismo (no escuro: branco puro, sem degradê,
 
 ## Decisões de design que não devem ser revertidas sem combinar
 
+- **Mobile sempre**: tudo o que for criado (site, BlueNews, painel) sai adaptado ao celular na mesma entrega e é conferido em captura 390px (regra da cliente, 12/09/2026).
+- **Tema**: o tema só é gravado no navegador quando a pessoa clica no sol/lua (chave `bluezone-theme-v2`). A chave antiga gravava o padrão no primeiro acesso e prendeu visitantes no claro; por isso o domínio oficial parecia claro para a cliente.
+- **BlueNews pública**: preto e branco, fundo branco, sem claro/escuro (decisão de 12/09/2026); CSS próprio em `src/styles/bluenews.css`; sem WhatsApp flutuante (link no rodapé).
+
 - **Rolagem**: `--p` (telas) move hero, página 1 e a cena WebGL; `--pc` mede o contato pela posição real; cada seção com `data-scroll-section` recebe `--ps` (0 = uma tela antes do topo, 1 = no topo) e as entradas de quem somos, direção, história e soluções animam por `--ps`, então dá para reordenar seções sem quebrar (feito em 12/09/2026 ao mover história para depois da marca).
 
 - **Logo é inegociável**: geometria vem do PNG oficial (`public/logo-bluezone-white.png`), medido e amostrado em `scene/markSampler.ts`. Nunca redesenhar. O PNG tem bordas em escada e uma linha de artefato no topo (o header usa `clip-path`).
