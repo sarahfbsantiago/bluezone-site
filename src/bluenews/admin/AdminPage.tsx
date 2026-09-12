@@ -6,7 +6,7 @@ import { withBase } from '../../lib/paths'
 /** Site público (para os links "ver" e o logotipo); o painel vive em outro endereço. */
 const SITE = (import.meta.env.VITE_SITE_URL || 'https://abluezone.com.br').replace(/\/$/, '')
 import { db, firebaseEnabled, signInWithGoogle, signOutUser, watchUser } from '../../lib/firebase'
-import { CATEGORIES, createPost, deletePost, listAll, slugify, updatePost, validatePost, type Post, type PostInput } from '../posts'
+import { CATEGORIES, createPost, deletePost, listAll, slugify, updatePost, validatePost, type Post, type PostInput, type PostStatus } from '../posts'
 import { Markdown } from '../Markdown'
 
 const EMPTY: PostInput = { title: '', slug: '', category: CATEGORIES[0]?.id ?? '', excerpt: '', content: '', coverUrl: '', author: 'Equipe Bluezone', status: 'draft' }
@@ -24,6 +24,11 @@ export function AdminPage() {
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const [preview, setPreview] = useState<PostInput | null>(null)
+  const [view, setView] = useState<'inicio' | 'noticias' | 'secoes' | 'newsletter' | 'leads' | 'config'>('inicio')
+  const [filterCat, setFilterCat] = useState('')
+  const [filterStatus, setFilterStatus] = useState<'' | PostStatus>('')
+  const [search, setSearch] = useState('')
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', 'light')
@@ -40,8 +45,9 @@ export function AdminPage() {
   }, [])
   useEffect(() => { if (isAdmin) void reload() }, [isAdmin, reload])
 
-  const goHome = () => { setEditing(null); setPreview(null); setMessage('') }
-  const startNew = () => { setForm(EMPTY); setEditing('new'); setMessage('') }
+  const goHome = () => { setEditing(null); setPreview(null); setMessage(''); setView('inicio'); setMenuOpen(false) }
+  const go = (next: typeof view) => { setEditing(null); setPreview(null); setMessage(''); setView(next); setMenuOpen(false) }
+  const startNew = (category?: string) => { setForm({ ...EMPTY, category: category ?? EMPTY.category }); setEditing('new'); setMessage('') }
   const startEdit = (post: Post) => { setForm({ title: post.title, slug: post.slug, category: post.category, excerpt: post.excerpt, content: post.content, coverUrl: post.coverUrl, author: post.author, status: post.status }); setEditing(post); setMessage('') }
   const update = (patch: Partial<PostInput>) => setForm((current) => ({ ...current, ...patch }))
 
@@ -72,7 +78,8 @@ export function AdminPage() {
       <a href="#" className="header-brand" aria-label="BlueNews.adm, início do painel" onClick={(event) => { event.preventDefault(); goHome() }}>
         <span className="brand-logo brand-news"><img src={withBase('/logo-symbol.png')} alt="" decoding="async" /><span className="brand-news-word"><b>Blue</b>News<span className="brand-adm">.adm</span></span></span>
       </a>
-      {user && <button type="button" className="admin-link" onClick={() => signOutUser()}>sair ({user.email})</button>}
+      {user && isAdmin && <button type="button" className="admin-menu-toggle" aria-label="Menu" onClick={() => setMenuOpen((v) => !v)}>☰</button>}
+      {user && <button type="button" className="admin-link admin-signout" onClick={() => signOutUser()}>sair ({user.email})</button>}
     </header>
   )
 
@@ -104,9 +111,106 @@ export function AdminPage() {
     </section>
   )
 
+  const published = posts.filter((p) => p.status === 'published')
+  const drafts = posts.filter((p) => p.status === 'draft')
+  const filtered = posts.filter((p) => (!filterCat || p.category === filterCat) && (!filterStatus || p.status === filterStatus) && (!search || p.title.toLowerCase().includes(search.toLowerCase())))
+  const NAV: Array<{ id: typeof view; label: string; soon?: boolean }> = [
+    { id: 'inicio', label: 'início' }, { id: 'noticias', label: 'notícias' }, { id: 'secoes', label: 'seções' },
+    { id: 'newsletter', label: 'newsletter', soon: true }, { id: 'leads', label: 'leads', soon: true }, { id: 'config', label: 'configurações' },
+  ]
+  const sidebar = (
+    <nav className={`admin-sidebar${menuOpen ? ' is-open' : ''}`} aria-label="Menu do painel">
+      <button type="button" className="contact-submit admin-new" onClick={() => startNew()}>nova notícia</button>
+      {NAV.map((item) => (
+        <button key={item.id} type="button" className={`admin-nav${view === item.id && !editing && !preview ? ' is-active' : ''}`} onClick={() => go(item.id)}>
+          {item.label}{item.soon && <span className="admin-soon">em breve</span>}
+        </button>
+      ))}
+    </nav>
+  )
+  const soon = (title: string, text: string) => (
+    <section className="admin-list"><div className="admin-toolbar"><h1 className="solution-title">{title}</h1></div><p className="admin-note">{text}</p></section>
+  )
+  const table = (list: Post[]) => (
+    list.length === 0 ? <p className="admin-note">Nenhuma notícia aqui.</p> : (
+      <table className="admin-table">
+        <thead><tr><th>título</th><th>seção</th><th>status</th><th>atualizada</th><th /></tr></thead>
+        <tbody>
+          {list.map((post) => (
+            <tr key={post.id}>
+              <td><button type="button" className="admin-link" onClick={() => startEdit(post)}>{post.title}</button></td>
+              <td>{CATEGORIES.find((c) => c.id === post.category)?.label ?? post.category}</td>
+              <td><span className={`admin-status is-${post.status}`}>{post.status === 'published' ? 'publicada' : 'rascunho'}</span></td>
+              <td>{post.updatedAt?.toDate ? post.updatedAt.toDate().toLocaleDateString('pt-BR') : ''}</td>
+              <td className="admin-actions">
+                <button type="button" className="admin-link" onClick={() => setPreview({ title: post.title, slug: post.slug, category: post.category, excerpt: post.excerpt, content: post.content, coverUrl: post.coverUrl, author: post.author, status: post.status })}>pré-visualizar</button>
+                <button type="button" className="admin-link" onClick={() => toggleStatus(post)} disabled={busy}>{post.status === 'published' ? 'despublicar' : 'publicar'}</button>
+                {post.status === 'published' && <a className="admin-link" href={`${SITE}/bluenews?post=${post.slug}`} target="_blank" rel="noopener noreferrer">ver</a>}
+                <button type="button" className="admin-link admin-danger" onClick={() => remove(post)} disabled={busy}>excluir</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )
+  )
+  const screen = view === 'inicio' ? (
+    <section className="admin-list">
+      <div className="admin-toolbar"><h1 className="solution-title">Início</h1></div>
+      <div className="admin-stats">
+        <button type="button" className="admin-stat" onClick={() => { setFilterStatus('published'); setFilterCat(''); go('noticias') }}><strong>{published.length}</strong><span>publicadas</span></button>
+        <button type="button" className="admin-stat" onClick={() => { setFilterStatus('draft'); setFilterCat(''); go('noticias') }}><strong>{drafts.length}</strong><span>rascunhos</span></button>
+        <button type="button" className="admin-stat" onClick={() => go('secoes')}><strong>{new Set(published.map((p) => p.category)).size}</strong><span>seções com notícia</span></button>
+      </div>
+      {message && <p className="admin-note">{message}</p>}
+      <h2 className="admin-subtitle">últimas atualizadas</h2>
+      {table(posts.slice(0, 5))}
+    </section>
+  ) : view === 'noticias' ? (
+    <section className="admin-list">
+      <div className="admin-toolbar"><h1 className="solution-title">Notícias</h1><button type="button" className="contact-submit" onClick={() => startNew()}>nova notícia</button></div>
+      <div className="admin-filters">
+        <input type="search" placeholder="buscar por título" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Buscar" />
+        <select value={filterCat} onChange={(e) => setFilterCat(e.target.value)} aria-label="Seção"><option value="">todas as seções</option>{CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}</select>
+        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value as '' | PostStatus)} aria-label="Status"><option value="">todos os status</option><option value="published">publicadas</option><option value="draft">rascunhos</option></select>
+      </div>
+      {message && <p className="admin-note">{message}</p>}
+      {table(filtered)}
+    </section>
+  ) : view === 'secoes' ? (
+    <section className="admin-list">
+      <div className="admin-toolbar"><h1 className="solution-title">Seções</h1></div>
+      <ul className="admin-sections">
+        {CATEGORIES.map((c) => { const n = posts.filter((p) => p.category === c.id); const pub = n.filter((p) => p.status === 'published').length; return (
+          <li key={c.id}>
+            <strong>{c.label}</strong>
+            <span>{pub} publicada{pub === 1 ? '' : 's'} · {n.length - pub} rascunho{n.length - pub === 1 ? '' : 's'}</span>
+            <div className="admin-actions"><button type="button" className="admin-link" onClick={() => { setFilterCat(c.id); setFilterStatus(''); go('noticias') }}>ver notícias</button><button type="button" className="admin-link" onClick={() => startNew(c.id)}>nova nesta seção</button></div>
+          </li>
+        ) })}
+      </ul>
+    </section>
+  ) : view === 'newsletter' ? soon('Newsletter', 'Em breve: lista de inscritos da BlueNews e envio de edições a partir das notícias publicadas. Hoje as inscrições chegam por e-mail e na planilha.')
+  : view === 'leads' ? soon('Leads', 'Em breve: quem chegou pelos formulários do site, do Blueprint e do pop-up, com a linha do tempo do que aconteceu com cada um. Hoje chegam por e-mail e na planilha.')
+  : (
+    <section className="admin-list">
+      <div className="admin-toolbar"><h1 className="solution-title">Configurações</h1></div>
+      <dl className="admin-config">
+        <dt>conta conectada</dt><dd>{user.email}</dd>
+        <dt>acesso ao painel</dt><dd>e-mails cadastrados na lista de administradores. Para adicionar alguém da equipe, peça em contato@abluezone.com.br.</dd>
+        <dt>portal público</dt><dd><a className="admin-link" href={`${SITE}/bluenews`} target="_blank" rel="noopener noreferrer">{SITE.replace('https://', '')}/bluenews</a></dd>
+        <dt>e-mail de suporte</dt><dd>contato@abluezone.com.br</dd>
+      </dl>
+      <button type="button" className="admin-link" onClick={() => signOutUser()}>sair</button>
+    </section>
+  )
+
   return (
-    <main className="admin">
+    <main className="admin admin-with-sidebar">
       {header}
+      <div className="admin-body">
+      {sidebar}
+      <div className="admin-content">
       {preview ? previewView(preview) : editing ? (
         <form className="admin-form" onSubmit={save}>
           <div className="admin-toolbar"><h1 className="solution-title">{editing === 'new' ? 'Nova notícia' : 'Editar notícia'}</h1><button type="button" className="admin-link" onClick={() => setEditing(null)}>voltar</button></div>
@@ -131,33 +235,9 @@ export function AdminPage() {
             </aside>
           </div>
         </form>
-      ) : (
-        <section className="admin-list">
-          <div className="admin-toolbar"><h1 className="solution-title">Notícias</h1><button type="button" className="contact-submit" onClick={startNew}>nova notícia</button></div>
-          {message && <p className="admin-note">{message}</p>}
-          {posts.length === 0 ? <p className="admin-note">Nenhuma notícia ainda. Clique em "nova notícia".</p> : (
-            <table className="admin-table">
-              <thead><tr><th>título</th><th>seção</th><th>status</th><th>atualizada</th><th /></tr></thead>
-              <tbody>
-                {posts.map((post) => (
-                  <tr key={post.id}>
-                    <td><button type="button" className="admin-link" onClick={() => startEdit(post)}>{post.title}</button></td>
-                    <td>{CATEGORIES.find((c) => c.id === post.category)?.label ?? post.category}</td>
-                    <td><span className={`admin-status is-${post.status}`}>{post.status === 'published' ? 'publicada' : 'rascunho'}</span></td>
-                    <td>{post.updatedAt?.toDate ? post.updatedAt.toDate().toLocaleDateString('pt-BR') : ''}</td>
-                    <td className="admin-actions">
-                      <button type="button" className="admin-link" onClick={() => setPreview({ title: post.title, slug: post.slug, category: post.category, excerpt: post.excerpt, content: post.content, coverUrl: post.coverUrl, author: post.author, status: post.status })}>pré-visualizar</button>
-                      <button type="button" className="admin-link" onClick={() => toggleStatus(post)} disabled={busy}>{post.status === 'published' ? 'despublicar' : 'publicar'}</button>
-                      {post.status === 'published' && <a className="admin-link" href={`${SITE}/bluenews?post=${post.slug}`} target="_blank" rel="noopener noreferrer">ver</a>}
-                      <button type="button" className="admin-link admin-danger" onClick={() => remove(post)} disabled={busy}>excluir</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </section>
-      )}
+      ) : screen}
+      </div>
+      </div>
     </main>
   )
 }
