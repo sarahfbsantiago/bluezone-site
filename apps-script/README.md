@@ -1,4 +1,4 @@
-> Versão atual: três arquivos (`Config.gs`, `Main.gs`, `Util.gs`). Passo a passo completo em `PASSO-A-PASSO.txt`. Para ajustar caminhos, e-mail e assuntos, edite só `Config.gs`.
+> Versão atual: um arquivo por formulário (`Bluezone.gs`, `Bluenews.gs`, `Blueprint.gs`) + `Config.gs` (destino e limites), `Main.gs` (recebe e despacha) e `Util.gs` (segurança). Passo a passo completo em `PASSO-A-PASSO.txt`.
 
 # Formulário de contato → Google Apps Script
 
