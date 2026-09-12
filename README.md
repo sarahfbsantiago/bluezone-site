@@ -12,6 +12,7 @@ npm run dev          # http://127.0.0.1:5173
 npm run build        # tsc -b + vite build → dist/
 npm test             # vitest (jsdom)
 npm run test:smoke   # Puppeteer contra um servidor em execução (BASE_URL, padrão 5173)
+npm run deploy       # build com o domínio oficial + Firebase Hosting (conta contato@abluezone.com.br)
 ```
 
 ## Arquitetura
