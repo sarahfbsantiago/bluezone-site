@@ -191,7 +191,33 @@ Ambientes e entrega
 - Configuracao por variaveis de ambiente (.env local, variaveis do GitHub); nenhum segredo no codigo.
 
 
-11. SEGURANCA (vale para todas as etapas)
+11. GESTAO DE CUSTO (plano)
+---------------------------
+Ja aplicado (12/09/2026)
+- Site estatico em CDN (Hosting): assets versionados com cache de 1 ano; HTML sem cache; nada e processado por visita.
+- Site institucional nao carrega o Firebase; so BlueNews e painel usam o banco.
+- Firestore: leituras unicas (sem onSnapshot no publico), limit(50), consultas por indice, so publicados; 1 leitura por noticia aberta.
+- Imagens reduzidas no navegador (<= 1600px, <= 500 KB) e cache de 1 ano no Storage.
+- Formularios via Apps Script (gratuito) com limite de envios e honeypot: ninguem gera custo por formulario.
+- Auth na cota gratuita; backup do Firestore com retencao de 7 dias; alerta de orcamento R$ 50 (50/90/100%).
+
+A fazer (sem custo, so codigo), em ordem de impacto
+[ ] 1. Separar o texto da noticia (posts/{id}/body) dos dados de lista: lista de cartoes 10-20x menor.
+[ ] 2. Cache da lista publicada no navegador (sessionStorage, ~5 min): navegar entre noticias nao gera leituras novas.
+[ ] 3. Miniaturas (480px) geradas no envio para os cartoes; imagem grande so na pagina da noticia.
+[ ] 4. Firebase SDK carregado sob demanda na BlueNews (dynamic import) para reduzir o JS de cada visitante.
+[ ] 5. Apagar a imagem do Storage ao excluir a noticia/trocar capa; regra de ciclo de vida no bucket para orfaos.
+[ ] 6. App Check (reCAPTCHA Enterprise) em Firestore e Storage: bloqueia robos usando a config publica para leituras em massa.
+[ ] 7. Functions: regiao southamerica-east1, memoria minima, timeout curto, minInstances 0, escrita em lote, idempotencia.
+[ ] 8. Pre-renderizar noticias no build (HTML estatico): zero leituras para visitantes e melhor SEO.
+Regras permanentes
+- Nunca usar escuta em tempo real em pagina publica; sempre paginar; nunca ler colecao inteira.
+- Nunca guardar arquivo original grande; sempre comprimir/derivar no envio.
+- Toda nova Function nasce com limites (memoria, timeout, retries) e deduplicacao.
+- Revisar o painel de uso do Firebase e a fatura no inicio de cada mes.
+
+
+12. SEGURANCA (vale para todas as etapas)
 ----------------------------------------
 Identidade e acesso
 - Conta dona: contato@abluezone.com.br (Workspace) com 2 etapas obrigatorias. Nada em contas pessoais.
@@ -222,7 +248,7 @@ Backups e resposta a incidentes
 - Plano de incidente: (1) despublicar/rollback, (2) revogar chaves/sessoes, (3) corrigir, (4) comunicar.
 
 
-12. DECISOES REGISTRADAS
+13. DECISOES REGISTRADAS
 -----------------------
 - Banco: Firestore (nunca Supabase) - decisao da cliente
 - Dominio oficial: abluezone.com.br (site e e-mail)
@@ -231,7 +257,7 @@ Backups e resposta a incidentes
 - Deploy oficial no dominio so com autorizacao da cliente; painel publica direto (area da equipe)
 
 
-13. HISTORICO
+14. HISTORICO
 -------------
 12/09/2026 - Site, formularios, hosting (prod/teste/previa), dominio e este plano.
 12/09/2026 - Firestore + regras, app Web, painel da BlueNews (/bluenews/admin), dominios do Auth; Blaze aguardando Pix.
