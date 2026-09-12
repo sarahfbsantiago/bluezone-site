@@ -14,6 +14,7 @@
     "deploy:teste": "VITE_SITE_URL=https://bluezone-teste.web.app VITE_ROBOTS=noindex,nofollow vite build && firebase deploy --only hosting:teste"
   },
   "dependencies": {
+    "firebase": "^12.19.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "three": "^0.181.2"

@@ -90,6 +90,10 @@ try {
   await new Promise((resolve) => setTimeout(resolve, 1500))
   check('Bluezone do footer volta ao site', page.url().replace(/#.*$/, '') === base + '/' || page.url().startsWith(base + '/#'), page.url())
 
+  await page.goto(base + '/bluenews/admin', { waitUntil: 'load' }) // Firestore mantém conexão aberta: não esperar networkidle
+  await new Promise((resolve) => setTimeout(resolve, 3000))
+  check('painel da BlueNews abre em /bluenews/admin com login', (await page.$('.admin')) !== null && ((await page.$eval('.admin', (el) => el.textContent ?? '')).includes('entrar com Google') || (await page.$eval('.admin', (el) => el.textContent ?? '')).includes('não está configurado')))
+
   await page.goto(base + '/blueprint', { waitUntil: 'networkidle0' })
   check('Blueprint abre em /blueprint com o botão do curso', (await page.title()).includes('Blueprint') && (await page.$('#blueprint-title')) !== null && (await page.$('.blog-cta')) !== null, await page.title())
   check('Blueprint: header próprio (logotipo Blueprint, 7 seções, comprar) e sempre escuro', (await page.$eval('.header-brand', (el) => el.textContent ?? '')).includes('Blueprint') && (await page.$$('.site-nav a[href^="#"]')).length === 7 && (await page.$eval('.header-cta', (el) => el.getAttribute('href') ?? '')).includes('kiwify') && (await page.$eval('html', (el) => el.getAttribute('data-theme'))) === 'dark')

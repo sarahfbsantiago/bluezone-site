@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Administradores: documento cujo id é o e-mail (criado só pelo console/CLI). Cada um lê apenas o próprio.
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && request.auth.token.email_verified == true
+        && exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
+    }
+    match /admins/{email} {
+      allow read: if request.auth != null && request.auth.token.email == email;
+      allow write: if false;
+    }
+
+    // Notícias da BlueNews: leitura pública do que está publicado; escrita só por administradores, com limites.
+    function validPost(d) {
+      return d.keys().hasAll(['title', 'slug', 'category', 'excerpt', 'content', 'coverUrl', 'author', 'status', 'updatedAt'])
+        && d.title is string && d.title.size() >= 3 && d.title.size() <= 140
+        && d.slug is string && d.slug.size() >= 1 && d.slug.size() <= 80 && d.slug.matches('^[a-z0-9-]+$')
+        && d.category is string && d.category.size() <= 40
+        && d.excerpt is string && d.excerpt.size() <= 300
+        && d.content is string && d.content.size() >= 20 && d.content.size() <= 20000
+        && d.coverUrl is string && d.coverUrl.size() <= 500 && (d.coverUrl == '' || d.coverUrl.matches('^https://.*'))
+        && d.author is string && d.author.size() <= 80
+        && d.status in ['draft', 'published'];
+    }
+    match /posts/{postId} {
+      allow read: if resource.data.status == 'published' || isAdmin();
+      allow create: if isAdmin() && validPost(request.resource.data);
+      allow update: if isAdmin() && validPost(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // Tudo o mais: negado (leads, events, users etc. entram nas próximas etapas, sempre via backend).
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
