@@ -43,6 +43,9 @@ button { font-family: inherit; }
 .header-brand { width: 120px; --brand-w: 120px; display: block; }
 .brand-logo { display: block; width: 100%; overflow: hidden; }
 .brand-logo img { width: 100%; height: auto; display: block; filter: grayscale(1) brightness(.22); clip-path: inset(3% 0 0 0); }
+/* fallback do logotipo (PNG não carregou): logotipo inteiro por máscara, na cor do tema */
+.brand-logo .brand-mark-word { display: block; width: 100%; aspect-ratio: 1594 / 366; background: #0b1020; -webkit-mask-image: url('/logo-bluezone.png'); mask-image: url('/logo-bluezone.png'); -webkit-mask-size: 100% auto; mask-size: 100% auto; -webkit-mask-position: center; mask-position: center; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
+[data-theme='dark'] .brand-logo .brand-mark-word { background: #ffffff; }
 /* Logotipo BlueNews: símbolo oficial + palavra no mesmo desenho do logotipo (Blue em negrito, News leve). */
 .brand-news { display: flex; align-items: center; gap: .3em; font-size: calc(var(--brand-w, 120px) * .158); color: #0b1020; }
 .brand-news img { width: 1.2em; height: auto; flex: none; }

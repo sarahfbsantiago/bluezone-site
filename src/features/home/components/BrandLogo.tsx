@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { withBase } from '../../../lib/paths'
 
 type BrandLogoProps = { markOnly?: boolean; className?: string; variant?: 'bluezone' | 'bluenews' | 'blueprint' }
@@ -17,5 +18,12 @@ export function BrandLogo({ markOnly = false, className = '', variant = 'bluezon
       </span>
     )
   }
-  return <span className={`brand-logo ${className}`}><img src={withBase('/logo-bluezone.png')} alt="Bluezone" decoding="async" /></span>
+  return <LogoImage className={className} />
+}
+
+/** Imagem do logotipo. Se o PNG não carregar (cache antigo, bloqueio), cai para a mesma geometria via máscara CSS em vez de mostrar o texto alternativo minúsculo. */
+function LogoImage({ className }: { className: string }) {
+  const [failed, setFailed] = useState(false)
+  if (failed) return <span className={`brand-logo ${className}`}><span className="brand-mark brand-mark-word" role="img" aria-label="Bluezone" /></span>
+  return <span className={`brand-logo ${className}`}><img src={withBase('/logo-bluezone.png')} alt="Bluezone" decoding="async" onError={() => setFailed(true)} /></span>
 }
