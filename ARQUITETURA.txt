@@ -174,15 +174,15 @@ Backend (Cloud Functions, apos Blaze)
 - Regiao southamerica-east1, memoria minima; concorrencia da plataforma cuida de picos.
 
 Disponibilidade e recuperacao
-- Backups: exportacao agendada do Firestore para Cloud Storage (diaria) quando o Blaze estiver ativo;
-  ate la, exportacao manual periodica. Retencao de 30 dias.
+- Backups: backup agendado diario do Firestore (recurso nativo), retencao de 7 dias (ativo desde 12/09/2026).
+  Exportacoes mensais para o Storage podem entrar depois para retencao longa.
 - Recuperacao: procedimento documentado (importar exportacao; republicar versao anterior do Hosting).
 - Dependencias externas (Apps Script/planilha, Kiwify): o site nunca quebra se elas falharem -
   mensagens de erro amigaveis e tentativa posterior.
 
 Observabilidade
 - Logs das Functions e do Hosting no Google Cloud Logging; alertas de erro por e-mail.
-- Orcamento e alertas de custo no faturamento (ex.: aviso em R$ 20 e R$ 50).
+- Orcamento e alertas de custo no faturamento: R$ 50/mes com avisos em 50/90/100% (criado em 12/09/2026).
 - Uptime check do dominio (Cloud Monitoring) apos o Blaze.
 
 Ambientes e entrega
