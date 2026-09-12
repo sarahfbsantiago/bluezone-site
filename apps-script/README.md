@@ -1,8 +1,10 @@
+> Versão atual: três arquivos (`Config.gs`, `Main.gs`, `Util.gs`). Passo a passo completo em `PASSO-A-PASSO.txt`. Para ajustar caminhos, e-mail e assuntos, edite só `Config.gs`.
+
 # Formulário de contato → Google Apps Script
 
 1. Logada em dmarketingevendas@gmail.com, crie uma planilha no Google Sheets chamada **Bluezone — contatos** (o nome é livre; o script cria a aba `contatos` sozinho).
 2. Na planilha: **Extensões → Apps Script**. Apague o conteúdo e cole `Code.gs`.
-3. `CONFIG.to` está com `contato@abluezone.com.br` (o e-mail que recebe os avisos). O script pode continuar na conta dmarketingevendas@gmail.com (dona da planilha); ele só envia o aviso para o contato@.
+3. `CONFIG.to` (em `Config.gs`) está com `contato@abluezone.com.br` (o e-mail que recebe os avisos). O script pode continuar na conta dmarketingevendas@gmail.com (dona da planilha); ele só envia o aviso para o contato@.
 4. **Implantar → Nova implantação → App da Web**: executar como *Eu*, acesso *Qualquer pessoa*. Autorize e copie a **URL do Web App**.
 5. No site, crie um arquivo `.env` na raiz do projeto com:
 

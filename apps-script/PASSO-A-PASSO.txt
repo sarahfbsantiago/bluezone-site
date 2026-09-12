@@ -8,11 +8,14 @@ Passo a passo do zero, na conta contato@abluezone.com.br
    - Nao precisa criar aba nem cabecalho: o script cria as abas sozinho
      (contatos = formulario do site, bluenews = newsletter, blueprint = pop-up e pagina do Blueprint).
 
-2. SCRIPT
+2. SCRIPT (3 arquivos)
    - No menu da planilha: Extensoes > Apps Script
-   - Apague tudo que estiver em Codigo.gs e cole o CODIGO abaixo (secao "CODIGO DO SCRIPT")
-   - Cmd+S para salvar
-   - No topo, clique em "Projeto sem titulo" e nomeie: Bluezone formulario
+   - O editor abre com um arquivo "Codigo.gs". Renomeie-o para Config (clique nos 3 pontinhos ao lado do nome > Renomear)
+     e cole nele o ARQUIVO 1 (Config.gs).
+   - Clique no "+" ao lado de "Arquivos" > Script > nomeie Main > cole o ARQUIVO 2 (Main.gs).
+   - Clique no "+" de novo > Script > nomeie Util > cole o ARQUIVO 3 (Util.gs).
+   - Cmd+S para salvar. No topo, clique em "Projeto sem titulo" e nomeie: Bluezone formulario
+   - Para ajustar depois (e-mail, assuntos, abas, novos caminhos): mexa so no Config.gs.
 
 3. PUBLICAR
    - Botao azul Implantar > Nova implantacao
@@ -26,78 +29,101 @@ Passo a passo do zero, na conta contato@abluezone.com.br
    - Copie a "URL do app da Web" (termina em /exec) e me mande.
 
 4. DEPOIS (eu faco)
-   - Coloco a URL nova no site e no GitHub, republico e envio um contato de teste.
-   - Voce confere a aba "contatos" da planilha e o e-mail em contato@abluezone.com.br.
+   - Coloco a URL nova no site e no GitHub, republico e envio um contato de teste por cada caminho.
+   - Voce confere as abas da planilha e os e-mails em contato@abluezone.com.br.
 
 5. SE UM DIA MUDAR O CODIGO
-   - Cole o codigo novo, salve, e va em Implantar > Gerenciar implantacoes > lapis (editar) > Versao: Nova versao > Implantar.
+   - Edite, salve, e va em Implantar > Gerenciar implantacoes > lapis (editar) > Versao: Nova versao > Implantar.
    - Assim a URL continua a mesma. NAO crie "Nova implantacao" nesse caso.
 
-DICA: cole o codigo exatamente como esta aqui. Aspas curvas (copiadas de chat ou Word) quebram o editor.
+DICA: cole os codigos exatamente como estao aqui. Aspas curvas (copiadas de chat ou Word) quebram o editor.
 
 
 =========================================================
-CODIGO DO SCRIPT (cole tudo abaixo desta linha em Codigo.gs)
+ARQUIVO 1 - Config.gs
 =========================================================
 
-// Bluezone - receptor do formulario de contato (Google Apps Script, Web App).
-// Grava cada envio na aba da sua origem (contatos, bluenews, blueprint) e envia um e-mail de aviso com assunto por origem.
-// Seguranca: valida e sanitiza campos, neutraliza formulas no Sheets e limita envios no servidor.
+// Bluezone - CONFIGURACAO (Config.gs)
+// Tudo que se ajusta com frequencia fica aqui: e-mail de destino, limites e a tabela de caminhos (origens).
 
 var CONFIG = {
-  to: "contato@abluezone.com.br",
-  sheetName: "contatos",          // aba padrao (formulario "Entre em contato")
-  sheets: { "bluenews": "bluenews", "popup-blueprint": "blueprint", "blueprint": "blueprint" },
-  subject: "Novo contato pelo site Bluezone",
-  subjectNews: "Nova inscricao na BlueNews",
-  subjectPopup: "Novo lead do pop-up Blueprint",
-  subjectBlueprint: "Novo contato pela pagina do Blueprint",
-  maxLength: 4000,
-  maxPerHour: 30,        // limite global de envios por hora
-  perEmailSeconds: 90    // intervalo minimo entre envios do mesmo e-mail
+  to: "contato@abluezone.com.br",   // quem recebe os avisos
+  maxLength: 4000,                  // tamanho maximo da mensagem
+  maxPerHour: 30,                   // limite global de envios por hora
+  perEmailSeconds: 90               // intervalo minimo entre envios do mesmo e-mail
 };
+
+// Um caminho por origem enviada pelo site (campo "source").
+// sheet = aba da planilha (criada sozinha) | subject = assunto do e-mail | minMessage = tamanho minimo da mensagem
+var ORIGENS = {
+  "bluezone-site":   { sheet: "contatos",  subject: "Novo contato pelo site Bluezone",          minMessage: 10 },
+  "bluenews":        { sheet: "bluenews",  subject: "Nova inscricao na BlueNews",               minMessage: 0 },
+  "popup-blueprint": { sheet: "blueprint", subject: "Novo lead do pop-up Blueprint",            minMessage: 0 },
+  "blueprint":       { sheet: "blueprint", subject: "Novo contato pela pagina do Blueprint",    minMessage: 0 }
+};
+
+// Se chegar uma origem desconhecida, usa este caminho.
+var ORIGEM_PADRAO = ORIGENS["bluezone-site"];
+
+
+=========================================================
+ARQUIVO 2 - Main.gs
+=========================================================
+
+// Bluezone - RECEPTOR (Main.gs)
+// Recebe o envio do site (POST em JSON), escolhe o caminho pela origem, grava na aba certa e envia o aviso por e-mail.
 
 function doPost(e) {
   try {
     var raw = (e && e.postData && e.postData.contents) ? e.postData.contents : "{}";
     if (raw.length > 12000) return respond({ ok: false, error: "invalid" });
     var body = JSON.parse(raw);
+
+    var source = clean(body.source, 60);
+    var origem = ORIGENS[source] || ORIGEM_PADRAO;
+
     var name = clean(body.name, 120);
     var email = clean(body.email, 200).toLowerCase();
     var phone = formatPhone(body.phone);
     var message = clean(body.message, CONFIG.maxLength);
-    if (!name || !isEmail(email) || !phone || message.length < 10) {
+    if (!name || !isEmail(email) || !phone || message.length < origem.minMessage) {
       return respond({ ok: false, error: "invalid" });
     }
     if (!allow(email)) return respond({ ok: false, error: "rate_limited" });
 
-    var source = clean(body.source, 60);
-    var sheet = getSheet(CONFIG.sheets[source] || CONFIG.sheetName);
-    sheet.appendRow([new Date(), safeCell(name), safeCell(email), safeCell(phone), safeCell(message), safeCell(source)]);
-
-    var nl = String.fromCharCode(10);
-    MailApp.sendEmail({
-      to: CONFIG.to,
-      replyTo: email,
-      subject: subjectFor(source) + " - " + name,
-      body: "Nome: " + name + nl + "E-mail: " + email + nl + "Telefone: " + phone + nl + nl + message
-    });
+    getSheet(origem.sheet).appendRow([new Date(), safeCell(name), safeCell(email), safeCell(phone), safeCell(message), safeCell(source)]);
+    sendNotice(origem, name, email, phone, message);
     return respond({ ok: true });
   } catch (error) {
     return respond({ ok: false, error: "server" });
   }
 }
 
-function subjectFor(source) {
-  if (source === "bluenews") return CONFIG.subjectNews;
-  if (source === "popup-blueprint") return CONFIG.subjectPopup;
-  if (source === "blueprint") return CONFIG.subjectBlueprint;
-  return CONFIG.subject;
-}
-
 function doGet() {
   return respond({ ok: true, service: "bluezone-contact" });
 }
+
+function sendNotice(origem, name, email, phone, message) {
+  var nl = String.fromCharCode(10);
+  MailApp.sendEmail({
+    to: CONFIG.to,
+    replyTo: email,
+    subject: origem.subject + " - " + name,
+    body: "Nome: " + name + nl + "E-mail: " + email + nl + "Telefone: " + phone + nl + "Origem: " + origem.sheet + nl + nl + message
+  });
+}
+
+function respond(payload) {
+  return ContentService.createTextOutput(JSON.stringify(payload)).setMimeType(ContentService.MimeType.JSON);
+}
+
+
+=========================================================
+ARQUIVO 3 - Util.gs
+=========================================================
+
+// Bluezone - APOIO E SEGURANCA (Util.gs)
+// Limpeza de campos, protecao contra formulas no Sheets, limite de envios e acesso as abas.
 
 // Limite de envios no servidor: global por hora e por e-mail. Usa cache e lock para evitar corrida.
 function allow(email) {
@@ -118,7 +144,7 @@ function allow(email) {
   }
 }
 
-// Uma aba por origem; cria a aba com cabecalho na primeira vez.
+// Uma aba por caminho; cria a aba com cabecalho na primeira vez.
 function getSheet(name) {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = spreadsheet.getSheetByName(name);
@@ -159,8 +185,4 @@ function formatPhone(value) {
   var rest = d.slice(2);
   var split = rest.length === 9 ? 5 : 4;
   return "(" + ddd + ") " + rest.slice(0, split) + "-" + rest.slice(split);
-}
-
-function respond(payload) {
-  return ContentService.createTextOutput(JSON.stringify(payload)).setMimeType(ContentService.MimeType.JSON);
 }
