@@ -1,10 +1,11 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, serverTimestamp } from 'firebase/firestore'
+import { deleteDoc, doc, getDoc } from 'firebase/firestore'
+import { getStorage, ref, uploadString, getDownloadURL, deleteObject } from 'firebase/storage'
 import { db, firebaseEnabled } from '../lib/firebase'
 
 /**
- * Imagens das notícias. Enquanto o projeto não tem Cloud Storage (exige plano Blaze), a imagem é reduzida no navegador
- * (máx. 1600px, WebP/JPEG) e guardada na coleção `images` como data URL (≤ 500 KB). A capa da notícia guarda `img:<id>`.
- * Quando o Storage entrar, só a função de envio muda; o painel e o portal continuam iguais.
+ * Imagens das notícias: reduzidas no navegador (máx. 1600px, WebP/JPEG, ≤ 500 KB) e enviadas ao Cloud Storage
+ * (pasta `noticias/`); a capa guarda a URL pública. Referências antigas `img:<id>` (guardadas no Firestore antes do Storage)
+ * continuam sendo lidas.
  */
 export const MAX_BYTES = 500 * 1024
 const ACCEPT = ['image/png', 'image/jpeg', 'image/webp']
@@ -33,13 +34,16 @@ export async function compressImage(file: File, maxWidth = 1600): Promise<Compre
 }
 
 export async function uploadImage(image: Compressed): Promise<string> {
-  const ref = await addDoc(collection(db(), 'images'), { data: image.dataUrl, width: image.width, height: image.height, bytes: image.bytes, createdAt: serverTimestamp() })
-  return `img:${ref.id}`
+  const ext = image.dataUrl.startsWith('data:image/webp') ? 'webp' : 'jpg'
+  const name = `noticias/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+  const fileRef = ref(getStorage(), name)
+  await uploadString(fileRef, image.dataUrl, 'data_url', { cacheControl: 'public, max-age=31536000, immutable' })
+  return getDownloadURL(fileRef)
 }
 
 export async function deleteImage(refId: string): Promise<void> {
-  if (!refId.startsWith('img:')) return
-  await deleteDoc(doc(db(), 'images', refId.slice(4)))
+  if (refId.startsWith('img:')) { await deleteDoc(doc(db(), 'images', refId.slice(4))); return }
+  if (refId.includes('firebasestorage.googleapis.com')) { try { await deleteObject(ref(getStorage(), refId)) } catch { /* já removida */ } }
 }
 
 const cache = new Map<string, Promise<string>>()

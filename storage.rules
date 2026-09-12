@@ -1,0 +1,26 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Equipe = e-mail verificado presente em admins ou editors no Firestore.
+    function isStaff() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && request.auth.token.email_verified == true
+        && (firestore.exists(/databases/(default)/documents/admins/$(request.auth.token.email))
+            || firestore.exists(/databases/(default)/documents/editors/$(request.auth.token.email)));
+    }
+    // Imagens das notícias: leitura pública; envio só pela equipe, só imagem, até 2 MB.
+    match /noticias/{file} {
+      allow read: if true;
+      allow write: if isStaff()
+        && request.resource != null
+        && request.resource.size <= 2 * 1024 * 1024
+        && request.resource.contentType.matches('image/(webp|jpeg|png)');
+      allow delete: if isStaff();
+    }
+    // Tudo o mais: negado (materiais de cursos etc. entram nas próximas etapas, com regras próprias).
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

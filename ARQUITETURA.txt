@@ -42,10 +42,9 @@ Feito em 12/09/2026 (parte A - BlueNews):
     criada no convite por link). Politica de senha forte e protecao contra enumeracao ativas no Firebase Auth
 [x] Colecao posts: titulo, slug, secao, resumo, texto (formatacao basica segura), capa (URL https), autor, status, datas
 [x] BlueNews publica le as noticias publicadas e abre cada uma em /bluenews?post=<slug>
-[ ] Imagens de capa por upload (Cloud Storage) - depende do bucket (exige Blaze)
-[ ] Ativar provedor Google no Authentication (console; pendente da cliente)
-[ ] Plano Blaze: conta de faturamento 01D89D-0C29A5-0366FC (org abluezone.com.br) paga por Pix em 12/09/2026,
-    aguardando o Google aplicar o credito e reabrir a conta. contato@ ja tem o papel de admin de faturamento.
+[x] Imagens de capa por upload no Cloud Storage (bucket em southamerica-east1, regras em storage.rules)
+[x] Provedor Google ativado; e-mail/senha + link de e-mail para editores
+[x] Plano Blaze ativo (12/09/2026; conta de faturamento 01D89D-0C29A5-0366FC, Pix pre-pago)
 
 Objetivo: leads e "registro de eventos" (timeline do que acontece com cada lead/aluno)
 no Firestore, com a planilha mantida como espelho para a equipe.
