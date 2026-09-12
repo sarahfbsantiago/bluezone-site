@@ -76,7 +76,8 @@ try {
   check('"nosso time" mostra os sete integrantes', (await page.$$('.team-card')).length === 7)
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
 
-  await page.goto(base + '/bluenews', { waitUntil: 'networkidle0' })
+  await page.goto(base + '/bluenews', { waitUntil: 'load' }) // Firestore mantém conexão aberta
+  await new Promise((resolve) => setTimeout(resolve, 2500))
   check('BlueNews abre em /bluenews', (await page.title()).includes('BlueNews') && (await page.$('#blog-title')) !== null, await page.title())
   check('header da BlueNews: logotipo BlueNews + voltar ao site no footer', (await page.$eval('.header-brand', (el) => el.textContent ?? '')).includes('BlueNews') && (await page.$('.site-footer .nav-back')) !== null)
   check('header da BlueNews lista as 8 seções do portal', (await page.$$('.site-nav a[href^="#"]')).length === 8 && (await page.$$('.blog-categories li')).length === 8)
