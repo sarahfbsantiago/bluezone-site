@@ -915,3 +915,9 @@ html[data-theme='dark'] { background: #050609; }
 .bp-scroll { --sp: 0; }
 .bp-scroll.is-done .bp-float { animation: bp-float 6s ease-in-out infinite; }
 .is-in .bp-float { animation: none; }
+
+/* Painel: envio de imagem */
+.admin-upload { gap: 8px; }
+.admin-upload-btn { display: inline-flex; align-items: center; justify-content: center; padding: 11px 16px; border-radius: 12px; border: 1px dashed rgba(16, 36, 58, .35); background: #fff; font: 500 11px var(--font-mono); letter-spacing: .1em; color: var(--blue); cursor: pointer; text-transform: none; }
+.admin-upload-btn input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.admin-upload small { font: 400 10.5px/1.5 var(--font-mono); letter-spacing: .02em; text-transform: none; color: rgba(16, 36, 58, .6); }

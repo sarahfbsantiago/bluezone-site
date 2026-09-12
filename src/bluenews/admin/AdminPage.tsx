@@ -8,6 +8,8 @@ const SITE = (import.meta.env.VITE_SITE_URL || 'https://abluezone.com.br').repla
 import { db, firebaseEnabled, signInWithGoogle, signOutUser, watchUser } from '../../lib/firebase'
 import { CATEGORIES, createPost, deletePost, listAll, slugify, updatePost, validatePost, type Post, type PostInput, type PostStatus } from '../posts'
 import { Markdown } from '../Markdown'
+import { CoverImage } from '../CoverImage'
+import { compressImage, uploadImage, MAX_BYTES } from '../images'
 
 const EMPTY: PostInput = { title: '', slug: '', category: CATEGORIES[0]?.id ?? '', excerpt: '', content: '', coverUrl: '', author: 'Equipe Bluezone', status: 'draft' }
 
@@ -29,6 +31,14 @@ export function AdminPage() {
   const [filterStatus, setFilterStatus] = useState<'' | PostStatus>('')
   const [search, setSearch] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const onFile = async (file: File | undefined) => {
+    if (!file) return
+    setUploading(true); setMessage('')
+    try { const image = await compressImage(file); const ref = await uploadImage(image); update({ coverUrl: ref }); setMessage(`imagem enviada (${Math.round(image.bytes / 1024)} KB, ${image.width}×${image.height}).`) }
+    catch (error) { setMessage('não foi possível enviar a imagem: ' + (error as Error).message) }
+    finally { setUploading(false) }
+  }
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', 'light')
@@ -102,7 +112,7 @@ export function AdminPage() {
     <section className="admin-previewpage">
       <div className="admin-toolbar"><span className="admin-title">pré-visualização · assim a notícia aparece no portal</span><button type="button" className="admin-link" onClick={() => setPreview(null)}>fechar pré-visualização</button></div>
       <article className="post admin-postpreview">
-        {post.coverUrl && <img src={post.coverUrl} alt="" className="post-cover" />}
+        {post.coverUrl && <CoverImage src={post.coverUrl} className="post-cover" loading="eager" />}
         <span className="solution-kicker">{CATEGORIES.find((c) => c.id === post.category)?.label}</span>
         <h1 className="post-title">{post.title || 'Título'}</h1>
         <p className="post-meta">{post.author}{post.status === 'draft' ? ' · rascunho' : ''}</p>
@@ -220,14 +230,19 @@ export function AdminPage() {
               <label className="field"><span>endereço (slug)</span><input value={form.slug} onChange={(e) => update({ slug: slugify(e.target.value) })} maxLength={80} /></label>
               <label className="field"><span>seção</span><select value={form.category} onChange={(e) => update({ category: e.target.value })}>{CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}</select></label>
               <label className="field"><span>autor</span><input value={form.author} onChange={(e) => update({ author: e.target.value })} maxLength={80} /></label>
-              <label className="field"><span>imagem de capa (endereço https)</span><input value={form.coverUrl} onChange={(e) => update({ coverUrl: e.target.value.trim() })} placeholder="https://…" maxLength={500} /></label>
+              <div className="field admin-upload"><span>imagem de capa</span>
+                <label className="admin-upload-btn"><input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => onFile(e.target.files?.[0])} disabled={uploading} />{uploading ? 'enviando…' : 'enviar imagem (PNG, JPG ou WebP)'}</label>
+                <small>reduzida automaticamente para até 1600px e {Math.round(MAX_BYTES / 1024)} KB. Ou cole um endereço https abaixo.</small>
+                <input value={form.coverUrl} onChange={(e) => update({ coverUrl: e.target.value.trim() })} placeholder="https://… ou imagem enviada" maxLength={500} />
+                {form.coverUrl && <button type="button" className="admin-link admin-danger" onClick={() => update({ coverUrl: '' })}>remover capa</button>}
+              </div>
               <label className="field"><span>resumo (aparece na lista)</span><textarea value={form.excerpt} onChange={(e) => update({ excerpt: e.target.value })} rows={3} maxLength={300} /></label>
               <label className="field"><span>texto · parágrafos separados por linha em branco · # título · - lista · **negrito** · [link](https://…)</span><textarea value={form.content} onChange={(e) => update({ content: e.target.value })} rows={16} maxLength={20000} required /></label>
               <label className="field"><span>status</span><select value={form.status} onChange={(e) => update({ status: e.target.value as PostInput['status'] })}><option value="draft">rascunho (invisível)</option><option value="published">publicada</option></select></label>
               <div className="contact-actions"><button type="submit" className="contact-submit" disabled={busy}>{busy ? 'salvando…' : 'salvar'}</button><button type="button" className="admin-link" onClick={() => setPreview({ ...form, slug: form.slug || slugify(form.title) })}>pré-visualizar</button><span className="contact-feedback">{message}</span></div>
             </div>
             <aside className="admin-preview" aria-label="Pré-visualização">
-              {form.coverUrl && <img src={form.coverUrl} alt="" className="post-cover" />}
+              {form.coverUrl && <CoverImage src={form.coverUrl} className="post-cover" loading="eager" />}
               <span className="solution-kicker">{CATEGORIES.find((c) => c.id === form.category)?.label}</span>
               <h2 className="post-title">{form.title || 'Título'}</h2>
               <p className="post-meta">{form.author}</p>

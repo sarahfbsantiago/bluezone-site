@@ -21,7 +21,7 @@ service cloud.firestore {
         && d.category is string && d.category.size() <= 40
         && d.excerpt is string && d.excerpt.size() <= 300
         && d.content is string && d.content.size() >= 20 && d.content.size() <= 20000
-        && d.coverUrl is string && d.coverUrl.size() <= 500 && (d.coverUrl == '' || d.coverUrl.matches('^https://.*'))
+        && d.coverUrl is string && d.coverUrl.size() <= 500 && (d.coverUrl == '' || d.coverUrl.matches('^https://.*') || d.coverUrl.matches('^img:[A-Za-z0-9_-]+$'))
         && d.author is string && d.author.size() <= 80
         && d.status in ['draft', 'published'];
     }
@@ -29,6 +29,17 @@ service cloud.firestore {
       allow read: if resource.data.status == 'published' || isAdmin();
       allow create: if isAdmin() && validPost(request.resource.data);
       allow update: if isAdmin() && validPost(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // Imagens das notícias (data URL reduzida no navegador, ≤ 700 KB): leitura pública, envio/exclusão só por administradores.
+    match /images/{imageId} {
+      allow read: if true;
+      allow create: if isAdmin()
+        && request.resource.data.data is string
+        && request.resource.data.data.size() <= 700000
+        && request.resource.data.data.matches('^data:image/(webp|jpeg|png);base64,.*');
+      allow update: if false;
       allow delete: if isAdmin();
     }
 

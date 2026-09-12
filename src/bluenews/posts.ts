@@ -37,7 +37,7 @@ export function validatePost(input: PostInput): string[] {
   if (input.excerpt.length > LIMITS.excerpt) problems.push('resumo muito longo')
   if (input.content.trim().length < 20) problems.push('texto muito curto')
   if (input.content.length > LIMITS.content) problems.push('texto muito longo')
-  if (input.coverUrl && !/^https:\/\/[^\s]+$/.test(input.coverUrl)) problems.push('imagem de capa precisa ser um endereço https://')
+  if (input.coverUrl && !/^https:\/\/[^\s]+$/.test(input.coverUrl) && !/^img:[A-Za-z0-9_-]+$/.test(input.coverUrl)) problems.push('imagem de capa precisa ser um endereço https:// ou uma imagem enviada')
   if (input.coverUrl.length > LIMITS.coverUrl) problems.push('endereço da capa muito longo')
   if (!['draft', 'published'].includes(input.status)) problems.push('status inválido')
   return problems

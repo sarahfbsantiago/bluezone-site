@@ -15,7 +15,8 @@ describe('BlueNews', () => {
   it('valida os campos da notícia antes de gravar', () => {
     const base = { title: 'Título de teste', slug: 'titulo-de-teste', category: 'marketing', excerpt: '', content: 'Texto com mais de vinte caracteres para valer.', coverUrl: '', author: 'Equipe', status: 'draft' as const }
     expect(validatePost(base)).toEqual([])
-    expect(validatePost({ ...base, title: 'ab', coverUrl: 'http://inseguro', category: 'x' })).toEqual(['título muito curto', 'seção inválida', 'imagem de capa precisa ser um endereço https://'])
+    expect(validatePost({ ...base, coverUrl: 'img:abc123_-X' })).toEqual([])
+    expect(validatePost({ ...base, title: 'ab', coverUrl: 'http://inseguro', category: 'x' })).toEqual(['título muito curto', 'seção inválida', 'imagem de capa precisa ser um endereço https:// ou uma imagem enviada'])
   })
 
   it('renderiza o texto com formatação básica sem HTML cru', () => {

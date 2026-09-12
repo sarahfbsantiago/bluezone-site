@@ -7,6 +7,7 @@ import { withBase } from '../lib/paths'
 import { firebaseEnabled } from '../lib/firebase'
 import { getPublishedBySlug, listPublished, CATEGORIES, type Post } from './posts'
 import { Markdown } from './Markdown'
+import { CoverImage } from './CoverImage'
 
 const MONTHS = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro']
 const dateLong = (d: Date) => `${d.getDate()} de ${MONTHS[d.getMonth()]} de ${d.getFullYear()}`
@@ -86,7 +87,7 @@ export function BlueNewsPage() {
   const card = (post: Post, big = false) => (
     <article key={post.id} className={`news-card${big ? ' is-featured' : ''}`}>
       <a href={postUrl(post.slug)}>
-        {post.coverUrl ? <img src={post.coverUrl} alt="" loading={big ? 'eager' : 'lazy'} /> : <span className="news-card-empty" aria-hidden="true" />}
+        {post.coverUrl ? <CoverImage src={post.coverUrl} loading={big ? 'eager' : 'lazy'} /> : <span className="news-card-empty" aria-hidden="true" />}
         <span className="news-kicker">{catLabel(post.category)}<i>·</i>{dateShort(post)}</span>
         <h2 className="news-card-title">{post.title}</h2>
         {post.excerpt && <p className="news-card-excerpt">{post.excerpt}</p>}
@@ -105,7 +106,7 @@ export function BlueNewsPage() {
         <span className="news-kicker"><a href={`${withBase('/bluenews')}?secao=${current.category}`}>{catLabel(current.category)}</a><i>·</i>{current.author}<i>·</i>{dateShort(current)}</span>
         <h1 id="blog-title" className="news-post-title">{current.title}</h1>
         {current.excerpt && <p className="news-post-lead">{current.excerpt}</p>}
-        {current.coverUrl && <img className="news-post-cover" src={current.coverUrl} alt="" />}
+        {current.coverUrl && <CoverImage className="news-post-cover" src={current.coverUrl} loading="eager" />}
         <div className="news-post-body"><Markdown text={current.content} /></div>
         <div className="news-share">
           <span>compartilhar</span>
