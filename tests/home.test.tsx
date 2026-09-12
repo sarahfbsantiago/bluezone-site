@@ -146,13 +146,13 @@ describe('Bluezone home hero', () => {
   it('alterna entre modo claro e escuro e lembra a escolha', () => {
     window.localStorage.removeItem('bluezone-theme')
     render(<HomePage />)
-    expect(document.documentElement.getAttribute('data-theme')).toBe('light')
-    expect(document.querySelector('.home-page')).toHaveClass('theme-light')
-    fireEvent.click(screen.getByRole('button', { name: 'Ativar modo escuro' }))
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
-    expect(window.localStorage.getItem('bluezone-theme')).toBe('dark')
+    expect(document.querySelector('.home-page')).toHaveClass('theme-dark')
     fireEvent.click(screen.getByRole('button', { name: 'Ativar modo claro' }))
     expect(document.documentElement.getAttribute('data-theme')).toBe('light')
+    expect(window.localStorage.getItem('bluezone-theme')).toBe('light')
+    fireEvent.click(screen.getByRole('button', { name: 'Ativar modo escuro' }))
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
   })
 
   it('abre e fecha o menu no mobile', () => {

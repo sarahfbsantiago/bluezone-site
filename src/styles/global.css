@@ -262,6 +262,11 @@ button { font-family: inherit; }
 .products-intro { margin: 0; max-width: 46ch; font: 400 clamp(13px, 1.05vw, 15.5px)/1.7 var(--font-mono); letter-spacing: .04em; color: rgba(16, 36, 58, .9); text-align: center; }
 .products-grid { grid-template-columns: repeat(3, 1fr); max-width: 1080px; }
 .products-grid li { position: relative; padding-top: 22px; }
+/* produtos ainda não disponíveis ficam esmaecidos (cinza), com a etiqueta "em breve" */
+.products-grid li:not(.product-available) { opacity: .62; filter: grayscale(.7) saturate(.6); }
+.products-grid li:not(.product-available):hover { opacity: .85; }
+.products-grid li:not(.product-available) .product-badge { color: rgba(16, 36, 58, .6); }
+[data-theme='dark'] .products-grid li:not(.product-available) .product-badge { color: rgba(242, 245, 250, .55); }
 .products-grid li.product-available { border-color: rgba(31, 109, 255, .45); box-shadow: 0 0 0 1px rgba(31, 109, 255, .12), 0 14px 40px rgba(31, 109, 255, .12); }
 .products-grid li.product-available .product-badge { color: var(--blue); }
 .product-link { align-self: flex-start; margin-top: 6px; font: 500 11px var(--font-mono); letter-spacing: .12em; color: var(--blue); text-decoration: none; border-bottom: 1px solid rgba(31, 109, 255, .5); padding-bottom: 2px; }
@@ -534,8 +539,8 @@ html[data-theme='dark'] { background: #050609; }
 [data-theme='dark'] .contact-feedback.is-success { color: #7fe6c4; }
 [data-theme='dark'] .site-footer { border-top-color: rgba(255, 255, 255, .14); }
 [data-theme='dark'] .video-placeholder svg { filter: grayscale(1) brightness(1.6) drop-shadow(0 0 8px rgba(255, 255, 255, .25)); }
-[data-theme='dark'] .whatsapp svg { filter: grayscale(1) brightness(2.4) contrast(1.1) drop-shadow(0 0 3px rgba(90, 150, 255, .95)) drop-shadow(0 0 10px rgba(31, 109, 255, .85)) drop-shadow(0 0 24px rgba(20, 70, 200, .65)); animation: led-glow 4.5s ease-in-out infinite; }
-[data-theme='dark'] .whatsapp { color: rgba(242, 245, 250, .92); text-shadow: 0 0 16px rgba(0, 0, 0, .6); }
+[data-theme='dark'] .whatsapp svg { filter: saturate(1.5) brightness(1.2) contrast(1.15) drop-shadow(0 0 3px rgba(120, 255, 170, .95)) drop-shadow(0 0 10px rgba(37, 211, 102, .8)) drop-shadow(0 0 26px rgba(37, 211, 102, .5)); animation: led-glow 4.5s ease-in-out infinite; }
+[data-theme='dark'] .whatsapp { color: #ffffff; text-shadow: 0 0 10px rgba(37, 211, 102, .6), 0 0 16px rgba(0, 0, 0, .6); }
 [data-theme='dark'] .whatsapp:hover { color: #ffffff; }
 [data-theme='dark'] .arrow:focus-visible, [data-theme='dark'] .header-cta:focus-visible, [data-theme='dark'] .site-header a:focus-visible, [data-theme='dark'] .explore:focus-visible, [data-theme='dark'] .hero-progress button:focus-visible, [data-theme='dark'] .theme-toggle:focus-visible, [data-theme='dark'] .whatsapp:focus-visible, [data-theme='dark'] .contact-submit:focus-visible, [data-theme='dark'] .site-footer a:focus-visible { outline-color: #ffffff; }
 
@@ -676,25 +681,16 @@ html[data-theme='dark'] { background: #050609; }
 .is-in .bp-float { animation: bp-float 6s ease-in-out 3.8s infinite; }
 @keyframes bp-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-/* Blueprint: notebook em CSS 3D (referência: MacBook prateado, bordas pretas finas, teclado preto). Entra girando (2,2 s), depois a tampa abre (1,6 s). */
-.bp-laptop { perspective: 1500px; width: min(100%, 560px); margin: 0 auto; padding: 24px 0 40px; }
-.bp-laptop-body { position: relative; transform-style: preserve-3d; transform: translateX(160px) translateY(30px) rotateX(16deg) rotateY(-140deg) scale(.6); opacity: 0; }
-.bp-laptop.is-in .bp-laptop-body { animation: bp-laptop-enter 2.2s cubic-bezier(.22, .8, .2, 1) .3s forwards; }
-.bp-laptop.is-static .bp-laptop-body { transform: rotateX(16deg) rotateY(-18deg); opacity: 1; animation: none; }
-.bp-laptop-lid { position: relative; transform-style: preserve-3d; transform-origin: 50% 100%; transform: rotateX(-108deg) translateZ(4px); aspect-ratio: 16 / 10; }
-.bp-laptop.is-in .bp-laptop-lid { animation: bp-lid-open 1.6s cubic-bezier(.25, .9, .25, 1.05) 2.3s forwards; }
-.bp-laptop.is-static .bp-laptop-lid { transform: rotateX(-6deg); animation: none; }
-.bp-laptop-screen { position: absolute; inset: 0; border-radius: 12px 12px 2px 2px; padding: 12px 12px 18px; background: #0a0a0c; border: 2px solid #c9cdd3; box-shadow: 0 0 0 1px rgba(0, 0, 0, .8), 0 0 44px var(--bp-glow-soft), inset 0 0 0 1px rgba(255, 255, 255, .05); backface-visibility: hidden; transform: translateZ(1px); }
-.bp-laptop-screen img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; display: block; }
-.bp-laptop-cam { position: absolute; top: 4px; left: 50%; width: 5px; height: 5px; translate: -50% 0; border-radius: 50%; background: #1d2330; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2); }
-.bp-laptop-lid-back { position: absolute; inset: 0; border-radius: 12px 12px 2px 2px; background: linear-gradient(160deg, #e6e8ec, #b9bec6 55%, #d6d9de); border: 1px solid rgba(255, 255, 255, .5); box-shadow: 0 0 30px var(--bp-glow-soft); transform: rotateY(180deg) translateZ(1px); backface-visibility: hidden; }
-.bp-laptop-lid-back::after { content: ''; position: absolute; left: 50%; top: 50%; width: 13%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; background: rgba(0, 0, 0, .08); box-shadow: inset 0 1px 2px rgba(255, 255, 255, .6); }
-.bp-laptop-base { position: absolute; left: -2%; right: -2%; top: 100%; height: 62%; transform-origin: 50% 0; transform: rotateX(72deg); transform-style: preserve-3d; background: linear-gradient(180deg, #d9dce1, #b5bac2); border-radius: 2px 2px 16px 16px; border: 1px solid rgba(255, 255, 255, .55); box-shadow: 0 40px 70px rgba(0, 0, 0, .6); }
-.bp-laptop-keys { position: absolute; left: 7%; right: 7%; top: 8%; height: 46%; border-radius: 6px; background: #14161a; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06); background-image: repeating-linear-gradient(90deg, rgba(255, 255, 255, .12) 0 5.2%, transparent 5.2% 6.4%), repeating-linear-gradient(180deg, rgba(255, 255, 255, .12) 0 17%, transparent 17% 21%); }
-.bp-laptop-pad { position: absolute; left: 34%; right: 34%; top: 61%; height: 30%; border-radius: 6px; border: 1px solid rgba(0, 0, 0, .18); background: rgba(255, 255, 255, .25); }
-.bp-laptop-edge { position: absolute; left: 0; right: 0; top: 100%; height: 10px; background: linear-gradient(180deg, #9ea3ab, #6e737b); border-radius: 0 0 16px 16px; transform-origin: 50% 0; transform: rotateX(-72deg); }
-@keyframes bp-laptop-enter { 0% { transform: translateX(160px) translateY(30px) rotateX(16deg) rotateY(-140deg) scale(.6); opacity: 0; } 35% { opacity: 1; } 100% { transform: translateX(0) translateY(0) rotateX(16deg) rotateY(-18deg) scale(1); opacity: 1; } }
-@keyframes bp-lid-open { from { transform: rotateX(-108deg) translateZ(4px); } 60% { transform: rotateX(4deg) translateZ(0); } to { transform: rotateX(-6deg) translateZ(0); } }
+/* Blueprint: tablet em CSS 3D (preto, moldura fina). Entra girando quando aparece e para em leve ângulo. */
+.bp-tablet { perspective: 1500px; width: min(100%, 540px); margin: 0 auto; padding: 20px 0; }
+.bp-tablet-body { position: relative; aspect-ratio: 4 / 3; border-radius: 30px; padding: 14px; background: linear-gradient(160deg, #3a3d44, #0c0d10 40%, #1d1f25 70%, #34373e); box-shadow: 0 0 0 1.5px #050608, inset 0 0 0 1px rgba(255, 255, 255, .26), 0 0 44px var(--bp-glow-soft), 0 40px 90px rgba(0, 0, 0, .6); transform-style: preserve-3d; transform: translateX(120px) rotateY(-540deg) scale(.8); opacity: 0; }
+.bp-tablet.is-in .bp-tablet-body { animation: bp-tablet-enter 2s cubic-bezier(.2, .75, .2, 1) .2s forwards; }
+.bp-tablet.is-static .bp-tablet-body { transform: rotateY(-14deg) rotateX(6deg); opacity: 1; animation: none; }
+.bp-tablet-screen { position: relative; width: 100%; height: 100%; border-radius: 18px; overflow: hidden; background: #000; box-shadow: inset 0 0 0 1.5px #000; }
+.bp-tablet-screen img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bp-tablet-cam { position: absolute; top: 5px; left: 50%; width: 6px; height: 6px; translate: -50% 0; border-radius: 50%; background: #1a1f3a; box-shadow: inset 0 0 2px rgba(120, 140, 255, .6), 0 0 0 1px rgba(255, 255, 255, .12); z-index: 1; }
+.bp-tablet-btn { position: absolute; right: -3px; top: 14%; width: 3px; height: 44px; border-radius: 2px; background: linear-gradient(180deg, #2b2e35, #0c0d10); box-shadow: 0 0 0 .5px rgba(255, 255, 255, .25); }
+@keyframes bp-tablet-enter { 0% { transform: translateX(120px) rotateY(-540deg) scale(.8); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateX(0) rotateY(-14deg) rotateX(6deg) scale(1); opacity: 1; } }
 
 /* Blueprint: celular em CSS 3D (referência: iPhone preto brilhante com entalhe e botões laterais). Entra girando quando a seção aparece. */
 .bp-phone { perspective: 1200px; width: min(100%, 232px); margin: 0 auto; padding: 10px 0; }
@@ -728,7 +724,7 @@ html[data-theme='dark'] { background: #050609; }
 .bp-paper-text p:first-child::first-letter { float: left; font-size: 46px; line-height: .8; font-weight: 700; padding: 6px 8px 0 0; color: #111216; }
 @media (max-width: 1024px) { .bp-paper-body { grid-template-columns: 1fr; } .bp-paper-text { column-count: 1; } }
 @media (max-width: 600px) { .bp-paper { padding: 22px 18px 26px; } .bp-paper-head { flex-direction: column; gap: 4px; } .bp-brand { gap: 12px; } .bp-brand-mark { width: 80px; } }
-@media (prefers-reduced-motion: reduce) { .bp-laptop-body, .bp-phone-body, .bp-laptop-lid, .bp-float { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .bp-tablet-body, .bp-phone-body, .bp-float { animation: none !important; } }
 
 /* ===== Blueprint em laranja: tudo que era azul de letreiro vira âmbar ===== */
 .blueprint-page { --bp-accent: #ff8a2a; --bp-accent-soft: #ffb56b; --bp-glow-soft: rgba(255, 138, 42, .38); --bp-glow: rgba(255, 138, 42, .8); --bp-glow-core: rgba(255, 200, 140, .95); --bp-glow-far: rgba(210, 90, 10, .55); }

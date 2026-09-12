@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 export type Theme = 'light' | 'dark'
 const STORAGE_KEY = 'bluezone-theme'
 /** Tema padrão do site: escuro. O claro fica como escolha do visitante. */
-export const DEFAULT_THEME: Theme = 'light'
+export const DEFAULT_THEME: Theme = 'dark'
 
 function initial(): Theme {
   if (typeof window === 'undefined') return DEFAULT_THEME

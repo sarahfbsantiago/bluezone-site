@@ -5,7 +5,7 @@ import { SiteHeader } from '../features/home/components/SiteHeader'
 import { WhatsAppButton } from '../features/home/components/WhatsAppButton'
 import { blueprint as bp } from './blueprintConfig'
 import { withBase } from '../lib/paths'
-import { BlueprintBrand, Laptop, Newspaper, Phone } from './BlueprintPieces'
+import { BlueprintBrand, Newspaper, Phone, Tablet } from './BlueprintPieces'
 
 const BUY = siteConfig.blueprintCourse
 const idx = (i: number) => ({ '--i': i } as CSSProperties)
@@ -60,7 +60,7 @@ export function BlueprintPage() {
           <div className="blog-actions"><Buy label={bp.hero.cta} /></div>
           <Badges items={bp.hero.badges} />
         </div>
-        <Laptop src={withBase('/midia/blueprint/hero.jpg')} alt="Alisson e Isabela, criadores do Blueprint, gravando com celular e notebook" />
+        <Tablet src={withBase('/midia/blueprint/hero.jpg')} alt="Alisson e Isabela, criadores do Blueprint, gravando com celular e notebook" />
         </div>
         <div className="bp-marquee" aria-hidden="true"><div className="bp-marquee-track">{Array.from({ length: 16 }, (_, i) => <span key={i}>Blueprint</span>)}</div></div>
       </section>

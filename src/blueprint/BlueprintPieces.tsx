@@ -61,23 +61,17 @@ function useInView<T extends HTMLElement>(reduced: boolean) {
   return { ref, inView }
 }
 
-/** Notebook em CSS 3D: entra girando, pousa e abre a tampa mostrando a foto na tela. */
-export function Laptop({ src, alt }: { src: string; alt: string }) {
+/** Tablet em CSS 3D (preto, moldura fina, câmera): entra girando quando aparece e para em leve ângulo, flutuando. */
+export function Tablet({ src, alt }: { src: string; alt: string }) {
   const reduced = useReducedMotion()
   const { ref, inView } = useInView<HTMLDivElement>(reduced)
   return (
-    <div ref={ref} className={`bp-laptop${inView ? ' is-in' : ''}${reduced ? ' is-static' : ''}`}>
+    <div ref={ref} className={`bp-tablet${inView ? ' is-in' : ''}${reduced ? ' is-static' : ''}`}>
       <div className="bp-float">
-        <div className="bp-laptop-body">
-          <div className="bp-laptop-lid">
-            <div className="bp-laptop-screen"><img src={src} alt={alt} decoding="async" /><span className="bp-laptop-cam" /></div>
-            <div className="bp-laptop-lid-back" />
-          </div>
-          <div className="bp-laptop-base">
-            <span className="bp-laptop-keys" />
-            <span className="bp-laptop-pad" />
-            <span className="bp-laptop-edge" />
-          </div>
+        <div className="bp-tablet-body">
+          <span className="bp-tablet-cam" />
+          <div className="bp-tablet-screen"><img src={src} alt={alt} decoding="async" /><span className="bp-phone-gloss" /></div>
+          <span className="bp-tablet-btn" />
         </div>
       </div>
     </div>

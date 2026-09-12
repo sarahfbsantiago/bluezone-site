@@ -90,7 +90,7 @@ Até 600px, as páginas 2, 3 e 4 alinham o texto à esquerda com margem de 8% e 
 
 ## Modo escuro
 
-O claro é o tema padrão (`DEFAULT_THEME` em `useTheme.ts`; `index.html` nasce com `data-theme="light"`). Interruptor sol/lua no header (`ThemeToggle`, hook `useTheme`), lembrado em `localStorage` e aplicado em `data-theme` no `<html>`. No escuro, o fundo vira preto com névoa discreta, a marca, as esferas, órbitas, cometas e estrelas ficam em branco e cinza (uniform `uDark`, interpolado na cena), e header, formulário e quadro de vídeo viram vidro escuro. Textos em branco.
+O escuro é o tema padrão (`DEFAULT_THEME` em `useTheme.ts`; `index.html` nasce com `data-theme="dark"`). Interruptor sol/lua no header (`ThemeToggle`, hook `useTheme`), lembrado em `localStorage` e aplicado em `data-theme` no `<html>`. No escuro, o fundo vira preto com névoa discreta, a marca, as esferas, órbitas, cometas e estrelas ficam em branco e cinza (uniform `uDark`, interpolado na cena), e header, formulário e quadro de vídeo viram vidro escuro. Textos em branco.
 
 ## Troca automática dos estados do hero
 
