@@ -116,6 +116,7 @@ export const particleVertex = /* glsl */ `
   uniform float uTime; uniform float uForm; uniform float uRelease; uniform float uFade; uniform float uBurst;
   uniform float uDir; uniform float uSpread; uniform float uSwirl; uniform float uAccent; uniform float uTilt;
   uniform float uPixelRatio; uniform float uSizeScale; uniform float uDot; uniform vec2 uPointer; uniform vec2 uMouse; uniform float uMouseStrength;
+  uniform float uThin; // fração dos pontos da marca escondida no hero (trama mais aberta: pontilhismo visível no mobile e no claro)
   uniform vec4 uSpheres[8]; uniform float uSphereRot[8]; uniform float uSphereTilt[8]; uniform float uSphereReveal;
   uniform float uScatter; uniform vec2 uStarSpread; uniform float uDepth; uniform float uSphereRef; uniform float uDark; uniform float uStarDensity; uniform vec2 uClearCenter;
   varying float vAlpha; varying vec3 vColor;
@@ -235,16 +236,20 @@ export const particleVertex = /* glsl */ `
     float darkShrink = 1.0 - uDark * 0.3 * step(aGroup, 2.5) - uDark * 0.18 * step(3.5, aGroup);
     gl_PointSize = uDot * sizeMul * darkShrink * uPixelRatio * uSizeScale * (18.0 / -mv.z);
     gl_Position = projectionMatrix * mv;
+    // hero: esconde uma fração fixa dos pontos da marca (mesma seleção sempre) para abrir a trama; some quando vira estrelas
+    alpha *= 1.0 - step(fract(seed * 5.3), uThin) * step(aGroup, 2.5) * (1.0 - uScatter);
     vAlpha = alpha;
   }
 `
 
 export const particleFragment = /* glsl */ `
   precision highp float;
+  uniform float uDark;
   varying float vAlpha; varying vec3 vColor;
   void main() {
     float d = length(gl_PointCoord - 0.5) * 2.0;
-    float a = smoothstep(1.0, 0.55, d) * vAlpha;
+    // no claro a borda do ponto é mais nítida, para cada ponto se destacar; no escuro segue mais suave
+    float a = smoothstep(1.0, mix(0.74, 0.55, uDark), d) * vAlpha;
     if (a < 0.01) discard;
     gl_FragColor = vec4(vColor * a, a);
   }

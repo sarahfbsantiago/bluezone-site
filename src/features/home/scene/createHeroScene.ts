@@ -300,7 +300,7 @@ export function createHeroScene(host: HTMLElement, options: SceneOptions): HeroS
       uTime, uPixelRatio, uDir, uTilt, uAccent, uFade, uDark,
       uForm: { value: 0 }, uRelease: { value: 0 }, uBurst: { value: 0 },
       uSpread: { value: options.mood.spread }, uSwirl: { value: options.mood.swirl },
-      uSizeScale: { value: 1 }, uDot: { value: quality.dot }, uPointer: { value: new THREE.Vector2() },
+      uSizeScale: { value: 1 }, uDot: { value: quality.dot }, uPointer: { value: new THREE.Vector2() }, uThin: { value: 0 },
       uMouse: { value: new THREE.Vector2(99, 99) }, uMouseStrength: { value: 0 },
       uSpheres: { value: sphereUniform }, uSphereRot: { value: sphereRotUniform }, uSphereTilt: { value: sphereTiltUniform }, uSphereReveal: { value: 0 },
       uScatter: { value: 0 }, uStarSpread: { value: new THREE.Vector2(6, 4) }, uDepth: { value: 0 },
@@ -558,6 +558,9 @@ export function createHeroScene(host: HTMLElement, options: SceneOptions): HeroS
     uOrbitReveal.value = orbitReveal * (1 - scatter)
     uStreakSpeed.value = current.streak * (1 + 2.2 * wave)
     particleMaterial.uniforms.uForm.value = form
+    // Trama mais aberta na marca do hero: no mobile (claro e escuro) e no desktop/tablet só no claro. Volta ao cheio ao deitar (página 1) e nas outras páginas.
+    const thinBase = layout === 'mobile' ? 0.4 : (layout === 'tablet' ? 0.32 : 0.36) * (1 - uDark.value)
+    particleMaterial.uniforms.uThin.value = thinBase * (1 - tiltBack)
     particleMaterial.uniforms.uRelease.value = release
     particleMaterial.uniforms.uBurst.value = burst
     particleMaterial.uniforms.uSpread.value = current.spread
