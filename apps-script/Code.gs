@@ -3,7 +3,7 @@
 // Seguranca: valida e sanitiza campos, neutraliza formulas no Sheets e limita envios no servidor.
 
 var CONFIG = {
-  to: "dmarketingevendas@gmail.com",
+  to: "contato@abluezone.com.br",
   sheetName: "contatos",
   subject: "Novo contato pelo site Bluezone",
   subjectNews: "Nova inscricao na BlueNews",

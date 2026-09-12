@@ -16,6 +16,6 @@ export const siteConfig = {
   /** Link de compra do Blueprint (Kiwify). */
   blueprintCourse: 'https://pay.kiwify.com.br/B4TG5UJ',
   /** E-mail de suporte mostrado na página do Blueprint (mesma caixa que recebe o formulário). */
-  supportEmail: 'dmarketingevendas@gmail.com',
+  supportEmail: 'contato@abluezone.com.br',
   year: 2026,
 } as const

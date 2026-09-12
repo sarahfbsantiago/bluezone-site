@@ -52,6 +52,7 @@ WhatsApp flutuante: ícone em pontilhismo (no escuro: branco puro, sem degradê,
 
 ## Integrações
 
+- **E-mail oficial da Blue (12/09/2026)**: contato@abluezone.com.br (Google Workspace criado pela cliente). É o e-mail de suporte do Blueprint (`siteConfig.supportEmail`) e o destinatário no `apps-script/Code.gs` do repositório; o script implantado ainda envia para dmarketingevendas@gmail.com até a cliente colar a versão nova. Domínio do e-mail é abluezone.com.br; confirmar se o site também será abluezone.com.br (canonical hoje aponta para bluezone.com.br).
 - **Formulário → Google Apps Script** (conta dmarketingevendas@gmail.com). URL do Web App no `.env` (`VITE_CONTACT_ENDPOINT`). Grava na aba `contatos` da planilha `1ntXclF4D8wef7CypEVmRjVXs8ZDUg-EUlSyRhSz2GEE` e envia e-mail. Script com proteção contra fórmulas, injeção no e-mail e limite de envios (30/h, 1 a cada 90 s por e-mail). Validado de ponta a ponta em 11/09/2026.
 - **Origens na planilha** (coluna `origem`): `bluezone-site` (formulário de contato), `bluenews` (newsletter), `popup-blueprint` (pop-up da home). O `apps-script/Code.gs` do repositório dá assunto próprio a cada uma; o script implantado hoje só tem o assunto padrão até a cliente colar a versão nova.
 - **Ao colar código no Apps Script**, usar a versão só com aspas duplas/ASCII (`apps-script/Code.gs`): aspas do chat viram tipográficas e quebram o editor.
@@ -89,8 +90,8 @@ Capturas headless com GPU: `--ignore-gpu-blocklist --use-angle=metal`. Em dev, `
 
 ### Para a próxima sessão (combinado em 12/09/2026, madrugada)
 - [ ] Blueprint: número do dado da Hootsuite 2024 ("__% das empresas usam as redes sociais como parte da estratégia de marketing") em `src/blueprint/blueprintConfig.ts` → `problem.statNumber`. O bloco fica oculto até preencher.
-- [ ] Confirmar o e-mail de suporte da página do Blueprint (hoje `siteConfig.supportEmail` = dmarketingevendas@gmail.com).
-- [ ] Colar o `apps-script/Code.gs` novo no Apps Script e publicar nova versão (Implantar → Gerenciar implantações → editar → Nova versão) para os e-mails chegarem com assunto por origem: contato, "Nova inscricao na BlueNews", "Novo lead do pop-up Blueprint". Sem isso tudo funciona, só com o assunto padrão.
+- [x] E-mail de suporte do Blueprint = contato@abluezone.com.br (12/09/2026).
+- [ ] Colar o `apps-script/Code.gs` novo no Apps Script e publicar nova versão (Implantar → Gerenciar implantações → editar → Nova versão) para os e-mails irem para contato@abluezone.com.br e chegarem com assunto por origem: contato, "Nova inscricao na BlueNews", "Novo lead do pop-up Blueprint". Sem isso tudo funciona, só com o assunto padrão.
 - [ ] Revisar com a cliente: textos do pop-up (escritos por mim), estilo do jornal, notebook e celular, laranja do Blueprint.
 
 
