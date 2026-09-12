@@ -178,6 +178,7 @@ export const pages = {
     },
     /** Seções do portal (header da BlueNews e cartões da página). As cinco primeiras são da cliente; as demais foram sugeridas em 12/09/2026. */
     categories: [
+      { id: 'geral', label: 'geral', title: 'Geral', text: 'Novidades da Bluezone, avisos e tudo o que não cabe em uma seção específica.' },
       { id: 'tecnologia', label: 'tecnologia', title: 'Tecnologia', text: 'Ferramentas, IA e automação explicadas para quem precisa aplicar no próprio negócio, sem equipe técnica.' },
       { id: 'marketing', label: 'marketing', title: 'Marketing', text: 'Posicionamento, redes sociais, tráfego e marca: o que funciona para negócios pequenos e por quê.' },
       { id: 'empreendedorismo', label: 'empreendedorismo', title: 'Empreendedorismo', text: 'Decisões, rotina e crescimento de quem constrói um negócio de verdade, com estrutura enxuta.' },

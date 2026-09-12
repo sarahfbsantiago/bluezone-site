@@ -80,7 +80,7 @@ try {
   await new Promise((resolve) => setTimeout(resolve, 2500))
   check('BlueNews abre em /bluenews', (await page.title()).includes('BlueNews') && (await page.$('#blog-title')) !== null, await page.title())
   check('header da BlueNews: logotipo BlueNews + voltar ao site no footer', (await page.$eval('.header-brand', (el) => el.textContent ?? '')).includes('BlueNews') && (await page.$('.site-footer .nav-back')) !== null)
-  check('header da BlueNews lista as 8 seções do portal', (await page.$$('.site-nav a[href^="#"]')).length === 8 && (await page.$$('.blog-categories li')).length === 8)
+  check('header da BlueNews lista as 9 seções do portal', (await page.$$('.site-nav a[href^="#"]')).length === 9 && (await page.$$('.blog-categories li')).length === 9)
   await page.click('.blog-cta')
   await new Promise((resolve) => setTimeout(resolve, 600))
   check('"quero ser avisado" abre a inscrição (nome, e-mail, telefone)', await visible('.newsletter-form input[name="phone"]') && (await page.$('.newsletter-form textarea')) === null)
