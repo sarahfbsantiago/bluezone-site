@@ -84,8 +84,11 @@ try {
   await new Promise((resolve) => setTimeout(resolve, 600))
   check('"quero ser avisado" abre a inscrição (nome, e-mail, telefone)', await visible('.newsletter-form input[name="phone"]') && (await page.$('.newsletter-form textarea')) === null)
   await page.click('.header-brand')
+  await new Promise((resolve) => setTimeout(resolve, 800))
+  check('logotipo BlueNews fica na BlueNews (topo)', page.url().startsWith(base + '/bluenews'), page.url())
+  await page.click('.site-footer .footer-brand')
   await new Promise((resolve) => setTimeout(resolve, 1500))
-  check('logotipo BlueNews volta ao topo do site', page.url().replace(/#.*$/, '') === base + '/' || page.url().startsWith(base + '/#'), page.url())
+  check('Bluezone do footer volta ao site', page.url().replace(/#.*$/, '') === base + '/' || page.url().startsWith(base + '/#'), page.url())
 
   await page.goto(base + '/blueprint', { waitUntil: 'networkidle0' })
   check('Blueprint abre em /blueprint com o botão do curso', (await page.title()).includes('Blueprint') && (await page.$('#blueprint-title')) !== null && (await page.$('.blog-cta')) !== null, await page.title())

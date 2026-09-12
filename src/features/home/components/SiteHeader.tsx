@@ -42,10 +42,12 @@ export const buyItem = { label: 'comprar agora', href: siteConfig.blueprintCours
 export function SiteHeader({ theme, onToggleTheme, site = 'home' }: SiteHeaderProps) {
   const [open, setOpen] = useState(false)
   const nav = useRef<HTMLElement>(null)
+  const toggle = useRef<HTMLButtonElement>(null)
   useEffect(() => {
     if (!open) return
     const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') setOpen(false) }
-    const onClick = (event: MouseEvent) => { if (nav.current && !nav.current.contains(event.target as Node)) setOpen(false) }
+    // clique fora fecha; o próprio botão do menu fica de fora, senão o "apertar" fecha e o clique abre de novo (o X parecia não funcionar)
+    const onClick = (event: MouseEvent) => { const target = event.target as Node; if (nav.current && !nav.current.contains(target) && !toggle.current?.contains(target)) setOpen(false) }
     window.addEventListener('keydown', onKey)
     window.addEventListener('pointerdown', onClick)
     return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('pointerdown', onClick) }
@@ -53,10 +55,12 @@ export function SiteHeader({ theme, onToggleTheme, site = 'home' }: SiteHeaderPr
   const items = site === 'bluenews' ? blogNavItems : site === 'blueprint' ? blueprintNavItems : navItems
   const action = site === 'blueprint' ? buyItem : contactItem
   const external = site === 'blueprint' ? { target: '_blank', rel: 'noopener noreferrer' } : {}
-  const brandLabel = site === 'bluenews' ? 'BlueNews, voltar ao início do site' : site === 'blueprint' ? 'Blueprint, voltar ao início do site' : 'Bluezone, início'
+  // o logotipo do header volta ao topo da própria página; só o Bluezone do footer volta ao site
+  const brandHref = site === 'home' ? withBase('/#top') : '#top'
+  const brandLabel = site === 'bluenews' ? 'BlueNews, início' : site === 'blueprint' ? 'Blueprint, início' : 'Bluezone, início'
   return (
     <header className={`site-header${open ? ' is-open' : ''}${site !== 'home' ? ' header-blog' : ''}`}>
-      <a href={withBase('/#top')} className="header-brand" aria-label={brandLabel}><BrandLogo variant={site === 'home' ? 'bluezone' : site} /></a>
+      <a href={brandHref} className="header-brand" aria-label={brandLabel}><BrandLogo variant={site === 'home' ? 'bluezone' : site} /></a>
       <nav ref={nav} id="site-nav" className="site-nav" aria-label="Navegação principal">
         {items.map((item) => <a key={item.label} href={item.href} onClick={() => setOpen(false)}>{item.label}</a>)}
         <a className="nav-contact" href={action.href} onClick={() => setOpen(false)} {...external}>{action.label}</a>
@@ -64,7 +68,7 @@ export function SiteHeader({ theme, onToggleTheme, site = 'home' }: SiteHeaderPr
       <div className="header-actions">
         {site !== 'blueprint' && <ThemeToggle theme={theme} onToggle={onToggleTheme} />}
         <a className="header-cta" href={action.href} {...external}>{action.label}</a>
-        <button type="button" className="menu-toggle" aria-label={open ? 'Fechar menu' : 'Abrir menu'} aria-expanded={open} aria-controls="site-nav" onClick={() => setOpen((value) => !value)}>
+        <button ref={toggle} type="button" className="menu-toggle" aria-label={open ? 'Fechar menu' : 'Abrir menu'} aria-expanded={open} aria-controls="site-nav" onClick={() => setOpen((value) => !value)}>
           <span /><span /><span />
         </button>
       </div>

@@ -163,6 +163,12 @@ describe('Bluezone home hero', () => {
     expect(screen.getByRole('button', { name: 'Fechar menu' })).toHaveAttribute('aria-expanded', 'true')
     fireEvent.keyDown(window, { key: 'Escape' })
     expect(document.querySelector('.site-header')).not.toHaveClass('is-open')
+    // o X fecha de verdade: o "apertar" no botão não conta como clique fora
+    fireEvent.click(toggle)
+    expect(document.querySelector('.site-header')).toHaveClass('is-open')
+    fireEvent.pointerDown(toggle)
+    fireEvent.click(toggle)
+    expect(document.querySelector('.site-header')).not.toHaveClass('is-open')
   })
 
   it('passa os estados sozinho depois da entrada e pausa com interação', () => {
