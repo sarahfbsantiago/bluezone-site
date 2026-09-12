@@ -2,7 +2,9 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import type { User } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore'
 import { BrandLogo } from '../../features/home/components/BrandLogo'
-import { withBase } from '../../lib/paths'
+
+/** Site público (para os links "ver" e o logotipo); o painel vive em outro endereço. */
+const SITE = (import.meta.env.VITE_SITE_URL || 'https://abluezone.com.br').replace(/\/$/, '')
 import { db, firebaseEnabled, signInWithGoogle, signOutUser, watchUser } from '../../lib/firebase'
 import { CATEGORIES, createPost, deletePost, listAll, slugify, updatePost, validatePost, type Post, type PostInput } from '../posts'
 import { Markdown } from '../Markdown'
@@ -65,7 +67,7 @@ export function AdminPage() {
 
   const header = (
     <header className="admin-header">
-      <a href={withBase('/bluenews')} className="header-brand" aria-label="BlueNews"><BrandLogo variant="bluenews" /></a>
+      <a href={`${SITE}/bluenews`} className="header-brand" aria-label="BlueNews"><BrandLogo variant="bluenews" /></a>
       <span className="admin-title">painel</span>
       {user && <button type="button" className="admin-link" onClick={() => signOutUser()}>sair ({user.email})</button>}
     </header>
@@ -129,7 +131,7 @@ export function AdminPage() {
                     <td>{post.updatedAt?.toDate ? post.updatedAt.toDate().toLocaleDateString('pt-BR') : ''}</td>
                     <td className="admin-actions">
                       <button type="button" className="admin-link" onClick={() => toggleStatus(post)} disabled={busy}>{post.status === 'published' ? 'despublicar' : 'publicar'}</button>
-                      {post.status === 'published' && <a className="admin-link" href={withBase(`/bluenews?post=${post.slug}`)} target="_blank" rel="noopener noreferrer">ver</a>}
+                      {post.status === 'published' && <a className="admin-link" href={`${SITE}/bluenews?post=${post.slug}`} target="_blank" rel="noopener noreferrer">ver</a>}
                       <button type="button" className="admin-link admin-danger" onClick={() => remove(post)} disabled={busy}>excluir</button>
                     </td>
                   </tr>

@@ -11,7 +11,9 @@
     "test:watch": "vitest",
     "test:smoke": "node tests/smoke.mjs",
     "deploy": "VITE_SITE_URL=https://abluezone.com.br VITE_ROBOTS=index,follow vite build && firebase deploy --only hosting:prod",
-    "deploy:teste": "VITE_SITE_URL=https://bluezone-teste.web.app VITE_ROBOTS=noindex,nofollow vite build && firebase deploy --only hosting:teste"
+    "deploy:teste": "VITE_SITE_URL=https://bluezone-teste.web.app VITE_ROBOTS=noindex,nofollow vite build && firebase deploy --only hosting:teste",
+    "build:painel": "vite build --config vite.painel.config.ts",
+    "deploy:painel": "vite build --config vite.painel.config.ts && firebase deploy --only hosting:painel"
   },
   "dependencies": {
     "firebase": "^12.19.0",

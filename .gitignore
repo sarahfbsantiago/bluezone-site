@@ -5,3 +5,4 @@ dist
 tsconfig.tsbuildinfo
 firebase-debug.log
 media-src
+dist-painel

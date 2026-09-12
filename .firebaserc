@@ -10,6 +10,9 @@
         ],
         "teste": [
           "bluezone-teste"
+        ],
+        "painel": [
+          "bluezone-painel"
         ]
       }
     }
