@@ -97,7 +97,7 @@ try {
 
   await page.goto(base + '/blueprint', { waitUntil: 'networkidle0' })
   check('Blueprint abre em /blueprint com o botão do curso', (await page.title()).includes('Blueprint') && (await page.$('#blueprint-title')) !== null && (await page.$('.blog-cta')) !== null, await page.title())
-  check('Blueprint: header próprio (logotipo Blueprint, 7 seções, comprar) e sempre escuro', (await page.$eval('.header-brand', (el) => el.textContent ?? '')).includes('Blueprint') && (await page.$$('.site-nav a[href^="#"]')).length === 7 && (await page.$eval('.header-cta', (el) => el.getAttribute('href') ?? '')).includes('kiwify') && (await page.$eval('html', (el) => el.getAttribute('data-theme'))) === 'dark')
+  check('Blueprint: header próprio (logotipo Blueprint, 7 seções, comprar) e sempre escuro', (await page.$eval('.header-brand', (el) => el.textContent ?? '')).includes('Blueprint') && (await page.$$('.site-nav a[href^="#"]')).length === 8 && (await page.$eval('.header-cta', (el) => el.getAttribute('href') ?? '')) === '#oferta' && (await page.$eval('html', (el) => el.getAttribute('data-theme'))) === 'dark')
 
   await page.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true })
   await page.goto(base, { waitUntil: 'networkidle0' })

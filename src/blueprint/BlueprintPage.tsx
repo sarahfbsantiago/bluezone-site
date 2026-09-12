@@ -34,13 +34,22 @@ export function BlueprintPage() {
   const [open, setOpen] = useState<number | null>(0)
   // A página do Blueprint é sempre escura, independentemente do tema escolhido no site (a escolha do visitante não é alterada).
   useEffect(() => { document.documentElement.setAttribute('data-theme', 'dark') }, [])
-  // Cada seção ganha `is-in` ao entrar na tela: os boxes sobem em cascata (CSS). Sem IntersectionObserver, tudo já visível.
+  // Cada seção recebe `--ps` (0→1) conforme entra na tela; os boxes sobem em cascata acompanhando a rolagem (e voltam ao subir).
   useEffect(() => {
     const sections = Array.from(document.querySelectorAll<HTMLElement>('.bp-section, .bp-offer'))
-    if (typeof IntersectionObserver === 'undefined') { sections.forEach((s) => s.classList.add('is-in')); return }
-    const observer = new IntersectionObserver((entries) => entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('is-in'); observer.unobserve(entry.target) } }), { threshold: 0.18 })
-    sections.forEach((s) => observer.observe(s))
-    return () => observer.disconnect()
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduced) { sections.forEach((s) => s.style.setProperty('--ps', '1')); return }
+    let frame = 0
+    const update = () => {
+      frame = 0
+      const vh = window.innerHeight || 1
+      sections.forEach((s) => { const top = s.getBoundingClientRect().top; s.style.setProperty('--ps', Math.min(1.4, Math.max(0, (vh * 0.9 - top) / (vh * 0.5))).toFixed(4)) })
+    }
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(update) }
+    update()
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule)
+    return () => { if (frame) cancelAnimationFrame(frame); window.removeEventListener('scroll', schedule); window.removeEventListener('resize', schedule) }
   }, [])
   return (
     <main id="top" className="home-page blog-page blueprint-page theme-dark">

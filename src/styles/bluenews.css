@@ -85,12 +85,14 @@
 .news-footer .social-links a { border-color: var(--line); color: var(--ink-2); }
 .news-legal { margin: 0 0 0 auto; font: 400 10.5px var(--font-mono); letter-spacing: .06em; color: var(--ink-3); }
 
+@media (max-width: 1300px) { .news-nav { gap: 12px; font-size: 10px; letter-spacing: .06em; } .news-contact { padding: 6px 10px !important; } }
 @media (max-width: 1024px) { .news-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 900px) {
+/* 9 seções + contato só cabem em linha acima de ~1180px; abaixo disso (inclusive zoom), menu em painel */
+@media (max-width: 1180px) {
   .news-nav { position: absolute; left: 0; right: 0; top: 100%; flex-direction: column; gap: 0; margin: 0; padding: 8px 16px 16px; background: #fff; border-bottom: 1px solid var(--line); display: none; }
   .news-header.is-open .news-nav { display: flex; }
   .news-nav a { padding: 12px 0; border-bottom: 1px solid var(--line) !important; }
   .news-contact { border-radius: 0; border: 0 !important; padding: 12px 0 !important; }
   .news-menu { display: flex; }
 }
-@media (max-width: 600px) { .news-grid { grid-template-columns: 1fr; } .news-card.is-featured a { grid-template-columns: 1fr; } .news-legal { margin-left: 0; } }
+@media (max-width: 600px) { .news-header { padding: 12px 16px; } .news-grid { grid-template-columns: 1fr; } .news-card.is-featured a { grid-template-columns: 1fr; } .news-legal { margin-left: 0; } }

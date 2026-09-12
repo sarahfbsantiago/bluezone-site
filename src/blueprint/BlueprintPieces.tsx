@@ -46,27 +46,41 @@ export function BlueprintBrand() {
   )
 }
 
-/** Dispara a classe `is-in` quando o elemento entra na janela (uma vez). Com reduced motion, já entra marcado. */
-function useInView<T extends HTMLElement>(reduced: boolean) {
+/**
+ * Progresso de rolagem do elemento (0 = entrando pela base da janela, 1 = já subiu o suficiente), em `--sp`.
+ * O movimento acompanha a rolagem nos dois sentidos; ao chegar a 1 ganha `is-done` (flutuação). Com reduced motion, fica em 1.
+ */
+function useScrollDriven<T extends HTMLElement>(reduced: boolean, span = 0.55, start = 0.92) {
   const ref = useRef<T>(null)
-  const [inView, setInView] = useState(reduced)
+  const [done, setDone] = useState(reduced)
   useEffect(() => {
     const element = ref.current
-    if (!element || reduced) { setInView(true); return }
-    if (typeof IntersectionObserver === 'undefined') { setInView(true); return }
-    const observer = new IntersectionObserver((entries) => { if (entries.some((entry) => entry.isIntersecting)) { setInView(true); observer.disconnect() } }, { threshold: 0.35 })
-    observer.observe(element)
-    return () => observer.disconnect()
-  }, [reduced])
-  return { ref, inView }
+    if (!element) return
+    if (reduced) { element.style.setProperty('--sp', '1'); setDone(true); return }
+    let frame = 0
+    const update = () => {
+      frame = 0
+      const rect = element.getBoundingClientRect()
+      const vh = window.innerHeight || 1
+      const p = Math.min(1, Math.max(0, (vh * start - rect.top) / (vh * span)))
+      element.style.setProperty('--sp', p.toFixed(4))
+      setDone(p >= 1)
+    }
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(update) }
+    update()
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule)
+    return () => { if (frame) cancelAnimationFrame(frame); window.removeEventListener('scroll', schedule); window.removeEventListener('resize', schedule) }
+  }, [reduced, span, start])
+  return { ref, done }
 }
 
 /** Tablet em CSS 3D (preto, moldura fina, câmera): entra girando quando aparece e para em leve ângulo, flutuando. */
 export function Tablet({ src, alt }: { src: string; alt: string }) {
   const reduced = useReducedMotion()
-  const { ref, inView } = useInView<HTMLDivElement>(reduced)
+  const { ref, done } = useScrollDriven<HTMLDivElement>(reduced, 0.5, 1.0)
   return (
-    <div ref={ref} className={`bp-tablet${inView ? ' is-in' : ''}${reduced ? ' is-static' : ''}`}>
+    <div ref={ref} className={`bp-tablet bp-scroll${done ? ' is-done' : ''}`}>
       <div className="bp-float">
         <div className="bp-tablet-body">
           <span className="bp-tablet-cam" />
@@ -81,9 +95,9 @@ export function Tablet({ src, alt }: { src: string; alt: string }) {
 /** Smartphone em CSS 3D: entra girando quando a seção aparece e para em pé, flutuando de leve. */
 export function Phone({ src, alt }: { src: string; alt: string }) {
   const reduced = useReducedMotion()
-  const { ref, inView } = useInView<HTMLDivElement>(reduced)
+  const { ref, done } = useScrollDriven<HTMLDivElement>(reduced)
   return (
-    <div ref={ref} className={`bp-phone${inView ? ' is-in' : ''}${reduced ? ' is-static' : ''}`}>
+    <div ref={ref} className={`bp-phone bp-scroll${done ? ' is-done' : ''}`}>
       <div className="bp-float">
         <div className="bp-phone-body">
           <div className="bp-phone-screen"><img src={src} alt={alt} loading="lazy" decoding="async" /><span className="bp-phone-gloss" /></div>
@@ -98,9 +112,7 @@ export function Phone({ src, alt }: { src: string; alt: string }) {
 /** Folha de jornal: cabeçalho, manchete, foto em preto e branco com legenda e texto em colunas com capitular. */
 export function Newspaper({ masthead, dateline, headline, photo, caption, children }: { masthead: string; dateline: string; headline: string; photo: string; caption: ReactNode; children: ReactNode }) {
   const reduced = useReducedMotion()
-  const { ref, inView } = useInView<HTMLDivElement>(reduced)
-  const [opened, setOpened] = useState(reduced)
-  useEffect(() => { if (!inView || reduced) return; const timer = window.setTimeout(() => setOpened(true), 2000); return () => window.clearTimeout(timer) }, [inView, reduced])
+  const { ref, done } = useScrollDriven<HTMLDivElement>(reduced, 0.6, 0.95)
   const onMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (reduced) return
     const rect = event.currentTarget.getBoundingClientRect()
@@ -111,7 +123,7 @@ export function Newspaper({ masthead, dateline, headline, photo, caption, childr
   }
   const onLeave = (event: React.PointerEvent<HTMLDivElement>) => { event.currentTarget.style.setProperty('--tilt-x', '0deg'); event.currentTarget.style.setProperty('--tilt-y', '0deg') }
   return (
-    <div ref={ref} className={`bp-paper-stage${inView ? ' is-in' : ''}${opened ? ' is-open' : ''}${reduced ? ' is-static' : ''}`} onPointerMove={onMove} onPointerLeave={onLeave}>
+    <div ref={ref} className={`bp-paper-stage bp-scroll${done ? ' is-done is-open' : ''}`} onPointerMove={onMove} onPointerLeave={onLeave}>
     <article className="bp-paper">
       <header className="bp-paper-head">
         <span className="bp-paper-masthead">{masthead}</span>

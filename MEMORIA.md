@@ -29,6 +29,9 @@ WhatsApp flutuante: ícone em pontilhismo (no escuro: branco puro, sem degradê,
 
 ## Decisões de design que não devem ser revertidas sem combinar
 
+- **Blueprint com movimento pela rolagem** (12/09/2026): tablet, celular, jornal e boxes acompanham a posição da rolagem (`--sp` por peça e `--ps` por seção, calculados em scroll/rAF), nos dois sentidos; ao completar, flutuam. O símbolo pontilhista do topo continua girando ao carregar (hero). Botão "comprar agora" do header leva ao bloco da oferta (`#oferta`); só os botões da página abrem a Kiwify.
+- **Sem "aba preta" no elástico do celular**: `html` recebe a cor de fundo do tema (escuro no site, branco na BlueNews, claro no painel) e `overscroll-behavior-y: none`.
+- **Painel publica direto** em painel.abluezone.com.br (`npm run deploy:painel`), sem etapa de teste; o site público passa pelo teste antes de ir ao domínio.
 - **Mobile sempre**: tudo o que for criado (site, BlueNews, painel) sai adaptado ao celular na mesma entrega e é conferido em captura 390px (regra da cliente, 12/09/2026).
 - **Tema**: o tema só é gravado no navegador quando a pessoa clica no sol/lua (chave `bluezone-theme-v2`). A chave antiga gravava o padrão no primeiro acesso e prendeu visitantes no claro; por isso o domínio oficial parecia claro para a cliente.
 - **BlueNews pública**: preto e branco, fundo branco, sem claro/escuro (decisão de 12/09/2026); CSS próprio em `src/styles/bluenews.css`; sem WhatsApp flutuante (link no rodapé).

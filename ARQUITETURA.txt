@@ -182,7 +182,7 @@ Backups e resposta a incidentes
 - Dominio oficial: abluezone.com.br (site e e-mail)
 - Conta dona de tudo: contato@abluezone.com.br (Firebase, Apps Script, planilha)
 - GitHub: sarahfbsantiago/bluezone-site
-- Deploy oficial no dominio so com autorizacao da cliente
+- Deploy oficial no dominio so com autorizacao da cliente; painel publica direto (area da equipe)
 
 
 11. HISTORICO

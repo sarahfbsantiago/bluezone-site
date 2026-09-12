@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { pages } from '../config/pagesConfig'
-import { siteConfig } from '../config/siteConfig'
 import { withBase } from '../../../lib/paths'
 import type { Theme } from '../hooks/useTheme'
 import { BrandLogo } from './BrandLogo'
@@ -36,7 +35,8 @@ export const blueprintNavItems = [
   { label: 'idealizadores', href: '#idealizadores' },
   { label: 'dúvidas', href: '#duvidas' },
 ] as const
-export const buyItem = { label: 'comprar agora', href: siteConfig.blueprintCourse } as const
+/** No header, "comprar agora" leva ao bloco da oferta (preço e condições); os botões de compra da página é que abrem a Kiwify. */
+export const buyItem = { label: 'comprar agora', href: '#oferta' } as const
 
 /** Header de vidro fixo. Em `site="bluenews"`, o logotipo vira BlueNews e o menu mostra as seções do portal; em `site="blueprint"`, logotipo Blueprint, seções da página de vendas e botão de compra (sem sol/lua: a página é sempre escura). Clicar no logotipo sempre volta ao topo do site. */
 export function SiteHeader({ theme, onToggleTheme, site = 'home' }: SiteHeaderProps) {
@@ -54,7 +54,7 @@ export function SiteHeader({ theme, onToggleTheme, site = 'home' }: SiteHeaderPr
   }, [open])
   const items = site === 'bluenews' ? blogNavItems : site === 'blueprint' ? blueprintNavItems : navItems
   const action = site === 'blueprint' ? buyItem : contactItem
-  const external = site === 'blueprint' ? { target: '_blank', rel: 'noopener noreferrer' } : {}
+  const external = {}
   // o logotipo do header volta ao topo da própria página; só o Bluezone do footer volta ao site
   const brandHref = site === 'home' ? withBase('/#top') : '#top'
   const brandLabel = site === 'bluenews' ? 'BlueNews, início' : site === 'blueprint' ? 'Blueprint, início' : 'Bluezone, início'

@@ -2,7 +2,11 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; background: var(--ice); color: var(--ink); font-family: var(--font-mono); -webkit-font-smoothing: antialiased; }
+html { background: var(--ice); overscroll-behavior-y: none; }
+[data-theme='dark'] html { background: #050609; }
+html:has(.news) { background: #ffffff; }
+html:has(.admin) { background: #f4f6fa; }
+body { margin: 0; overscroll-behavior-y: none; background: var(--ice); color: var(--ink); font-family: var(--font-mono); -webkit-font-smoothing: antialiased; }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; }
 .home-page { overflow: hidden; }
@@ -708,20 +712,15 @@ html[data-theme='dark'] { background: #050609; }
 
 /* Blueprint: tablet em CSS 3D (preto, moldura fina). Entra girando quando aparece e para em leve ângulo. */
 .bp-tablet { perspective: 1500px; width: min(100%, 540px); margin: 0 auto; padding: 20px 0; }
-.bp-tablet-body { position: relative; aspect-ratio: 4 / 3; border-radius: 30px; padding: 14px; background: linear-gradient(160deg, #3a3d44, #0c0d10 40%, #1d1f25 70%, #34373e); box-shadow: 0 0 0 1.5px #050608, inset 0 0 0 1px rgba(255, 255, 255, .26), 0 0 44px var(--bp-glow-soft), 0 40px 90px rgba(0, 0, 0, .6); transform-style: preserve-3d; transform: translateX(120px) rotateY(-540deg) scale(.8); opacity: 0; }
-.bp-tablet.is-in .bp-tablet-body { animation: bp-tablet-enter 2s cubic-bezier(.2, .75, .2, 1) .2s forwards; }
-.bp-tablet.is-static .bp-tablet-body { transform: rotateY(-14deg) rotateX(6deg); opacity: 1; animation: none; }
+.bp-tablet-body { position: relative; aspect-ratio: 4 / 3; border-radius: 30px; padding: 14px; background: linear-gradient(160deg, #3a3d44, #0c0d10 40%, #1d1f25 70%, #34373e); box-shadow: 0 0 0 1.5px #050608, inset 0 0 0 1px rgba(255, 255, 255, .26), 0 0 44px var(--bp-glow-soft), 0 40px 90px rgba(0, 0, 0, .6); transform-style: preserve-3d; transform: translateX(calc(120px * (1 - var(--sp)))) rotateY(calc(-540deg * (1 - var(--sp)) - 14deg)) rotateX(calc(6deg * var(--sp))) scale(calc(.8 + .2 * var(--sp))); opacity: var(--sp); }
 .bp-tablet-screen { position: relative; width: 100%; height: 100%; border-radius: 18px; overflow: hidden; background: #000; box-shadow: inset 0 0 0 1.5px #000; }
 .bp-tablet-screen img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .bp-tablet-cam { position: absolute; top: 5px; left: 50%; width: 6px; height: 6px; translate: -50% 0; border-radius: 50%; background: #1a1f3a; box-shadow: inset 0 0 2px rgba(120, 140, 255, .6), 0 0 0 1px rgba(255, 255, 255, .12); z-index: 1; }
 .bp-tablet-btn { position: absolute; right: -3px; top: 14%; width: 3px; height: 44px; border-radius: 2px; background: linear-gradient(180deg, #2b2e35, #0c0d10); box-shadow: 0 0 0 .5px rgba(255, 255, 255, .25); }
-@keyframes bp-tablet-enter { 0% { transform: translateX(120px) rotateY(-540deg) scale(.8); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateX(0) rotateY(-14deg) rotateX(6deg) scale(1); opacity: 1; } }
 
 /* Blueprint: celular em CSS 3D (referência: iPhone preto brilhante com entalhe e botões laterais). Entra girando quando a seção aparece. */
 .bp-phone { perspective: 1200px; width: min(100%, 232px); margin: 0 auto; padding: 10px 0; }
-.bp-phone-body { position: relative; aspect-ratio: 9 / 19.2; border-radius: 42px; padding: 8px; background: linear-gradient(160deg, #3a3d44, #0c0d10 40%, #1d1f25 70%, #34373e); box-shadow: 0 0 0 1.5px #050608, inset 0 0 0 1px rgba(255, 255, 255, .28), 0 0 36px var(--bp-glow-soft), 0 40px 80px rgba(0, 0, 0, .6); transform-style: preserve-3d; transform: translateY(60px) rotateY(-540deg) scale(.8); opacity: 0; }
-.bp-phone.is-in .bp-phone-body { animation: bp-phone-enter 1.8s cubic-bezier(.2, .75, .2, 1) forwards; }
-.bp-phone.is-static .bp-phone-body { transform: rotateY(-10deg) rotateX(3deg); opacity: 1; animation: none; }
+.bp-phone-body { position: relative; aspect-ratio: 9 / 19.2; border-radius: 42px; padding: 8px; background: linear-gradient(160deg, #3a3d44, #0c0d10 40%, #1d1f25 70%, #34373e); box-shadow: 0 0 0 1.5px #050608, inset 0 0 0 1px rgba(255, 255, 255, .28), 0 0 36px var(--bp-glow-soft), 0 40px 80px rgba(0, 0, 0, .6); transform-style: preserve-3d; transform: translateY(calc(60px * (1 - var(--sp)))) rotateY(calc(-540deg * (1 - var(--sp)) - 10deg)) rotateX(calc(3deg * var(--sp))) scale(calc(.8 + .2 * var(--sp))); opacity: var(--sp); }
 .bp-phone-screen { position: relative; width: 100%; height: 100%; border-radius: 34px; overflow: hidden; background: #000; box-shadow: inset 0 0 0 1.5px #000; }
 .bp-phone-screen img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .bp-phone-gloss { position: absolute; inset: 0; background: linear-gradient(115deg, rgba(255, 255, 255, .14) 0%, rgba(255, 255, 255, .03) 26%, rgba(255, 255, 255, 0) 42%); pointer-events: none; }
@@ -732,7 +731,6 @@ html[data-theme='dark'] { background: #050609; }
 .bp-phone-btn-l1 { left: -3px; top: 18%; height: 22px; }
 .bp-phone-btn-l2 { left: -3px; top: 26%; height: 40px; }
 .bp-phone-btn-r { right: -3px; top: 24%; height: 60px; }
-@keyframes bp-phone-enter { 0% { transform: translateY(80px) rotateY(-540deg) scale(.8); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(0) rotateY(-10deg) rotateX(3deg) scale(1); opacity: 1; } }
 
 /* Blueprint: jornal */
 .bp-paper { width: min(960px, 100%); margin-top: 6px; padding: 34px 38px 40px; background: #f3efe6; color: #17181c; border-radius: 4px; box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 30px 80px rgba(0, 0, 0, .6); text-align: left; }
@@ -749,7 +747,7 @@ html[data-theme='dark'] { background: #050609; }
 .bp-paper-text p:first-child::first-letter { float: left; font-size: 46px; line-height: .8; font-weight: 700; padding: 6px 8px 0 0; color: #111216; }
 @media (max-width: 1024px) { .bp-paper-body { grid-template-columns: 1fr; } .bp-paper-text { column-count: 1; } }
 @media (max-width: 600px) { .bp-paper { padding: 22px 18px 26px; } .bp-paper-head { flex-direction: column; gap: 4px; } .bp-brand { gap: 12px; } .bp-brand-mark { width: 80px; } }
-@media (prefers-reduced-motion: reduce) { .bp-tablet-body, .bp-phone-body, .bp-float { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .bp-scroll { --sp: 1 !important; } .blueprint-page .bp-section, .blueprint-page .bp-offer { --ps: 1 !important; } .bp-float { animation: none !important; } }
 
 /* ===== Blueprint em laranja: tudo que era azul de letreiro vira âmbar ===== */
 .blueprint-page { --bp-accent: #ff8a2a; --bp-accent-soft: #ffb56b; --bp-glow-soft: rgba(255, 138, 42, .38); --bp-glow: rgba(255, 138, 42, .8); --bp-glow-core: rgba(255, 200, 140, .95); --bp-glow-far: rgba(210, 90, 10, .55); }
@@ -768,24 +766,18 @@ html[data-theme='dark'] { background: #050609; }
 .blueprint-page .products-note:hover, .blueprint-page .bp-popup-link:hover { color: var(--bp-accent-soft); border-color: var(--bp-accent-soft); }
 .blueprint-page .field input:focus-visible { border-color: var(--bp-accent); box-shadow: 0 0 0 4px rgba(255, 138, 42, .18); }
 /* boxes: sobem em cascata quando a seção entra; brilho laranja no hover */
-.blueprint-page .bp-section .solution-items li, .blueprint-page .bp-faq-item { opacity: 0; transform: translateY(18px); }
-.blueprint-page .is-in .solution-items li, .blueprint-page .is-in .bp-faq-item { animation: bp-rise .65s cubic-bezier(.2, .7, .2, 1) forwards; animation-delay: calc(var(--i, 0) * 90ms + 120ms); }
+.blueprint-page .bp-section, .blueprint-page .bp-offer { --ps: 1; }
+.blueprint-page .bp-section .solution-items li, .blueprint-page .bp-faq-item { opacity: clamp(0, calc((var(--ps) - .15 - var(--i, 0) * .07) * 4), 1); transform: translateY(calc(18px * clamp(0, 1 - (var(--ps) - .15 - var(--i, 0) * .07) * 4, 1))); }
 @keyframes bp-rise { to { opacity: 1; transform: translateY(0); } }
 .blueprint-page .solution-items li:hover, .blueprint-page .bp-faq-item:hover { border-color: rgba(255, 160, 80, .5); box-shadow: 0 0 0 1px rgba(255, 160, 80, .12), 0 16px 40px rgba(255, 138, 42, .18); transform: translateY(-2px); }
 .blueprint-page .solution-items li { transition: border-color var(--motion-fast), box-shadow var(--motion-fast), transform var(--motion-fast); }
 
 /* Blueprint: jornal abrindo. Entra dobrado e girando, desdobra pela borda de cima, assenta; foto e texto entram em cascata; inclina com o mouse. */
 .bp-paper-stage { perspective: 1600px; width: min(960px, 100%); --tilt-x: 0deg; --tilt-y: 0deg; }
-.bp-paper-stage .bp-paper { width: 100%; transform-style: preserve-3d; transform-origin: 50% 0; transform: rotateX(-96deg) rotateY(-30deg) translateY(60px); opacity: 0; transition: transform .35s ease; }
-.bp-paper-stage.is-in .bp-paper { animation: bp-paper-open 1.9s cubic-bezier(.22, .8, .2, 1) forwards; }
-.bp-paper-stage.is-in.is-open .bp-paper { transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y)); }
-.bp-paper-stage.is-static .bp-paper { transform: none; opacity: 1; animation: none; }
-@keyframes bp-paper-open { 0% { transform: rotateX(-96deg) rotateY(-30deg) translateY(60px); opacity: 0; } 25% { opacity: 1; } 60% { transform: rotateX(8deg) rotateY(-4deg) translateY(0); } 100% { transform: rotateX(0) rotateY(0) translateY(0); opacity: 1; } }
-.bp-paper-stage .bp-paper-headline, .bp-paper-stage .bp-paper-photo, .bp-paper-stage .bp-paper-text p { opacity: 0; transform: translateY(14px); }
-.bp-paper-stage.is-in .bp-paper-headline { animation: bp-rise .6s ease-out 1.4s forwards; }
-.bp-paper-stage.is-in .bp-paper-photo { animation: bp-rise .7s ease-out 1.65s forwards; }
-.bp-paper-stage.is-in .bp-paper-text p { animation: bp-rise .6s ease-out forwards; animation-delay: calc(1.8s + var(--i, 0) * 120ms); }
-.bp-paper-stage.is-static .bp-paper-headline, .bp-paper-stage.is-static .bp-paper-photo, .bp-paper-stage.is-static .bp-paper-text p { opacity: 1; transform: none; animation: none; }
+.bp-paper-stage .bp-paper { width: 100%; transform-style: preserve-3d; transform-origin: 50% 0; transform: rotateX(calc(-96deg * (1 - var(--sp)) + var(--tilt-x) * var(--sp))) rotateY(calc(-30deg * (1 - var(--sp)) + var(--tilt-y) * var(--sp))) translateY(calc(60px * (1 - var(--sp)))); opacity: calc(var(--sp) * 2); transition: transform .12s linear; }
+.bp-paper-stage .bp-paper-headline { opacity: clamp(0, calc((var(--sp) - .55) * 4), 1); transform: translateY(calc(14px * clamp(0, 1 - (var(--sp) - .55) * 4, 1))); }
+.bp-paper-stage .bp-paper-photo { opacity: clamp(0, calc((var(--sp) - .65) * 4), 1); transform: translateY(calc(14px * clamp(0, 1 - (var(--sp) - .65) * 4, 1))); }
+.bp-paper-stage .bp-paper-text p { opacity: clamp(0, calc((var(--sp) - .7 - var(--i, 0) * .04) * 5), 1); transform: translateY(calc(14px * clamp(0, 1 - (var(--sp) - .7 - var(--i, 0) * .04) * 5, 1))); }
 .blueprint-page .bp-paper-headline { text-shadow: 0 0 1px rgba(255, 138, 42, .4), 0 0 14px rgba(255, 138, 42, .28); }
 .bp-paper { box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 30px 80px rgba(0, 0, 0, .6), 0 0 60px rgba(255, 138, 42, .12); }
 .bp-paper-stage:hover .bp-paper { box-shadow: 0 0 0 1px rgba(255, 255, 255, .1), 0 40px 90px rgba(0, 0, 0, .65), 0 0 80px rgba(255, 138, 42, .22); }
@@ -811,7 +803,7 @@ html[data-theme='dark'] { background: #050609; }
 .bp-popup .contact-actions { justify-content: center; }
 .bp-popup .contact-feedback { color: rgba(242, 245, 250, .85); }
 @media (max-width: 600px) { .bp-popup { padding: 30px 18px 22px; } }
-@media (prefers-reduced-motion: reduce) { .bp-paper-stage .bp-paper, .bp-popup, .bp-popup-backdrop, .blueprint-page .bp-card { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .bp-popup, .bp-popup-backdrop, .blueprint-page .bp-card { animation: none !important; } }
 
 /* ===== BlueNews: notícias públicas ===== */
 .post-list { list-style: none; margin: 10px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%; max-width: 980px; text-align: left; }
@@ -919,3 +911,7 @@ html[data-theme='dark'] { background: #050609; }
   .admin-postpreview { padding: 24px 16px; }
   .admin-sidebar.is-open { padding: 12px; margin-bottom: 12px; background: #fff; border-radius: 14px; box-shadow: 0 1px 0 rgba(16, 36, 58, .08); }
 }
+
+.bp-scroll { --sp: 0; }
+.bp-scroll.is-done .bp-float { animation: bp-float 6s ease-in-out infinite; }
+.is-in .bp-float { animation: none; }
