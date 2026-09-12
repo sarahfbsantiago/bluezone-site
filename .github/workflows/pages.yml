@@ -32,6 +32,7 @@ jobs:
           VITE_BASE: /${{ github.event.repository.name }}/
           VITE_CONTACT_ENDPOINT: ${{ vars.VITE_CONTACT_ENDPOINT }}
           VITE_SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+          VITE_ROBOTS: noindex,nofollow
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

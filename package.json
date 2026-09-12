@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:smoke": "node tests/smoke.mjs",
-    "deploy": "VITE_SITE_URL=https://abluezone.com.br vite build && firebase deploy --only hosting"
+    "deploy": "VITE_SITE_URL=https://abluezone.com.br VITE_ROBOTS=index,follow vite build && firebase deploy --only hosting:prod",
+    "deploy:teste": "VITE_SITE_URL=https://bluezone-teste.web.app VITE_ROBOTS=noindex,nofollow vite build && firebase deploy --only hosting:teste"
   },
   "dependencies": {
     "react": "19.2.0",
