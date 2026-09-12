@@ -37,7 +37,9 @@ Feito em 12/09/2026 (parte A - BlueNews):
 [x] App Web registrado no projeto (config publica em VITE_FIREBASE_* no .env e nas variaveis do GitHub)
 [x] Firebase Authentication com Google (provedor ativado no console; dominios autorizados)
 [x] Painel em site separado em painel.abluezone.com.br (CNAME, certificado ok), fora do site publico, com barra lateral: login Google, lista, editor com previa, publicar/despublicar, excluir
-[x] Colecao admins/{email}: quem pode publicar (hoje: contato@abluezone.com.br). Adicionar e-mails so pelo console
+[x] Papeis: admins/{email} (Google apenas; tudo, inclusive pessoas e futuros leads) e editors/{email}
+    (convidados pelo painel; publicam noticias, nao excluem, nao veem leads; entram com Google ou e-mail+senha
+    criada no convite por link). Politica de senha forte e protecao contra enumeracao ativas no Firebase Auth
 [x] Colecao posts: titulo, slug, secao, resumo, texto (formatacao basica segura), capa (URL https), autor, status, datas
 [x] BlueNews publica le as noticias publicadas e abre cada uma em /bluenews?post=<slug>
 [ ] Imagens de capa por upload (Cloud Storage) - depende do bucket (exige Blaze)
@@ -94,7 +96,52 @@ Passos:
 [ ] Notificacoes (e-mail/WhatsApp) para novos leads
 
 
-6. ETAPA 4 - PRODUTOS E CONTEUDO
+6. ETAPA 3B - PAGAMENTOS (Mercado Pago: Pix, cartao e recorrencia)
+------------------------------------------------------------------
+Objetivo: vender no proprio site (cursos, assinaturas, produtos) sem depender so da Kiwify.
+Pecas:
+- Cloud Function "createPayment": cria a preferencia/pedido no Mercado Pago (Checkout Pro ou Checkout
+  Transparente para Pix) com o access token guardado no Secret Manager. O navegador NUNCA fala com o
+  Mercado Pago com credencial; so recebe o link/QR do Pix.
+- Cloud Function "mpWebhook": recebe as notificacoes (pagamento aprovado, recusado, estornado, assinatura
+  criada/cancelada), valida a assinatura x-signature do Mercado Pago, consulta a API para confirmar o status
+  (nunca confiar so no corpo da notificacao) e grava em Firestore: payments/{id}, subscriptions/{id},
+  enrollments (libera o curso) e um "event" na timeline do lead/aluno.
+- Recorrencia: "preapproval" (assinaturas) do Mercado Pago para planos mensais; cancelamento e retentativas
+  refletidos por webhook; status da assinatura decide o acesso (rules leem enrollments/subscriptions).
+- Pix: QR e copia-e-cola gerados pela Function; expiracao curta; confirmacao so por webhook.
+Seguranca:
+- Idempotencia por id de pagamento/notificacao (deduplicacao persistente), retry seguro, logs de auditoria.
+- Reconciliacao diaria (lista de pagamentos do MP x Firestore) para pegar webhook perdido.
+- Valores e produtos definidos no servidor (o cliente manda so o id do produto), nunca o preco pelo navegador.
+- Dados de cartao nunca passam pelo nosso backend (tokenizacao do MP); LGPD: guardar so o necessario.
+- Sandbox do MP para testes; chaves de producao so no Secret Manager; alertas de erro nas Functions.
+Depende do plano Blaze (Functions).
+
+
+7. ETAPA 3C - MARKETING: GOOGLE ADS, META ADS E ANALYTICS
+--------------------------------------------------------
+Objetivo: medir e otimizar campanhas (trafego pago) com os eventos reais do site: lead, inscricao, compra.
+Pecas:
+- Google Tag (gtag.js) + Google Analytics 4 + conversoes do Google Ads; Meta Pixel + Conversions API (CAPI).
+- Carregamento so depois do consentimento (banner de cookies LGPD com "aceitar", "recusar" e preferencias);
+  Consent Mode v2 do Google. Sem consentimento, nada de pixel no navegador.
+- Eventos padronizados (mesmos nomes no GA4, Ads e Meta): view_page, lead (formulario/pop-up/newsletter),
+  begin_checkout (clique em comprar), purchase (confirmado pelo webhook do Mercado Pago/Kiwify - server-side).
+- Envio server-side (CAPI da Meta e Enhanced Conversions do Google) pelas Cloud Functions, com hash dos
+  dados (SHA-256 de e-mail/telefone) e deduplicacao por event_id entre navegador e servidor.
+- Parametros de campanha (utm_*) e gclid/fbclid guardados no lead (Firestore) para saber a origem de cada
+  contato e fechar o funil ate a venda.
+Seguranca e privacidade:
+- CSP do Hosting liberando so os dominios das tags (googletagmanager.com, google-analytics.com,
+  connect.facebook.net, facebook.com) e nada mais.
+- Tokens do Ads/Meta so no Secret Manager (Functions); politica de privacidade e cookies publicada;
+  consentimento registrado com data/versao; dados pessoais nunca em texto claro nos pixels.
+- Painel: aba "campanhas" mostrando origem dos leads (utm/canal) e conversoes por periodo.
+Depende do plano Blaze para a parte server-side; o pixel/GA4 com consentimento pode entrar antes.
+
+
+8. ETAPA 4 - PRODUTOS E CONTEUDO
 --------------------------------
 [ ] BlueNews: artigos (Markdown no repositorio ou CMS), newsletter com envio
 [ ] BlueCast: paginas dos episodios
@@ -102,14 +149,14 @@ Passos:
 [ ] Analytics com aviso de privacidade (LGPD)
 
 
-7. ETAPA 5 - APPS ANDROID E iOS
+9. ETAPA 5 - APPS ANDROID E iOS
 -------------------------------
 [ ] Registrar apps no mesmo projeto Firebase
 [ ] Mesmo Auth, mesmo Firestore, mesmas Functions e regras
 [ ] Notificacoes push (Cloud Messaging)
 
 
-8. ESCALABILIDADE, DISPONIBILIDADE E OPERACAO
+10. ESCALABILIDADE, DISPONIBILIDADE E OPERACAO
 --------------------------------------------
 Hospedagem
 - Firebase Hosting entrega o site por CDN global com HTTPS automatico; escala sozinho e nao tem servidor
@@ -145,7 +192,7 @@ Ambientes e entrega
 - Configuracao por variaveis de ambiente (.env local, variaveis do GitHub); nenhum segredo no codigo.
 
 
-9. SEGURANCA (vale para todas as etapas)
+11. SEGURANCA (vale para todas as etapas)
 ----------------------------------------
 Identidade e acesso
 - Conta dona: contato@abluezone.com.br (Workspace) com 2 etapas obrigatorias. Nada em contas pessoais.
@@ -176,7 +223,7 @@ Backups e resposta a incidentes
 - Plano de incidente: (1) despublicar/rollback, (2) revogar chaves/sessoes, (3) corrigir, (4) comunicar.
 
 
-10. DECISOES REGISTRADAS
+12. DECISOES REGISTRADAS
 -----------------------
 - Banco: Firestore (nunca Supabase) - decisao da cliente
 - Dominio oficial: abluezone.com.br (site e e-mail)
@@ -185,7 +232,7 @@ Backups e resposta a incidentes
 - Deploy oficial no dominio so com autorizacao da cliente; painel publica direto (area da equipe)
 
 
-11. HISTORICO
+13. HISTORICO
 -------------
 12/09/2026 - Site, formularios, hosting (prod/teste/previa), dominio e este plano.
 12/09/2026 - Firestore + regras, app Web, painel da BlueNews (/bluenews/admin), dominios do Auth; Blaze aguardando Pix.

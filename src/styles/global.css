@@ -937,3 +937,13 @@ html[data-theme='dark'] { background: #050609; }
   .admin-stat span { font-size: 8.5px; }
   .admin-header .admin-menu-toggle { margin-left: auto; }
 }
+
+/* Painel: login por e-mail/senha, convite, editores */
+.admin-loginform { width: min(420px, 100%); gap: 12px; margin-top: 10px; }
+.admin-loginform .field input { background: #fff; border-color: rgba(16, 36, 58, .18); }
+.admin-editors { margin: 6px 0 22px; display: flex; flex-direction: column; gap: 12px; }
+.admin-editor-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto; gap: 10px; align-items: center; }
+.admin-editor-form input { font: 400 12.5px var(--font-mono); padding: 11px 12px; border-radius: 10px; border: 1px solid rgba(16, 36, 58, .18); background: #fff; color: #10243a; min-width: 0; }
+.admin-editor-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.admin-editor-list li { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 14px; background: #fff; border-radius: 12px; box-shadow: 0 1px 0 rgba(16, 36, 58, .08); font: 400 12.5px var(--font-mono); color: #10243a; }
+@media (max-width: 900px) { .admin-editor-form { grid-template-columns: 1fr; } }

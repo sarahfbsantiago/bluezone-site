@@ -66,7 +66,7 @@ WhatsApp flutuante: ícone em pontilhismo (no escuro: branco puro, sem degradê,
 
 - Firestore em southamerica-east1; regras em `firestore.rules` (nega tudo; `posts` público só publicado, escrita só admin; `admins` só leitura do próprio). Índices em `firestore.indexes.json`. Deploy: `firebase deploy --only firestore`.
 - App Web "Bluezone site" (config pública em `VITE_FIREBASE_*`, `.env` local e variáveis do GitHub). SDK modular `firebase` (v12) em `src/lib/firebase.ts`.
-- Auth: Google, restrito por `hd=abluezone.com.br` no popup + lista `admins`. Domínios autorizados: abluezone.com.br, bluezone-teste.web.app, sarahfbsantiago.github.io, 127.0.0.1.
+- Auth: Google (admins, só Google) e e-mail/senha ou Google (editores, convidados pelo painel via link de e-mail; `editors/{email}`); política de senha forte (10+, letra e número), enumeração protegida, e-mails do Firebase em pt. Editores publicam, não excluem e não veem leads. Domínios autorizados: abluezone.com.br, bluezone-teste.web.app, sarahfbsantiago.github.io, 127.0.0.1.
 - CSP do Hosting inclui firestore/identitytoolkit/securetoken/googleapis e frame-src do authDomain.
 - Cliente decidiu (12/09/2026): BlueNews sem claro/escuro, design mais clean (pendente, fazer depois do Firebase). Captcha: não no painel; App Check nos formulários públicos mais adiante.
 

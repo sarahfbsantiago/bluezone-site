@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import type { User } from 'firebase/auth'
-import { doc, getDoc } from 'firebase/firestore'
+import { collection, deleteDoc, doc, getDoc, getDocs, serverTimestamp, setDoc } from 'firebase/firestore'
 import { withBase } from '../../lib/paths'
 
 /** Site público (para os links "ver" e o logotipo); o painel vive em outro endereço. */
 const SITE = (import.meta.env.VITE_SITE_URL || 'https://abluezone.com.br').replace(/\/$/, '')
-import { db, firebaseEnabled, signInWithGoogle, signOutUser, watchUser } from '../../lib/firebase'
+import { db, firebaseEnabled, signInWithGoogle, signOutUser, watchUser, signInWithPassword, sendInvite, isInviteLink, finishInvite, setPassword, resetPassword } from '../../lib/firebase'
 import { CATEGORIES, createPost, deletePost, listAll, slugify, updatePost, validatePost, type Post, type PostInput, type PostStatus } from '../posts'
 import { Markdown } from '../Markdown'
 import { CoverImage } from '../CoverImage'
@@ -20,6 +20,14 @@ const EMPTY: PostInput = { title: '', slug: '', category: CATEGORIES[0]?.id ?? '
 export function AdminPage() {
   const [user, setUser] = useState<User | null | undefined>(undefined)
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
+  const [role, setRole] = useState<'admin' | 'editor' | null>(null)
+  const [loginEmail, setLoginEmail] = useState('')
+  const [loginPassword, setLoginPassword] = useState('')
+  const [invite, setInvite] = useState<'none' | 'email' | 'password' | 'done'>('none')
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [editors, setEditors] = useState<Array<{ email: string; name: string }>>([])
+  const [newEditor, setNewEditor] = useState({ name: '', email: '' })
   const [posts, setPosts] = useState<Post[]>([])
   const [editing, setEditing] = useState<Post | 'new' | null>(null)
   const [form, setForm] = useState<PostInput>(EMPTY)
@@ -44,16 +52,27 @@ export function AdminPage() {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', 'light')
     if (demo) {
-      setUser({ email: 'demo@abluezone.com.br' } as User); setIsAdmin(true)
+      setUser({ email: 'demo@abluezone.com.br' } as User); setIsAdmin(true); setRole('admin')
       const now = { toDate: () => new Date() } as unknown as Post['updatedAt']
       setPosts([1, 2, 3, 4].map((i) => ({ id: String(i), title: `Notícia de exemplo ${i} com um título um pouco mais longo`, slug: `noticia-${i}`, category: CATEGORIES[i % CATEGORIES.length].id, excerpt: 'Resumo de exemplo para conferir o layout.', content: 'Texto de exemplo.\n\nSegundo parágrafo.', coverUrl: '', author: 'Equipe Bluezone', status: i % 2 ? 'published' : 'draft', updatedAt: now, publishedAt: now })))
       return
     }
     if (!firebaseEnabled) { setUser(null); return }
+    if (isInviteLink()) setInvite('email')
     return watchUser(async (next) => {
       setUser(next)
-      if (!next?.email) { setIsAdmin(null); return }
-      try { setIsAdmin((await getDoc(doc(db(), 'admins', next.email))).exists()) } catch { setIsAdmin(false) }
+      if (!next?.email) { setIsAdmin(null); setRole(null); return }
+      try {
+        const admin = (await getDoc(doc(db(), 'admins', next.email))).exists()
+        if (admin) {
+          // administradores entram só com Google
+          const viaPassword = next.providerData.some((p) => p.providerId === 'password') && !next.providerData.some((p) => p.providerId === 'google.com')
+          if (viaPassword) { await signOutUser(); setMessage('administradores entram com Google.'); return }
+          setIsAdmin(true); setRole('admin'); return
+        }
+        const editor = (await getDoc(doc(db(), 'editors', next.email))).exists()
+        setIsAdmin(editor); setRole(editor ? 'editor' : null)
+      } catch { setIsAdmin(false); setRole(null) }
     })
   }, [])
 
@@ -62,11 +81,53 @@ export function AdminPage() {
     try { setPosts(await listAll()) } catch (error) { setMessage('não foi possível carregar as notícias: ' + (error as Error).message) }
   }, [demo])
   useEffect(() => { if (isAdmin) void reload() }, [isAdmin, reload])
+  const loadEditors = useCallback(async () => {
+    if (demo) { setEditors([{ email: 'editor@exemplo.com', name: 'Editor de exemplo' }]); return }
+    try { const snap = await getDocs(collection(db(), 'editors')); setEditors(snap.docs.map((d) => ({ email: d.id, name: String(d.data().name ?? '') }))) } catch { setEditors([]) }
+  }, [demo])
+  useEffect(() => { if (role === 'admin') void loadEditors() }, [role, loadEditors])
+  const addEditor = async (event: FormEvent) => {
+    event.preventDefault()
+    const email = newEditor.email.trim().toLowerCase()
+    if (!/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(email)) { setMessage('confira o e-mail do editor.'); return }
+    setBusy(true)
+    try {
+      await setDoc(doc(db(), 'editors', email), { name: newEditor.name.trim().slice(0, 80), invitedBy: user?.email ?? '', createdAt: serverTimestamp() })
+      await sendInvite(email)
+      setMessage(`convite enviado para ${email}. A pessoa recebe um link para entrar e criar a senha.`)
+      setNewEditor({ name: '', email: '' }); await loadEditors()
+    } catch (error) { setMessage('não foi possível convidar: ' + (error as Error).message) } finally { setBusy(false) }
+  }
+  const removeEditor = async (email: string) => {
+    if (!window.confirm(`Remover o acesso de ${email}?`)) return
+    setBusy(true)
+    try { await deleteDoc(doc(db(), 'editors', email)); await loadEditors() } catch (error) { setMessage('erro: ' + (error as Error).message) } finally { setBusy(false) }
+  }
+  const resendInvite = async (email: string) => {
+    try { await sendInvite(email); setMessage(`convite reenviado para ${email}.`) } catch (error) { setMessage('erro: ' + (error as Error).message) }
+  }
+  const loginWithPassword = async (event: FormEvent) => {
+    event.preventDefault(); setMessage('')
+    try { await signInWithPassword(loginEmail, loginPassword) } catch { setMessage('e-mail ou senha incorretos.') }
+  }
+  const forgot = async () => {
+    if (!loginEmail) { setMessage('digite seu e-mail e clique de novo em "esqueci a senha".'); return }
+    try { await resetPassword(loginEmail); setMessage('enviamos um e-mail para redefinir a senha.') } catch { setMessage('não foi possível enviar. confira o e-mail.') }
+  }
+  const completeInvite = async (event: FormEvent) => {
+    event.preventDefault(); setMessage('')
+    try { await finishInvite(inviteEmail); setInvite('password') } catch (error) { setMessage('link inválido ou expirado. peça um novo convite. (' + (error as Error).message + ')') }
+  }
+  const savePassword = async (event: FormEvent) => {
+    event.preventDefault(); setMessage('')
+    if (newPassword.length < 10 || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) { setMessage('a senha precisa ter pelo menos 10 caracteres, com letra minúscula e número.'); return }
+    try { await setPassword(newPassword); setInvite('done'); setNewPassword(''); window.history.replaceState(null, '', window.location.pathname); setMessage('senha criada. bem-vindo(a) ao painel!') } catch (error) { setMessage('não foi possível criar a senha: ' + (error as Error).message) }
+  }
 
   const goHome = () => { setEditing(null); setPreview(null); setMessage(''); setView('inicio'); setMenuOpen(false) }
   const go = (next: typeof view) => { setEditing(null); setPreview(null); setMessage(''); setView(next); setMenuOpen(false) }
-  const startNew = (category?: string) => { setForm({ ...EMPTY, category: category ?? EMPTY.category }); setEditing('new'); setMessage('') }
-  const startEdit = (post: Post) => { setForm({ title: post.title, slug: post.slug, category: post.category, excerpt: post.excerpt, content: post.content, coverUrl: post.coverUrl, author: post.author, status: post.status }); setEditing(post); setMessage('') }
+  const startNew = (category?: string) => { setForm({ ...EMPTY, category: category ?? EMPTY.category }); setEditing('new'); setPreview(null); setMessage(''); setMenuOpen(false) }
+  const startEdit = (post: Post) => { setForm({ title: post.title, slug: post.slug, category: post.category, excerpt: post.excerpt, content: post.content, coverUrl: post.coverUrl, author: post.author, status: post.status }); setEditing(post); setPreview(null); setMessage(''); setMenuOpen(false) }
   const update = (patch: Partial<PostInput>) => setForm((current) => ({ ...current, ...patch }))
 
   const save = async (event: FormEvent) => {
@@ -103,17 +164,50 @@ export function AdminPage() {
 
   if (!firebaseEnabled) return <main className="admin">{header}<p className="admin-note">Painel indisponível: o Firebase não está configurado neste ambiente.</p></main>
   if (user === undefined) return <main className="admin">{header}<p className="admin-note">carregando…</p></main>
-  if (!user) return (
+  if (invite === 'email' && !user) return (
     <main className="admin">{header}
       <section className="admin-login">
-        <h1 className="solution-title">Entrar no painel da BlueNews</h1>
-        <p className="admin-note">Use a conta Google da Bluezone. Só e-mails autorizados conseguem publicar.</p>
-        <button type="button" className="contact-submit" onClick={() => signInWithGoogle().catch((error) => setMessage('não foi possível entrar: ' + error.message))}>entrar com Google</button>
+        <h1 className="solution-title">Convite para o painel</h1>
+        <p className="admin-note">Confirme o e-mail que recebeu o convite para concluir o acesso.</p>
+        <form className="contact-form admin-loginform" onSubmit={completeInvite}>
+          <label className="field"><span>e-mail</span><input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} required autoComplete="email" /></label>
+          <div className="contact-actions"><button type="submit" className="contact-submit">continuar</button></div>
+        </form>
         {message && <p className="admin-note admin-error">{message}</p>}
       </section>
     </main>
   )
-  if (isAdmin === false) return <main className="admin">{header}<section className="admin-login"><h1 className="solution-title">Sem permissão</h1><p className="admin-note">A conta {user.email} não está na lista de administradores. Peça para adicionar em contato@abluezone.com.br.</p></section></main>
+  if (user && invite === 'password') return (
+    <main className="admin">{header}
+      <section className="admin-login">
+        <h1 className="solution-title">Crie sua senha</h1>
+        <p className="admin-note">Você entrou como {user.email}. Crie uma senha para os próximos acessos (mínimo 10 caracteres, com letra e número). Também dá para entrar com Google usando este mesmo e-mail.</p>
+        <form className="contact-form admin-loginform" onSubmit={savePassword}>
+          <label className="field"><span>nova senha</span><input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} minLength={10} required autoComplete="new-password" /></label>
+          <div className="contact-actions"><button type="submit" className="contact-submit">salvar senha</button></div>
+        </form>
+        {message && <p className="admin-note admin-error">{message}</p>}
+      </section>
+    </main>
+  )
+  if (!user) return (
+    <main className="admin">{header}
+      <section className="admin-login">
+        <h1 className="solution-title">Entrar no painel da BlueNews</h1>
+        <p className="admin-note">Administradores entram com Google. Editores entram com Google ou com e-mail e senha criada no convite.</p>
+        <button type="button" className="contact-submit" onClick={() => signInWithGoogle().catch((error) => setMessage('não foi possível entrar: ' + error.message))}>entrar com Google</button>
+        <form className="contact-form admin-loginform" onSubmit={loginWithPassword} aria-label="Entrar com e-mail e senha">
+          <span className="admin-subtitle">ou com e-mail e senha</span>
+          <label className="field"><span>e-mail</span><input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} autoComplete="username" required /></label>
+          <label className="field"><span>senha</span><input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} autoComplete="current-password" required /></label>
+          <div className="contact-actions"><button type="submit" className="contact-submit">entrar</button><button type="button" className="admin-link" onClick={forgot}>esqueci a senha</button></div>
+        </form>
+        <p className="admin-note">Recebeu um convite? Abra o link do e-mail neste navegador para entrar e criar sua senha.</p>
+        {message && <p className="admin-note admin-error">{message}</p>}
+      </section>
+    </main>
+  )
+  if (isAdmin === false) return <main className="admin">{header}<section className="admin-login"><h1 className="solution-title">Sem permissão</h1><p className="admin-note">A conta {user.email} não está na lista de administradores nem de editores. Peça um convite em contato@abluezone.com.br.</p><button type="button" className="admin-link" onClick={() => signOutUser()}>sair</button></section></main>
   if (isAdmin === null) return <main className="admin">{header}<p className="admin-note">verificando permissão…</p></main>
 
   const previewView = (post: PostInput) => (
@@ -132,9 +226,11 @@ export function AdminPage() {
   const published = posts.filter((p) => p.status === 'published')
   const drafts = posts.filter((p) => p.status === 'draft')
   const filtered = posts.filter((p) => (!filterCat || p.category === filterCat) && (!filterStatus || p.status === filterStatus) && (!search || p.title.toLowerCase().includes(search.toLowerCase())))
-  const NAV: Array<{ id: typeof view; label: string; soon?: boolean }> = [
+  const NAV: Array<{ id: typeof view; label: string; soon?: boolean }> = role === 'admin' ? [
     { id: 'inicio', label: 'início' }, { id: 'noticias', label: 'notícias' }, { id: 'secoes', label: 'seções' },
     { id: 'newsletter', label: 'newsletter', soon: true }, { id: 'leads', label: 'leads', soon: true }, { id: 'config', label: 'configurações' },
+  ] : [
+    { id: 'inicio', label: 'início' }, { id: 'noticias', label: 'notícias' }, { id: 'secoes', label: 'seções' }, { id: 'config', label: 'minha conta' },
   ]
   const sidebar = (
     <nav className={`admin-sidebar${menuOpen ? ' is-open' : ''}`} aria-label="Menu do painel">
@@ -160,7 +256,7 @@ export function AdminPage() {
               <button type="button" className="admin-link" onClick={() => setPreview({ title: post.title, slug: post.slug, category: post.category, excerpt: post.excerpt, content: post.content, coverUrl: post.coverUrl, author: post.author, status: post.status })}>pré-visualizar</button>
               <button type="button" className="admin-link" onClick={() => toggleStatus(post)} disabled={busy}>{post.status === 'published' ? 'despublicar' : 'publicar'}</button>
               {post.status === 'published' && <a className="admin-link" href={`${SITE}/bluenews?post=${post.slug}`} target="_blank" rel="noopener noreferrer">ver</a>}
-              <button type="button" className="admin-link admin-danger" onClick={() => remove(post)} disabled={busy}>excluir</button>
+              {role === 'admin' && <button type="button" className="admin-link admin-danger" onClick={() => remove(post)} disabled={busy}>excluir</button>}
             </div>
           </li>
         ))}
@@ -178,7 +274,7 @@ export function AdminPage() {
                 <button type="button" className="admin-link" onClick={() => setPreview({ title: post.title, slug: post.slug, category: post.category, excerpt: post.excerpt, content: post.content, coverUrl: post.coverUrl, author: post.author, status: post.status })}>pré-visualizar</button>
                 <button type="button" className="admin-link" onClick={() => toggleStatus(post)} disabled={busy}>{post.status === 'published' ? 'despublicar' : 'publicar'}</button>
                 {post.status === 'published' && <a className="admin-link" href={`${SITE}/bluenews?post=${post.slug}`} target="_blank" rel="noopener noreferrer">ver</a>}
-                <button type="button" className="admin-link admin-danger" onClick={() => remove(post)} disabled={busy}>excluir</button>
+                {role === 'admin' && <button type="button" className="admin-link admin-danger" onClick={() => remove(post)} disabled={busy}>excluir</button>}
               </td>
             </tr>
           ))}
@@ -228,11 +324,28 @@ export function AdminPage() {
     <section className="admin-list">
       <div className="admin-toolbar"><h1 className="solution-title">Configurações</h1></div>
       <dl className="admin-config">
-        <dt>conta conectada</dt><dd>{user.email}</dd>
-        <dt>acesso ao painel</dt><dd>e-mails cadastrados na lista de administradores. Para adicionar alguém da equipe, peça em contato@abluezone.com.br.</dd>
+        <dt>conta conectada</dt><dd>{user.email} · {role === 'admin' ? 'administradora' : 'editor(a)'}</dd>
+        <dt>acesso ao painel</dt><dd>{role === 'admin' ? 'administradores entram com Google e gerenciam pessoas; editores publicam notícias e entram com Google ou e-mail e senha.' : 'você publica notícias. Exclusão de notícias e gestão de pessoas ficam com a administração.'}</dd>
         <dt>portal público</dt><dd><a className="admin-link" href={`${SITE}/bluenews`} target="_blank" rel="noopener noreferrer">{SITE.replace('https://', '')}/bluenews</a></dd>
         <dt>e-mail de suporte</dt><dd>contato@abluezone.com.br</dd>
       </dl>
+      {role === 'admin' && (
+        <section className="admin-editors" aria-labelledby="admin-editors-title">
+          <h2 id="admin-editors-title" className="admin-subtitle">editores</h2>
+          <form className="admin-editor-form" onSubmit={addEditor}>
+            <input placeholder="nome" value={newEditor.name} onChange={(e) => setNewEditor({ ...newEditor, name: e.target.value })} maxLength={80} aria-label="Nome" />
+            <input type="email" placeholder="e-mail" value={newEditor.email} onChange={(e) => setNewEditor({ ...newEditor, email: e.target.value })} required aria-label="E-mail" />
+            <button type="submit" className="contact-submit" disabled={busy}>convidar</button>
+          </form>
+          <p className="admin-note">A pessoa recebe um e-mail com o link de acesso, entra por ele e cria a senha. Depois pode entrar com Google (mesmo e-mail) ou com e-mail e senha.</p>
+          {editors.length > 0 && (
+            <ul className="admin-editor-list">
+              {editors.map((e) => <li key={e.email}><span><strong>{e.name || '(sem nome)'}</strong> · {e.email}</span><span className="admin-actions"><button type="button" className="admin-link" onClick={() => resendInvite(e.email)}>reenviar convite</button><button type="button" className="admin-link admin-danger" onClick={() => removeEditor(e.email)} disabled={busy}>remover</button></span></li>)}
+            </ul>
+          )}
+          {message && <p className="admin-note">{message}</p>}
+        </section>
+      )}
       <button type="button" className="admin-link" onClick={() => signOutUser()}>sair</button>
     </section>
   )

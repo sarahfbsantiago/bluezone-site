@@ -12,6 +12,24 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.token.email == email;
       allow write: if false;
     }
+    // Editores: convidados por administradores pelo painel. Publicam notícias; não veem leads nem gerenciam pessoas.
+    function isEditor() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && request.auth.token.email_verified == true
+        && exists(/databases/$(database)/documents/editors/$(request.auth.token.email));
+    }
+    function isStaff() { return isAdmin() || isEditor(); }
+    match /editors/{email} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.token.email == email);
+      allow create: if isAdmin()
+        && email.matches('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$')
+        && request.resource.data.keys().hasOnly(['name', 'invitedBy', 'createdAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 80
+        && request.resource.data.invitedBy == request.auth.token.email;
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
 
     // Notícias da BlueNews: leitura pública do que está publicado; escrita só por administradores, com limites.
     function validPost(d) {
@@ -26,21 +44,21 @@ service cloud.firestore {
         && d.status in ['draft', 'published'];
     }
     match /posts/{postId} {
-      allow read: if resource.data.status == 'published' || isAdmin();
-      allow create: if isAdmin() && validPost(request.resource.data);
-      allow update: if isAdmin() && validPost(request.resource.data);
+      allow read: if resource.data.status == 'published' || isStaff();
+      allow create: if isStaff() && validPost(request.resource.data);
+      allow update: if isStaff() && validPost(request.resource.data);
       allow delete: if isAdmin();
     }
 
     // Imagens das notícias (data URL reduzida no navegador, ≤ 700 KB): leitura pública, envio/exclusão só por administradores.
     match /images/{imageId} {
       allow read: if true;
-      allow create: if isAdmin()
+      allow create: if isStaff()
         && request.resource.data.data is string
         && request.resource.data.data.size() <= 700000
         && request.resource.data.data.matches('^data:image/(webp|jpeg|png);base64,.*');
       allow update: if false;
-      allow delete: if isAdmin();
+      allow delete: if isStaff();
     }
 
     // Tudo o mais: negado (leads, events, users etc. entram nas próximas etapas, sempre via backend).

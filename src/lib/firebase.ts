@@ -1,5 +1,5 @@
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app'
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, type Auth, type User } from 'firebase/auth'
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, updatePassword, sendPasswordResetEmail, type Auth, type User } from 'firebase/auth'
 import { getFirestore, type Firestore } from 'firebase/firestore'
 
 /** Config pública do app Web (Console → Configurações do projeto). Sem ela, o site funciona sem banco. */
@@ -24,10 +24,10 @@ function getApp(): FirebaseApp {
 export function db(): Firestore { return getFirestore(getApp()) }
 export function auth(): Auth { return getAuth(getApp()) }
 
-/** Login da equipe com a conta Google do Workspace. */
+/** Login com Google (administradores e editores; o e-mail precisa estar nas listas do banco). */
 export async function signInWithGoogle(): Promise<User> {
   const provider = new GoogleAuthProvider()
-  provider.setCustomParameters({ hd: 'abluezone.com.br', prompt: 'select_account' })
+  provider.setCustomParameters({ prompt: 'select_account' })
   const result = await signInWithPopup(auth(), provider)
   return result.user
 }
@@ -36,4 +36,38 @@ export function signOutUser(): Promise<void> { return signOut(auth()) }
 
 export function watchUser(callback: (user: User | null) => void): () => void {
   return onAuthStateChanged(auth(), callback)
+}
+
+/** Login de editor com e-mail e senha (senha criada no primeiro acesso, pelo convite). */
+export function signInWithPassword(email: string, password: string): Promise<User> {
+  return signInWithEmailAndPassword(auth(), email.trim().toLowerCase(), password).then((r) => r.user)
+}
+
+const INVITE_KEY = 'bluezone-convite-email'
+
+/** Convite: o Firebase envia um link de acesso para o e-mail; ao abrir, a pessoa entra e cria a senha. */
+export async function sendInvite(email: string): Promise<void> {
+  const target = email.trim().toLowerCase()
+  await sendSignInLinkToEmail(auth(), target, { url: `${window.location.origin}/?convite=1`, handleCodeInApp: true })
+}
+
+export function isInviteLink(): boolean {
+  return typeof window !== 'undefined' && isSignInWithEmailLink(auth(), window.location.href)
+}
+
+/** Conclui o convite a partir do link (pede o e-mail se não estiver guardado neste navegador). */
+export async function finishInvite(email: string): Promise<User> {
+  const result = await signInWithEmailLink(auth(), email.trim().toLowerCase(), window.location.href)
+  try { window.localStorage.removeItem(INVITE_KEY) } catch { /* ignora */ }
+  return result.user
+}
+
+export function setPassword(password: string): Promise<void> {
+  const user = auth().currentUser
+  if (!user) return Promise.reject(new Error('sem sessão'))
+  return updatePassword(user, password)
+}
+
+export function resetPassword(email: string): Promise<void> {
+  return sendPasswordResetEmail(auth(), email.trim().toLowerCase())
 }
