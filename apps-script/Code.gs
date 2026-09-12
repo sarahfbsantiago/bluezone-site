@@ -1,13 +1,15 @@
 // Bluezone - receptor do formulario de contato (Google Apps Script, Web App).
-// Grava cada mensagem na aba "contatos" da planilha e envia um e-mail de aviso.
+// Grava cada envio na aba da sua origem (contatos, bluenews, blueprint) e envia um e-mail de aviso com assunto por origem.
 // Seguranca: valida e sanitiza campos, neutraliza formulas no Sheets e limita envios no servidor.
 
 var CONFIG = {
   to: "contato@abluezone.com.br",
-  sheetName: "contatos",
+  sheetName: "contatos",          // aba padrao (formulario "Entre em contato")
+  sheets: { "bluenews": "bluenews", "popup-blueprint": "blueprint", "blueprint": "blueprint" },
   subject: "Novo contato pelo site Bluezone",
   subjectNews: "Nova inscricao na BlueNews",
   subjectPopup: "Novo lead do pop-up Blueprint",
+  subjectBlueprint: "Novo contato pela pagina do Blueprint",
   maxLength: 4000,
   maxPerHour: 30,        // limite global de envios por hora
   perEmailSeconds: 90    // intervalo minimo entre envios do mesmo e-mail
@@ -28,20 +30,27 @@ function doPost(e) {
     if (!allow(email)) return respond({ ok: false, error: "rate_limited" });
 
     var source = clean(body.source, 60);
-    var sheet = getSheet();
+    var sheet = getSheet(CONFIG.sheets[source] || CONFIG.sheetName);
     sheet.appendRow([new Date(), safeCell(name), safeCell(email), safeCell(phone), safeCell(message), safeCell(source)]);
 
     var nl = String.fromCharCode(10);
     MailApp.sendEmail({
       to: CONFIG.to,
       replyTo: email,
-      subject: (source === "bluenews" ? CONFIG.subjectNews : source === "popup-blueprint" ? CONFIG.subjectPopup : CONFIG.subject) + " - " + name,
+      subject: subjectFor(source) + " - " + name,
       body: "Nome: " + name + nl + "E-mail: " + email + nl + "Telefone: " + phone + nl + nl + message
     });
     return respond({ ok: true });
   } catch (error) {
     return respond({ ok: false, error: "server" });
   }
+}
+
+function subjectFor(source) {
+  if (source === "bluenews") return CONFIG.subjectNews;
+  if (source === "popup-blueprint") return CONFIG.subjectPopup;
+  if (source === "blueprint") return CONFIG.subjectBlueprint;
+  return CONFIG.subject;
 }
 
 function doGet() {
@@ -67,11 +76,12 @@ function allow(email) {
   }
 }
 
-function getSheet() {
+// Uma aba por origem; cria a aba com cabecalho na primeira vez.
+function getSheet(name) {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = spreadsheet.getSheetByName(CONFIG.sheetName);
+  var sheet = spreadsheet.getSheetByName(name);
   if (!sheet) {
-    sheet = spreadsheet.insertSheet(CONFIG.sheetName);
+    sheet = spreadsheet.insertSheet(name);
     sheet.appendRow(["data", "nome", "e-mail", "telefone", "mensagem", "origem"]);
     sheet.setFrozenRows(1);
   }
