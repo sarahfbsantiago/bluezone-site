@@ -843,6 +843,9 @@ html[data-theme='dark'] { background: #050609; }
 .admin-header .header-brand { --brand-w: 120px; width: 120px; }
 .admin-title { font: 500 11px var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: rgba(16, 36, 58, .6); }
 .admin-header .admin-link { margin-left: auto; }
+.brand-adm { font-weight: 300; opacity: .55; }
+.admin-previewpage { display: flex; flex-direction: column; gap: 18px; }
+.admin-postpreview { margin: 0 auto; padding: 36px clamp(20px, 4vw, 48px); background: #fff; border-radius: 18px; box-shadow: 0 1px 0 rgba(16, 36, 58, .08); }
 .admin-link { background: none; border: 0; padding: 0; font: 500 11px var(--font-mono); letter-spacing: .1em; color: var(--blue); cursor: pointer; text-decoration: none; border-bottom: 1px solid rgba(31, 109, 255, .4); }
 .admin-link:disabled { opacity: .5; cursor: default; }
 .admin-danger { color: #c1273f; border-color: rgba(193, 39, 63, .4); }
