@@ -36,7 +36,7 @@ Feito em 12/09/2026 (parte A - BlueNews):
 [x] Firestore criado (southamerica-east1) com regras "nega tudo" + excecoes para posts/admins
 [x] App Web registrado no projeto (config publica em VITE_FIREBASE_* no .env e nas variaveis do GitHub)
 [x] Firebase Authentication com Google (provedor ativado no console; dominios autorizados)
-[x] Painel em site separado (bluezone-painel.web.app -> painel.abluezone.com.br), fora do site publico: login Google, lista, editor com previa, publicar/despublicar, excluir
+[x] Painel em site separado em painel.abluezone.com.br (CNAME, certificado ok), fora do site publico, com barra lateral: login Google, lista, editor com previa, publicar/despublicar, excluir
 [x] Colecao admins/{email}: quem pode publicar (hoje: contato@abluezone.com.br). Adicionar e-mails so pelo console
 [x] Colecao posts: titulo, slug, secao, resumo, texto (formatacao basica segura), capa (URL https), autor, status, datas
 [x] BlueNews publica le as noticias publicadas e abre cada uma em /bluenews?post=<slug>

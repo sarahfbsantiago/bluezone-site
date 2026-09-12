@@ -37,7 +37,11 @@ export function BlueNewsPage() {
     if (slug) getPublishedBySlug(slug).then(setCurrent).catch(() => setCurrent(null))
     else setCurrent(null)
   }, [slug])
-  useEffect(() => { if (subscribe) formBox.current?.querySelector<HTMLInputElement>('input[name="name"]')?.focus({ preventScroll: true }) }, [subscribe])
+  useEffect(() => {
+    if (!subscribe || !formBox.current) return
+    formBox.current.scrollIntoView?.({ behavior: 'smooth', block: 'center' })
+    formBox.current.querySelector<HTMLInputElement>('input[name="name"]')?.focus({ preventScroll: true })
+  }, [subscribe])
 
   const pick = (id: string) => {
     setSection(id)
@@ -57,11 +61,11 @@ export function BlueNewsPage() {
       <a className="news-brand header-brand" href={withBase('/bluenews')} aria-label="BlueNews, início" onClick={(e) => { if (!slug) { e.preventDefault(); pick('') } }}>
         <img src={withBase('/logo-symbol.png')} alt="" decoding="async" /><span><b>Blue</b>News</span>
       </a>
-      <nav className="news-nav site-nav" aria-label="Seções">
+      <nav className="news-nav" aria-label="Seções">
         {CATEGORIES.map((c) => <a key={c.id} href={`${withBase('/bluenews')}?secao=${c.id}`} className={section === c.id && !slug ? 'is-active' : undefined} onClick={(e) => { if (!slug) { e.preventDefault(); pick(c.id) } }}>{c.label}</a>)}
-        <a className="news-contact nav-contact" href={withBase(`/#${pages.contact.id}`)}>contato</a>
+        <a className="news-contact" href={withBase(`/#${pages.contact.id}`)}>contato</a>
       </nav>
-      <button type="button" className="news-menu menu-toggle" aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen((v) => !v)}><span /><span /><span /></button>
+      <button type="button" className="news-menu" aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen((v) => !v)}><span /><span /><span /></button>
     </header>
   )
 
