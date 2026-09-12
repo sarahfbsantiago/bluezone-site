@@ -47,17 +47,21 @@ WhatsApp flutuante: ícone em pontilhismo (no escuro: branco puro, sem degradê,
 
 ## Prévia de compartilhamento e GitHub Pages
 
-- Imagens de prévia (WhatsApp/Instagram/redes) em `public/og-bluezone.png` (site e BlueNews) e `public/og-blueprint.png` (Blueprint), 1200×630, geradas com Puppeteer (marca com letreiro sobre fundo escuro). As tags `og:*`/`twitter:*` usam `%VITE_SITE_URL%` (Vite troca no build): `.env` local = http://127.0.0.1:5173; GitHub Pages = https://sarahfbsantiago.github.io/bluezone-site; Firebase = https://bluezone.com.br.
+- Imagens de prévia (WhatsApp/Instagram/redes) em `public/og-bluezone.png` (site e BlueNews) e `public/og-blueprint.png` (Blueprint), 1200×630, geradas com Puppeteer (marca com letreiro sobre fundo escuro). As tags `og:*`/`twitter:*` usam `%VITE_SITE_URL%` (Vite troca no build): `.env` local = http://127.0.0.1:5173; GitHub Pages = https://sarahfbsantiago.github.io/bluezone-site; Firebase = https://abluezone.com.br.
 - **GitHub**: conta correta da cliente é **sarahfbsantiago** (a conta SarahSantiago1009910 / sarah@y.uno foi deslogada do `gh` em 12/09/2026 a pedido da cliente e **nunca** deve ser usada para GitHub; ficou um repositório `bluezone-site` vazio nela para apagar pelo navegador). Repositório `sarahfbsantiago/bluezone-site` (público, exigido pelo Pages gratuito). Workflow `.github/workflows/pages.yml` publica a cada push na main com `VITE_BASE=/bluezone-site/`; caminhos absolutos no código passam por `withBase()` (`src/lib/paths.ts`). Link: https://sarahfbsantiago.github.io/bluezone-site/. O deploy oficial continua sendo o Firebase (base `/`).
+
+## Assinatura de e-mail
+
+- `assinatura/assinatura-bluezone.html`: bloco para colar no Gmail (contato@abluezone.com.br): GIF animado do símbolo em pontilhismo formando/girando/levitando com "Bluezone" (`public/midia/assinatura-bluezone.gif`, 440×150, ~450 KB, loop 3,8 s, primeiro quadro já formado para clientes que não animam) + texto com WhatsApp, e-mail, site abluezone.com.br e @abluezone. O GIF é servido pelo GitHub Pages; quando o Firebase estiver no ar, trocar a URL da imagem para https://abluezone.com.br/midia/assinatura-bluezone.gif. Gerado com Puppeteer (relógio controlado) + ffmpeg (12/09/2026).
 
 ## Integrações
 
-- **E-mail oficial da Blue (12/09/2026)**: contato@abluezone.com.br (Google Workspace criado pela cliente). É o e-mail de suporte do Blueprint (`siteConfig.supportEmail`) e o destinatário no `apps-script/Code.gs` do repositório; o script implantado ainda envia para dmarketingevendas@gmail.com até a cliente colar a versão nova. Domínio do e-mail é abluezone.com.br; confirmar se o site também será abluezone.com.br (canonical hoje aponta para bluezone.com.br).
+- **E-mail oficial da Blue (12/09/2026)**: contato@abluezone.com.br (Google Workspace criado pela cliente). É o e-mail de suporte do Blueprint (`siteConfig.supportEmail`) e o destinatário no `apps-script/Code.gs` do repositório; o script implantado ainda envia para dmarketingevendas@gmail.com até a cliente colar a versão nova. **Domínio oficial do site e do e-mail: abluezone.com.br** (confirmado em 12/09/2026; canonical/og já apontam para ele; será o domínio do Firebase Hosting).
 - **Formulário → Google Apps Script** (conta dmarketingevendas@gmail.com). URL do Web App no `.env` (`VITE_CONTACT_ENDPOINT`). Grava na aba `contatos` da planilha `1ntXclF4D8wef7CypEVmRjVXs8ZDUg-EUlSyRhSz2GEE` e envia e-mail. Script com proteção contra fórmulas, injeção no e-mail e limite de envios (30/h, 1 a cada 90 s por e-mail). Validado de ponta a ponta em 11/09/2026.
 - **Origens na planilha** (coluna `origem`): `bluezone-site` (formulário de contato), `bluenews` (newsletter), `popup-blueprint` (pop-up da home). O `apps-script/Code.gs` do repositório dá assunto próprio a cada uma; o script implantado hoje só tem o assunto padrão até a cliente colar a versão nova.
 - **Ao colar código no Apps Script**, usar a versão só com aspas duplas/ASCII (`apps-script/Code.gs`): aspas do chat viram tipográficas e quebram o editor.
 - **Deploy**: `firebase.json` pronto com cabeçalhos de segurança (CSP, HSTS etc.). Projeto Firebase ainda **não** existe: a conta dmarketingevendas@gmail.com precisa ativar verificação em duas etapas e aceitar os termos no console; depois criar `bluezone-site` e vincular. CLI já tem a conta adicionada (`firebase login:use dmarketingevendas@gmail.com`). Dois projetos GCP vazios ficaram criados na tentativa (`bluezone-br`, `bluezone-oficial`) — apagar depois.
-- **Domínio**: registrado pela cliente; DNS entra quando o Hosting existir.
+- **Domínio**: abluezone.com.br, registrado pela cliente; DNS entra quando o Hosting existir.
 - **Banco de dados**: não é necessário agora. Quando precisar: Firestore (nunca Supabase, decisão da cliente).
 
 ## Como rodar e testar
