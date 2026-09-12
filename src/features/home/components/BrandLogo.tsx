@@ -25,5 +25,10 @@ export function BrandLogo({ markOnly = false, className = '', variant = 'bluezon
 function LogoImage({ className }: { className: string }) {
   const [failed, setFailed] = useState(false)
   if (failed) return <span className={`brand-logo ${className}`}><span className="brand-mark brand-mark-word" role="img" aria-label="Bluezone" /></span>
-  return <span className={`brand-logo ${className}`}><img src={withBase('/logo-bluezone.png')} alt="Bluezone" decoding="async" onError={() => setFailed(true)} /></span>
+  return (
+    <span className={`brand-logo ${className}`}>
+      <img className="logo-full" src={withBase('/logo-bluezone.png')} alt="Bluezone" decoding="async" onError={() => setFailed(true)} />
+      <img className="logo-symbol" src={withBase('/logo-symbol.png')} alt="Bluezone" decoding="async" />
+    </span>
+  )
 }
