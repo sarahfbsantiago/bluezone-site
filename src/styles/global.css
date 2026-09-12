@@ -56,6 +56,7 @@ button { font-family: inherit; }
 .brand-news-word b { font-weight: 700; }
 [data-theme='dark'] .brand-news { color: #ffffff; }
 .nav-back { opacity: .85; }
+.nav-admin { opacity: .55; }
 .header-blog .site-nav { gap: 18px; font-size: 10.5px; letter-spacing: .1em; }
 /* Header da BlueNews tem 8 seções: abaixo de 1180px vira o painel (mesmas regras do menu mobile). */
 @media (max-width: 1180px) {

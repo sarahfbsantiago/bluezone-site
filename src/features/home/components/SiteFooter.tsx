@@ -11,6 +11,7 @@ export function SiteFooter({ site = 'home' }: { site?: 'home' | 'bluenews' | 'bl
       <a href={withBase('/#top')} className="footer-brand" aria-label="Bluezone, voltar à página inicial do site"><BrandLogo /></a>
       <nav aria-label="Navegação do rodapé">
         {site !== 'home' && <a className="nav-back" href={withBase('/#top')}>voltar ao site</a>}
+        {site === 'bluenews' && <a className="nav-admin" href={withBase('/bluenews/admin')}>painel</a>}
         {navItems.map((item) => <a key={item.label} href={item.href}>{item.label}</a>)}
         <a href={contactItem.href}>{contactItem.label}</a>
         <a href={siteConfig.whatsapp} target="_blank" rel="noopener noreferrer">whatsapp</a>
