@@ -39,7 +39,10 @@ Feito em 12/09/2026 (parte A - BlueNews):
 [x] Colecao admins/{email}: quem pode publicar (hoje: contato@abluezone.com.br). Adicionar e-mails so pelo console
 [x] Colecao posts: titulo, slug, secao, resumo, texto (formatacao basica segura), capa (URL https), autor, status, datas
 [x] BlueNews publica le as noticias publicadas e abre cada uma em /bluenews?post=<slug>
-[ ] Imagens de capa por upload (Cloud Storage) - depende do bucket (pode exigir Blaze)
+[ ] Imagens de capa por upload (Cloud Storage) - depende do bucket (exige Blaze)
+[ ] Ativar provedor Google no Authentication (console; pendente da cliente)
+[ ] Plano Blaze: conta de faturamento 01D89D-0C29A5-0366FC (org abluezone.com.br) paga por Pix em 12/09/2026,
+    aguardando o Google aplicar o credito e reabrir a conta. contato@ ja tem o papel de admin de faturamento.
 
 Objetivo: leads e "registro de eventos" (timeline do que acontece com cada lead/aluno)
 no Firestore, com a planilha mantida como espelho para a equipe.
@@ -105,17 +108,74 @@ Passos:
 [ ] Notificacoes push (Cloud Messaging)
 
 
-8. SEGURANCA (vale para todas as etapas)
+8. ESCALABILIDADE, DISPONIBILIDADE E OPERACAO
+--------------------------------------------
+Hospedagem
+- Firebase Hosting entrega o site por CDN global com HTTPS automatico; escala sozinho e nao tem servidor
+  para cair. Dois sites (prod/teste) + previa no GitHub Pages: nada e publicado em prod sem passar pelo teste.
+- Rollback: Hosting guarda versoes; "firebase hosting:rollback" ou pelo console volta em segundos.
+
+Banco (Firestore)
+- Serverless e replicado pela regiao (southamerica-east1); escala por leitura/escrita sem ajuste nosso.
+- Modelagem para escala: documentos pequenos, consultas por indice (status+publishedAt, slug+status),
+  listas paginadas (limit), sem varreduras. Contadores/agregacoes futuras em documentos proprios.
+- Regioes: se um dia precisar de multi-regiao, migracao por exportacao/importacao (planejar antes de crescer).
+
+Backend (Cloud Functions, apos Blaze)
+- Funcoes pequenas por responsabilidade (submitLead, kiwifyWebhook, mirrorToSheet...), idempotentes
+  (chave de deduplicacao por envio/webhook), com retry seguro e timeouts curtos.
+- Regiao southamerica-east1, memoria minima; concorrencia da plataforma cuida de picos.
+
+Disponibilidade e recuperacao
+- Backups: exportacao agendada do Firestore para Cloud Storage (diaria) quando o Blaze estiver ativo;
+  ate la, exportacao manual periodica. Retencao de 30 dias.
+- Recuperacao: procedimento documentado (importar exportacao; republicar versao anterior do Hosting).
+- Dependencias externas (Apps Script/planilha, Kiwify): o site nunca quebra se elas falharem -
+  mensagens de erro amigaveis e tentativa posterior.
+
+Observabilidade
+- Logs das Functions e do Hosting no Google Cloud Logging; alertas de erro por e-mail.
+- Orcamento e alertas de custo no faturamento (ex.: aviso em R$ 20 e R$ 50).
+- Uptime check do dominio (Cloud Monitoring) apos o Blaze.
+
+Ambientes e entrega
+- teste (bluezone-teste.web.app, noindex) -> aprovacao -> prod (abluezone.com.br).
+- Testes automaticos (unitarios + smoke em navegador) rodam a cada push; build falha bloqueia publicacao.
+- Configuracao por variaveis de ambiente (.env local, variaveis do GitHub); nenhum segredo no codigo.
+
+
+9. SEGURANCA (vale para todas as etapas)
 ----------------------------------------
-- Segredos so nas Functions (config/secret manager); nada no site nem no GitHub
-- Regras do Firestore/Storage: nega tudo; abre por uid e por papel
-- App Check em Functions, Firestore e Storage
-- Validacao e limite de envios no servidor; logs de auditoria em "events"
-- LGPD: dados minimos, finalidade clara, canal para exclusao (contato@)
-- Backups/exportacao periodica do Firestore
+Identidade e acesso
+- Conta dona: contato@abluezone.com.br (Workspace) com 2 etapas obrigatorias. Nada em contas pessoais.
+- Firebase Auth com Google (hd=abluezone.com.br no login da equipe); e-mail verificado obrigatorio nas regras.
+- Papeis: lista "admins" (hoje) -> claims personalizadas via Function (quando Blaze). Nunca campo editavel pelo cliente.
+- Papeis de faturamento e organizacao no Google Cloud so para contato@; revisar acessos a cada 3 meses.
+
+Dados
+- Regras do Firestore/Storage: nega tudo; abre por uid, papel e validacao de esquema (tipos, tamanhos, formatos).
+- Escritas sensiveis (leads, eventos, matriculas) so pelo backend com Admin SDK; o cliente le o proprio.
+- Conteudo de usuarios renderizado como texto (nunca HTML cru) - vale para BlueNews e futuros comentarios.
+- LGPD: dados minimos, finalidade clara, prazo de retencao, canal para exclusao (contato@), politica de privacidade.
+
+Aplicacao e rede
+- CSP restritiva no Hosting (scripts so do proprio site), HSTS, X-Frame-Options DENY, Referrer-Policy.
+- App Check (reCAPTCHA Enterprise) em Firestore, Storage e Functions quando o Blaze estiver ativo.
+- Limite de envios por IP/e-mail no servidor; honeypot no site; validacao dupla (cliente + servidor).
+- Webhooks (Kiwify) com verificacao de assinatura e deduplicacao.
+
+Segredos e cadeia de entrega
+- Segredos so em Secret Manager/config das Functions; .env fora do Git; variaveis publicas do Firebase
+  sao publicas por desenho (as regras protegem).
+- Dependencias atualizadas (npm audit periodico); GitHub com 2FA; branch main protegida (revisao antes de merge).
+- Logs de auditoria: toda acao relevante vira um "event" (quem, quando, o que).
+
+Backups e resposta a incidentes
+- Exportacao diaria do Firestore + versoes do Hosting = ponto de retorno.
+- Plano de incidente: (1) despublicar/rollback, (2) revogar chaves/sessoes, (3) corrigir, (4) comunicar.
 
 
-9. DECISOES REGISTRADAS
+10. DECISOES REGISTRADAS
 -----------------------
 - Banco: Firestore (nunca Supabase) - decisao da cliente
 - Dominio oficial: abluezone.com.br (site e e-mail)
@@ -124,6 +184,7 @@ Passos:
 - Deploy oficial no dominio so com autorizacao da cliente
 
 
-10. HISTORICO
+11. HISTORICO
 -------------
 12/09/2026 - Site, formularios, hosting (prod/teste/previa), dominio e este plano.
+12/09/2026 - Firestore + regras, app Web, painel da BlueNews (/bluenews/admin), dominios do Auth; Blaze aguardando Pix.
