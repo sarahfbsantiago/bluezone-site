@@ -62,6 +62,11 @@
 .news-related .news-grid { padding: 16px 0 0; }
 .news-section-title { margin: 0; font: 500 10px var(--font-mono); letter-spacing: .24em; text-transform: uppercase; color: var(--ink-3); }
 
+/* contato */
+.news-contact-page .news-form { max-width: 100%; margin-top: 8px; }
+.news .field textarea { background: #fff; border-color: var(--line); color: var(--ink); border-radius: 8px; }
+.news .field textarea:focus-visible { border-color: var(--ink); box-shadow: none; }
+
 /* newsletter */
 .news-newsletter { max-width: 1180px; margin: 24px auto 0; padding: 40px clamp(16px, 5vw, 64px) 56px; border-top: 1px solid var(--line); }
 .news-newsletter p { max-width: 60ch; margin: 12px 0 18px; font: 400 13.5px/1.7 var(--font-mono); color: var(--ink-2); }
@@ -78,7 +83,7 @@
 
 /* rodapé */
 .news-footer { max-width: 1180px; margin: 0 auto; padding: 28px clamp(16px, 5vw, 64px) 40px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; align-items: center; gap: 16px 28px; background: transparent; box-shadow: none; }
-.news-footer-brand { font: 700 15px var(--font-mono); letter-spacing: -.01em; text-decoration: none; color: var(--ink); width: auto; }
+.news-footer-brand { font: 700 15px var(--font-mono); letter-spacing: -.01em; text-decoration: none; color: var(--ink) !important; width: auto; text-shadow: none; }
 .news-footer nav { display: flex; flex-wrap: wrap; gap: 18px; font: 500 10.5px var(--font-mono); letter-spacing: .12em; }
 .news-footer nav a { text-decoration: none; color: var(--ink-2); }
 .news-footer nav a:hover { color: var(--ink); }
@@ -95,4 +100,4 @@
   .news-contact { border-radius: 0; border: 0 !important; padding: 12px 0 !important; }
   .news-menu { display: flex; }
 }
-@media (max-width: 600px) { .news-header { padding: 12px 16px; } .news-grid { grid-template-columns: 1fr; } .news-card.is-featured a { grid-template-columns: 1fr; } .news-legal { margin-left: 0; } }
+@media (max-width: 600px) { .news-header { padding: 12px 16px; } .news-chips ul { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 12px 0; } .news-chips ul::-webkit-scrollbar { display: none; } .news-chips li { flex: none; } .news-masthead { padding-top: 28px; } .news-footer { flex-direction: column; align-items: flex-start; } .news-legal { margin-left: 0; } .news-grid { grid-template-columns: 1fr; } .news-card.is-featured a { grid-template-columns: 1fr; } .news-legal { margin-left: 0; } }

@@ -30,7 +30,8 @@ function doPost(e) {
       phone: formatPhone(body.phone),
       message: clean(body.message, CONFIG.maxLength)
     };
-    if (!d.name || !isEmail(d.email) || !d.phone || d.message.length < form.minMessage) {
+    var minMessage = source === "bluenews-contato" ? 10 : form.minMessage;
+    if (!d.name || !isEmail(d.email) || !d.phone || d.message.length < minMessage) {
       return respond({ ok: false, error: "invalid" });
     }
     if (!allow(d.email)) return respond({ ok: false, error: "rate_limited" });

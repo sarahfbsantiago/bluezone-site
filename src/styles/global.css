@@ -921,3 +921,19 @@ html[data-theme='dark'] { background: #050609; }
 .admin-upload-btn { display: inline-flex; align-items: center; justify-content: center; padding: 11px 16px; border-radius: 12px; border: 1px dashed rgba(16, 36, 58, .35); background: #fff; font: 500 11px var(--font-mono); letter-spacing: .1em; color: var(--blue); cursor: pointer; text-transform: none; }
 .admin-upload-btn input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .admin-upload small { font: 400 10.5px/1.5 var(--font-mono); letter-spacing: .02em; text-transform: none; color: rgba(16, 36, 58, .6); }
+
+/* Painel no celular: lista em cartões (a tabela fica só no desktop) */
+.admin-cards { display: none; list-style: none; margin: 0; padding: 0; flex-direction: column; gap: 10px; }
+.admin-cards li { display: flex; flex-direction: column; gap: 8px; padding: 14px; background: #fff; border-radius: 14px; box-shadow: 0 1px 0 rgba(16, 36, 58, .08); }
+.admin-card-title { background: none; border: 0; padding: 0; text-align: left; font: 500 14px/1.4 var(--font-mono); color: #10243a; cursor: pointer; }
+.admin-card-meta { font: 400 11px var(--font-mono); letter-spacing: .04em; color: rgba(16, 36, 58, .7); }
+@media (max-width: 900px) {
+  .admin-cards { display: flex; }
+  .admin-table { display: none; }
+  .admin-list { overflow: visible; }
+  .admin-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .admin-stat { padding: 12px; }
+  .admin-stat strong { font-size: 22px; }
+  .admin-stat span { font-size: 8.5px; }
+  .admin-header .admin-menu-toggle { margin-left: auto; }
+}

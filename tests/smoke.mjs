@@ -91,6 +91,10 @@ try {
   await new Promise((resolve) => setTimeout(resolve, 1500))
   check('Bluezone do footer volta ao site', page.url().replace(/#.*$/, '') === base + '/' || page.url().startsWith(base + '/#'), page.url())
 
+  await page.goto(base + '/bluenews?contato', { waitUntil: 'load' })
+  await new Promise((resolve) => setTimeout(resolve, 2000))
+  check('BlueNews: aba contato com formulário próprio', (await page.$('.news-contact-page textarea[name="message"]')) !== null)
+
   await page.goto(base + '/painel/', { waitUntil: 'load' }) // painel: site separado (em dev, pasta /painel); Firestore mantém conexão aberta
   await new Promise((resolve) => setTimeout(resolve, 3000))
   check('painel abre em /painel/ com login', (await page.$('.admin')) !== null && ((await page.$eval('.admin', (el) => el.textContent ?? '')).includes('entrar com Google') || (await page.$eval('.admin', (el) => el.textContent ?? '')).includes('não está configurado')))

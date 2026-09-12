@@ -40,8 +40,15 @@ export function AdminPage() {
     finally { setUploading(false) }
   }
 
+  const demo = import.meta.env.DEV && typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('demo')
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', 'light')
+    if (demo) {
+      setUser({ email: 'demo@abluezone.com.br' } as User); setIsAdmin(true)
+      const now = { toDate: () => new Date() } as unknown as Post['updatedAt']
+      setPosts([1, 2, 3, 4].map((i) => ({ id: String(i), title: `Notícia de exemplo ${i} com um título um pouco mais longo`, slug: `noticia-${i}`, category: CATEGORIES[i % CATEGORIES.length].id, excerpt: 'Resumo de exemplo para conferir o layout.', content: 'Texto de exemplo.\n\nSegundo parágrafo.', coverUrl: '', author: 'Equipe Bluezone', status: i % 2 ? 'published' : 'draft', updatedAt: now, publishedAt: now })))
+      return
+    }
     if (!firebaseEnabled) { setUser(null); return }
     return watchUser(async (next) => {
       setUser(next)
@@ -51,8 +58,9 @@ export function AdminPage() {
   }, [])
 
   const reload = useCallback(async () => {
+    if (demo) return
     try { setPosts(await listAll()) } catch (error) { setMessage('não foi possível carregar as notícias: ' + (error as Error).message) }
-  }, [])
+  }, [demo])
   useEffect(() => { if (isAdmin) void reload() }, [isAdmin, reload])
 
   const goHome = () => { setEditing(null); setPreview(null); setMessage(''); setView('inicio'); setMenuOpen(false) }
@@ -142,7 +150,21 @@ export function AdminPage() {
     <section className="admin-list"><div className="admin-toolbar"><h1 className="solution-title">{title}</h1></div><p className="admin-note">{text}</p></section>
   )
   const table = (list: Post[]) => (
-    list.length === 0 ? <p className="admin-note">Nenhuma notícia aqui.</p> : (
+    list.length === 0 ? <p className="admin-note">Nenhuma notícia aqui.</p> : (<>
+      <ul className="admin-cards" aria-label="Notícias">
+        {list.map((post) => (
+          <li key={post.id}>
+            <button type="button" className="admin-card-title" onClick={() => startEdit(post)}>{post.title}</button>
+            <span className="admin-card-meta">{CATEGORIES.find((c) => c.id === post.category)?.label ?? post.category} · <span className={`admin-status is-${post.status}`}>{post.status === 'published' ? 'publicada' : 'rascunho'}</span>{post.updatedAt?.toDate ? ' · ' + post.updatedAt.toDate().toLocaleDateString('pt-BR') : ''}</span>
+            <div className="admin-actions">
+              <button type="button" className="admin-link" onClick={() => setPreview({ title: post.title, slug: post.slug, category: post.category, excerpt: post.excerpt, content: post.content, coverUrl: post.coverUrl, author: post.author, status: post.status })}>pré-visualizar</button>
+              <button type="button" className="admin-link" onClick={() => toggleStatus(post)} disabled={busy}>{post.status === 'published' ? 'despublicar' : 'publicar'}</button>
+              {post.status === 'published' && <a className="admin-link" href={`${SITE}/bluenews?post=${post.slug}`} target="_blank" rel="noopener noreferrer">ver</a>}
+              <button type="button" className="admin-link admin-danger" onClick={() => remove(post)} disabled={busy}>excluir</button>
+            </div>
+          </li>
+        ))}
+      </ul>
       <table className="admin-table">
         <thead><tr><th>título</th><th>seção</th><th>status</th><th>atualizada</th><th /></tr></thead>
         <tbody>
@@ -162,7 +184,7 @@ export function AdminPage() {
           ))}
         </tbody>
       </table>
-    )
+    </>)
   )
   const screen = view === 'inicio' ? (
     <section className="admin-list">

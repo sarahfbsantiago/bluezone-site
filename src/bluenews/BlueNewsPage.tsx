@@ -22,6 +22,7 @@ const postUrl = (slug: string) => withBase(`/bluenews?post=${slug}`)
 export function BlueNewsPage() {
   const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams()
   const slug = params.get('post')
+  const contact = params.has('contato')
   const [section, setSection] = useState(params.get('secao') ?? '')
   const [posts, setPosts] = useState<Post[]>([])
   const [current, setCurrent] = useState<Post | null | undefined>(undefined)
@@ -64,7 +65,7 @@ export function BlueNewsPage() {
       </a>
       <nav className="news-nav" aria-label="Seções">
         {CATEGORIES.map((c) => <a key={c.id} href={`${withBase('/bluenews')}?secao=${c.id}`} className={section === c.id && !slug ? 'is-active' : undefined} onClick={(e) => { if (!slug) { e.preventDefault(); pick(c.id) } }}>{c.label}</a>)}
-        <a className="news-contact" href={withBase(`/#${pages.contact.id}`)}>contato</a>
+        <a className="news-contact" href={`${withBase('/bluenews')}?contato`}>contato</a>
       </nav>
       <button type="button" className="news-menu" aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen((v) => !v)}><span /><span /><span /></button>
     </header>
@@ -75,7 +76,7 @@ export function BlueNewsPage() {
       <a href={withBase('/#top')} className="footer-brand news-footer-brand" aria-label="Bluezone, voltar ao site">Bluezone</a>
       <nav aria-label="Rodapé">
         <a className="nav-back" href={withBase('/#top')}>voltar ao site</a>
-        <a href={withBase(`/#${pages.contact.id}`)}>contato</a>
+        <a href={`${withBase('/bluenews')}?contato`}>contato</a>
         <a href={siteConfig.whatsapp} target="_blank" rel="noopener noreferrer">whatsapp</a>
         <a href={`mailto:${siteConfig.supportEmail}`}>{siteConfig.supportEmail}</a>
       </nav>
@@ -94,6 +95,20 @@ export function BlueNewsPage() {
         <span className="news-more">ler notícia →</span>
       </a>
     </article>
+  )
+
+  if (contact) return (
+    <main className="news">
+      {header}
+      <section className="news-post news-contact-page" aria-labelledby="blog-title">
+        <a className="news-backlink" href={withBase('/bluenews')}>← todas as notícias</a>
+        <span className="news-kicker">contato</span>
+        <h1 id="blog-title" className="news-post-title">Fale com a BlueNews</h1>
+        <p className="news-post-lead">Sugestões de pauta, histórias de empreendedores, parcerias de conteúdo ou dúvidas sobre a newsletter. Respondemos em até 1 dia útil.</p>
+        <div className="news-form"><ContactForm variant="bluenews-contact" /></div>
+      </section>
+      {footer}
+    </main>
   )
 
   if (slug && current === undefined) return <main className="news">{header}<p className="news-empty">carregando…</p>{footer}</main>

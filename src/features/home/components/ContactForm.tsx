@@ -8,11 +8,11 @@ type Status = 'idle' | 'sending' | 'success' | 'error' | 'unconfigured'
 const MIN_FILL_MS = 2500
 const MIN_INTERVAL_MS = 8000
 
-type Variant = 'contact' | 'newsletter' | 'popup'
+type Variant = 'contact' | 'newsletter' | 'popup' | 'bluenews-contact'
 type ContactFormProps = { endpoint?: string; variant?: Variant }
 
 /** Variantes curtas (sem campo de mensagem): texto fixo enviado como mensagem, origem para a planilha e rótulos. */
-const SHORT: Record<Exclude<Variant, 'contact'>, { source: 'bluenews' | 'popup-blueprint'; message: string; submit: string; success: string; label: string }> = {
+const SHORT: Record<Exclude<Variant, 'contact' | 'bluenews-contact'>, { source: 'bluenews' | 'popup-blueprint'; message: string; submit: string; success: string; label: string }> = {
   newsletter: { source: 'bluenews', message: pages.blog.form.message, submit: pages.blog.form.submit, success: pages.blog.form.success, label: 'Inscrição na BlueNews' },
   popup: { source: 'popup-blueprint', message: 'Quero receber promoções e conteúdo exclusivo do Blueprint por e-mail (pop-up do site).', submit: 'quero receber', success: 'pronto! você vai receber as novidades do Blueprint por e-mail.', label: 'Receber novidades do Blueprint' },
 }
@@ -22,8 +22,9 @@ const SHORT: Record<Exclude<Variant, 'contact'>, { source: 'bluenews' | 'popup-b
  * `variant="newsletter"` (BlueNews): sem campo de mensagem, texto fixo e origem "bluenews" para a planilha e o e-mail.
  */
 export function ContactForm({ endpoint = siteConfig.contactEndpoint, variant = 'contact' }: ContactFormProps) {
-  const short = variant === 'contact' ? null : SHORT[variant]
+  const short = variant === 'contact' || variant === 'bluenews-contact' ? null : SHORT[variant]
   const newsletter = short !== null
+  const source = short ? short.source : variant === 'bluenews-contact' ? 'bluenews-contato' : 'bluezone-site'
   const [status, setStatus] = useState<Status>('idle')
   const [invalid, setInvalid] = useState<Array<keyof ContactPayload>>([])
   const [phone, setPhone] = useState('')
@@ -39,7 +40,7 @@ export function ContactForm({ endpoint = siteConfig.contactEndpoint, variant = '
     event.preventDefault()
     const form = event.currentTarget
     const data = new FormData(form)
-    const payload: ContactPayload = { name: String(data.get('name') ?? ''), email, phone, message: short ? short.message : String(data.get('message') ?? ''), website: String(data.get('website') ?? ''), source: short ? short.source : 'bluezone-site' }
+    const payload: ContactPayload = { name: String(data.get('name') ?? ''), email, phone, message: short ? short.message : String(data.get('message') ?? ''), website: String(data.get('website') ?? ''), source }
     const problems = validateContact(payload)
     setInvalid(problems)
     if (problems.length) return
@@ -61,7 +62,7 @@ export function ContactForm({ endpoint = siteConfig.contactEndpoint, variant = '
   }
 
   return (
-    <form className={`contact-form${newsletter ? ' newsletter-form' : ''}`} onSubmit={onSubmit} noValidate aria-describedby="contact-feedback" aria-label={short ? short.label : undefined}>
+    <form className={`contact-form${newsletter ? ' newsletter-form' : ''}`} onSubmit={onSubmit} noValidate aria-describedby="contact-feedback" aria-label={short ? short.label : variant === 'bluenews-contact' ? 'Contato pela BlueNews' : undefined}>
       <label className="field">
         <span>nome</span>
         <input name="name" type="text" autoComplete="name" onFocus={onFocus} aria-invalid={invalid.includes('name') || undefined} required />
