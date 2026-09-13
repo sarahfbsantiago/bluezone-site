@@ -202,9 +202,10 @@ export const pages = {
     id: 'contato',
     label: '09 — contato',
     title: 'Entre em contato',
-    subtitle: 'Vamos dar direção ao seu negócio',
+    subtitle: 'Como podemos ajudar?',
     paragraphs: [
-      'Conte um pouco sobre o momento da sua marca, os desafios que está enfrentando e onde quer chegar. A gente entende o cenário, identifica as possibilidades e mostra como a Bluezone pode ajudar.',
+      'Conte um pouco sobre o momento do seu negócio, os desafios que está enfrentando e onde quer chegar. Vamos dar direção ao seu negócio!',
+      'Vamos conversar?',
     ],
     note: 'Respondemos em até 1 dia útil.',
   },
