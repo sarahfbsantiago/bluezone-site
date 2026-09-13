@@ -204,7 +204,7 @@ export const pages = {
     title: 'Entre em contato',
     subtitle: 'Como podemos ajudar?',
     paragraphs: [
-      'Conte um pouco sobre o momento do seu negócio, os desafios que está enfrentando e onde quer chegar. Vamos dar direção ao seu negócio!',
+      'Conte um pouco sobre o momento do seu negócio, os desafios que está enfrentando e onde quer chegar.',
       'Vamos conversar?',
     ],
     note: 'Respondemos em até 1 dia útil.',
