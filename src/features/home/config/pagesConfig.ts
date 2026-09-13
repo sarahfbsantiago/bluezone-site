@@ -81,7 +81,7 @@ export const pages = {
           { title: 'Executar.', text: 'Transformamos estratégia em conteúdo, ferramentas e ações concretas.' },
           { title: 'Evoluir.', text: 'Acompanhamos o que funciona, aprendemos com os resultados e ajustamos a rota.' },
         ],
-        closing: ['Porque estratégia não é um documento que fica parado. **É uma direção que orienta decisões.**'],
+        closing: [],
       },
       {
         id: 'para-quem-fazemos',
@@ -117,8 +117,12 @@ export const pages = {
       { type: 'quote', name: 'Viviane Alecrim', service: 'estratégia e conteúdo', photo: '/midia/clientes/viviane-alecrim.png', via: '', text: 'Se tem uma coisa que eu confio, é no seu poder de convencimento e criação das melhores estratégias!!!' },
       { type: 'quote', name: 'Rosi Thomaz', service: 'projeto e estratégia', photo: '/midia/clientes/rosi-thomaz.png', via: '', text: 'Obrigada pela apresentação do projeto elaborado, ficou incrível! Me surpreendi com a assertividade, com a compreensão que desenvolveram do meu negócio e as soluções propostas. Parabéns pelo talento e competência nessa etapa!' },
       { type: 'quote', name: 'Darlim Miranda', service: 'identidade visual e mentoria', photo: '/midia/clientes/darlim-miranda.png', via: '', text: 'Bela e Alisson, passando para agradecer por tudo. Vocês são top demais. Arrasaram na escolha da nossa identidade, nas cores. Tudo perfeito. Sinto a dedicação e carinho em cada detalhe. Sem falar nas nossas mentorias. Foi Deus que colocou vocês em nossos caminhos. Desejo a vocês muito sucesso, pois vocês são incríveis.' },
-      { type: 'quote', name: 'Cliente Bluezone', service: 'conteúdo para redes', photo: '', via: 'whatsapp', text: 'Gente! Que trabalho lindo de vocês, Bluezone! Que posts lindos, que trazem a mensagem do nosso produto, que converte em resultado positivo e em vendas. Amei!' },
     ] as TestimonialItem[],
+    /** Prints reais de WhatsApp, lado a lado em iPhones 3D que giram com o scroll (telas recortadas dos PNGs, em public/midia/clientes/). */
+    phones: [
+      { src: '/midia/clientes/wpp-viviane.webp', alt: 'Mensagem de Viviane Alecrim no WhatsApp agradecendo a primeira etapa do contrato', name: 'Viviane Alecrim', note: 'via WhatsApp' },
+      { src: '/midia/clientes/wpp-cliente.webp', alt: 'Mensagem de cliente no WhatsApp: que trabalho lindo de vocês, Bluezone', name: 'Cliente Bluezone', note: 'via WhatsApp' },
+    ],
   },
   products: {
     id: 'produtos',

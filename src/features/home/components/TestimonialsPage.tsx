@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { withBase } from '../../../lib/paths'
 import { pages } from '../config/pagesConfig'
 import { useReducedMotion } from '../hooks/useReducedMotion'
+import { Phone } from '../../../blueprint/BlueprintPieces'
 
 type Item = (typeof pages.testimonials.items)[number]
 type MediaItem = Exclude<Item, { type: 'quote' }>
@@ -122,6 +123,16 @@ export function TestimonialsPage() {
         <div className="carousel-dots" role="tablist" aria-label="Posição no carrossel">
           {testimonials.items.map((_, i) => <button type="button" key={i} role="tab" aria-selected={i === index} aria-label={`Depoimento ${i + 1}`} className={i === index ? 'active' : ''} onClick={() => interact(i)} />)}
         </div>
+        {testimonials.phones.length > 0 && (
+          <ul className="clients-phones" aria-label="Mensagens de clientes no WhatsApp">
+            {testimonials.phones.map((phone) => (
+              <li key={phone.src}>
+                <Phone src={withBase(phone.src)} alt={phone.alt} />
+                <p className="clients-phone-caption"><strong>{phone.name}</strong><span>{phone.note}</span></p>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       <a className="page-continue" href={`#${products.id}`}>continuar<span className="page-continue-line" /></a>
     </section>

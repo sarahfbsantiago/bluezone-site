@@ -258,6 +258,16 @@ button { font-family: inherit; }
 .carousel-quote blockquote p { margin: 0 0 18px; font: 400 13px/1.7 var(--font-mono); letter-spacing: .01em; }
 .quote-foot { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
 .quote-via { margin-left: auto; font: 400 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; opacity: .6; }
+/* iPhones com prints de WhatsApp abaixo do carrossel: mesma peça 3D do Blueprint, brilho azul, giro preso ao scroll (vai e volta) */
+.clients-phones { --bp-glow-soft: rgba(31, 109, 255, .42); list-style: none; margin: 34px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 232px)); justify-content: center; gap: clamp(18px, 5vw, 64px); width: 100%; }
+.clients-phones li { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.clients-phones .bp-phone { width: 100%; }
+.clients-phone-caption { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
+.clients-phone-caption strong { font: 600 12.5px var(--font-mono); letter-spacing: -.01em; color: rgba(16, 36, 58, .92); }
+.clients-phone-caption span { font: 400 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: rgba(16, 36, 58, .6); }
+[data-theme='dark'] .clients-phones { --bp-glow-soft: rgba(120, 180, 255, .45); }
+[data-theme='dark'] .clients-phone-caption strong { color: rgba(242, 245, 250, .92); }
+[data-theme='dark'] .clients-phone-caption span { color: rgba(242, 245, 250, .6); }
 [data-theme='dark'] .carousel-quote { background: rgba(12, 14, 20, .55); border-color: rgba(255, 255, 255, .16); box-shadow: 0 16px 50px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .08); color: rgba(242, 245, 250, .92); }
 [data-theme='dark'] .quote-photo { background: rgba(255, 255, 255, .06); border-color: rgba(255, 255, 255, .22); box-shadow: 0 0 0 3px rgba(120, 190, 255, .16), 0 0 22px rgba(90, 170, 255, .22); }
 [data-theme='dark'] .quote-photo b { color: #8ec5ff; }
@@ -507,6 +517,7 @@ button { font-family: inherit; }
   .carousel-card { flex-basis: 86%; }
   .carousel-quote { padding: 18px 18px 16px; }
   .carousel-card:has(.carousel-quote) { height: 400px; }
+  .clients-phones { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; max-width: 360px; }
   .carousel-dots { align-self: center; }
   .team-card { align-items: flex-start; text-align: left; }
   .team-photo { width: 100%; max-width: 150px; }
