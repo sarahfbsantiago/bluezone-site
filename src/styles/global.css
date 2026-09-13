@@ -239,8 +239,9 @@ button { font-family: inherit; }
 .carousel-audio { width: 100%; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding: 16px; background-size: cover; background-position: center; }
 .carousel-audio audio { width: 100%; }
 .carousel-caption { margin: 0; font: 400 11.5px/1.6 var(--font-mono); letter-spacing: .04em; color: rgba(16, 36, 58, .85); text-align: left; }
-.carousel-track { align-items: flex-start; }
-.carousel-quote { margin: 0; text-align: left; display: flex; flex-direction: column; gap: 14px; padding: 22px 22px 18px; border-radius: 22px; background: rgba(255, 255, 255, .26); border: 1px solid rgba(255, 255, 255, .6); box-shadow: 0 16px 40px rgba(20, 90, 140, .12), inset 0 1px 0 rgba(255, 255, 255, .6); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3); color: rgba(16, 36, 58, .92); transition: background var(--motion-normal) var(--ease-out), border-color var(--motion-normal) var(--ease-out), box-shadow var(--motion-normal) var(--ease-out); }
+.carousel-track { align-items: stretch; }
+.carousel-card:has(.carousel-quote) { height: 372px; }
+.carousel-quote { margin: 0; flex: 1; min-height: 0; text-align: left; display: flex; flex-direction: column; gap: 14px; padding: 22px 22px 18px; border-radius: 22px; background: rgba(255, 255, 255, .26); border: 1px solid rgba(255, 255, 255, .6); box-shadow: 0 16px 40px rgba(20, 90, 140, .12), inset 0 1px 0 rgba(255, 255, 255, .6); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3); color: rgba(16, 36, 58, .92); transition: background var(--motion-normal) var(--ease-out), border-color var(--motion-normal) var(--ease-out), box-shadow var(--motion-normal) var(--ease-out); }
 .quote-head { display: flex; align-items: center; gap: 14px; }
 .quote-photo { flex: none; width: 64px; height: 64px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, .55), rgba(255, 255, 255, .12) 60%), rgba(255, 255, 255, .18); border: 1px solid rgba(255, 255, 255, .7); box-shadow: 0 0 0 3px rgba(22, 132, 237, .18), 0 8px 20px rgba(20, 90, 140, .16); }
 .quote-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -249,17 +250,19 @@ button { font-family: inherit; }
 .quote-head strong { font: 600 14px/1.25 var(--font-mono); letter-spacing: -.01em; }
 .quote-head span:not(.quote-stars) { font: 400 10.5px/1.4 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
 .quote-stars { font-size: 11px; letter-spacing: .14em; color: #f2b33d; line-height: 1; }
-.carousel-quote blockquote { margin: 0; }
-.carousel-quote blockquote p { margin: 0; font: 400 13px/1.7 var(--font-mono); letter-spacing: .01em; display: -webkit-box; -webkit-line-clamp: 7; -webkit-box-orient: vertical; overflow: hidden; }
-.carousel-quote.open blockquote p { -webkit-line-clamp: unset; display: block; }
-.quote-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 18px; }
-.quote-more { padding: 0; border: 0; background: none; cursor: pointer; font: 500 11px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: #1684ed; }
-.quote-more:hover { text-decoration: underline; }
-.quote-more:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; border-radius: 4px; }
+/* texto rola dentro do cartão (altura fixa); barra fina e uma sombra no fim indicando que há mais */
+.carousel-quote blockquote { margin: 0; flex: 1; min-height: 0; overflow-y: auto; padding-right: 8px; scrollbar-width: thin; scrollbar-color: rgba(22, 132, 237, .35) transparent; overscroll-behavior: contain; -webkit-mask-image: linear-gradient(#000 calc(100% - 22px), transparent); mask-image: linear-gradient(#000 calc(100% - 22px), transparent); }
+.carousel-quote blockquote::-webkit-scrollbar { width: 4px; }
+.carousel-quote blockquote::-webkit-scrollbar-thumb { background: rgba(22, 132, 237, .35); border-radius: 4px; }
+.carousel-quote blockquote:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; border-radius: 6px; }
+.carousel-quote blockquote p { margin: 0 0 18px; font: 400 13px/1.7 var(--font-mono); letter-spacing: .01em; }
+.quote-foot { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
 .quote-via { margin-left: auto; font: 400 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; opacity: .6; }
 [data-theme='dark'] .carousel-quote { background: rgba(12, 14, 20, .55); border-color: rgba(255, 255, 255, .16); box-shadow: 0 16px 50px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .08); color: rgba(242, 245, 250, .92); }
 [data-theme='dark'] .quote-photo { background: rgba(255, 255, 255, .06); border-color: rgba(255, 255, 255, .22); box-shadow: 0 0 0 3px rgba(120, 190, 255, .16), 0 0 22px rgba(90, 170, 255, .22); }
-[data-theme='dark'] .quote-photo b, [data-theme='dark'] .quote-more { color: #8ec5ff; }
+[data-theme='dark'] .quote-photo b { color: #8ec5ff; }
+[data-theme='dark'] .carousel-quote blockquote { scrollbar-color: rgba(255, 255, 255, .3) transparent; }
+[data-theme='dark'] .carousel-quote blockquote::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .3); }
 .carousel-arrow { width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(41, 105, 151, .45); background: rgba(255, 255, 255, .14); color: #183954; display: grid; place-items: center; cursor: pointer; padding: 0; backdrop-filter: blur(4px); transition: background var(--motion-fast), transform var(--motion-fast); }
 .carousel-arrow:hover { background: rgba(255, 255, 255, .55); transform: scale(1.06); }
 .carousel-arrow:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; }
@@ -305,6 +308,20 @@ button { font-family: inherit; }
 .product-link:hover { border-color: var(--blue); }
 [data-theme='dark'] .products-grid li.product-available { border-color: rgba(140, 180, 255, .5); box-shadow: 0 0 0 1px rgba(120, 170, 255, .15), 0 14px 40px rgba(31, 109, 255, .2); }
 [data-theme='dark'] .products-grid li.product-available .product-badge, [data-theme='dark'] .product-link { color: #ffffff; border-color: rgba(255, 255, 255, .5); }
+/* Blueprint: cartão iluminado em laranja (cor do produto), com o logotipo no lugar do título */
+.products-grid li.product-blueprint { --bp: #ff8a2a; border-color: rgba(255, 138, 42, .7); background: linear-gradient(160deg, rgba(255, 138, 42, .16), rgba(255, 255, 255, .28) 55%); box-shadow: 0 0 0 1px rgba(255, 138, 42, .3), 0 0 34px rgba(255, 138, 42, .3), 0 18px 48px rgba(255, 120, 20, .18); transform: translateY(-2px); }
+.products-grid li.product-blueprint:hover { box-shadow: 0 0 0 1px rgba(255, 138, 42, .45), 0 0 48px rgba(255, 138, 42, .45), 0 22px 56px rgba(255, 120, 20, .22); }
+.products-grid li.product-blueprint .product-badge { color: #d9640a; }
+.products-grid li.product-blueprint .product-link { color: #d9640a; border-color: rgba(217, 100, 10, .55); }
+.products-grid li.product-blueprint .product-link:hover { border-color: #d9640a; }
+.product-brand { display: block; margin-bottom: 2px; }
+.product-brand .brand-news { --brand-w: 150px; color: #0b1020; }
+.product-brand .brand-logo { filter: drop-shadow(0 0 6px rgba(255, 138, 42, .35)); }
+[data-theme='dark'] .products-grid li.product-blueprint { background: linear-gradient(160deg, rgba(255, 138, 42, .18), rgba(12, 14, 20, .55) 55%); border-color: rgba(255, 160, 80, .75); box-shadow: 0 0 0 1px rgba(255, 138, 42, .35), 0 0 40px rgba(255, 138, 42, .45), 0 18px 50px rgba(255, 120, 20, .25); }
+[data-theme='dark'] .products-grid li.product-blueprint:hover { box-shadow: 0 0 0 1px rgba(255, 138, 42, .5), 0 0 56px rgba(255, 138, 42, .6), 0 22px 60px rgba(255, 120, 20, .3); }
+[data-theme='dark'] .products-grid li.product-blueprint .product-badge, [data-theme='dark'] .products-grid li.product-blueprint .product-link { color: #ffb56b; border-color: rgba(255, 181, 107, .6); }
+[data-theme='dark'] .product-brand .brand-news { color: #fff; }
+[data-theme='dark'] .product-brand .brand-logo { filter: drop-shadow(0 0 2px rgba(255, 200, 140, .95)) drop-shadow(0 0 7px rgba(255, 138, 42, .8)) drop-shadow(0 0 18px rgba(210, 90, 10, .55)); }
 .product-badge { position: absolute; top: 12px; right: 14px; font: 500 9px var(--font-mono); letter-spacing: .18em; text-transform: uppercase; color: rgba(31, 109, 255, .85); }
 .products-note { margin-top: 6px; font: 400 12px var(--font-mono); letter-spacing: .08em; color: rgba(16, 36, 58, .8); border-bottom: 1px solid rgba(16, 36, 58, .3); padding-bottom: 2px; }
 .products-note:hover { color: var(--blue); border-color: var(--blue); }
@@ -489,6 +506,7 @@ button { font-family: inherit; }
   .carousel-track { padding: 6px 9%; }
   .carousel-card { flex-basis: 86%; }
   .carousel-quote { padding: 18px 18px 16px; }
+  .carousel-card:has(.carousel-quote) { height: 400px; }
   .carousel-dots { align-self: center; }
   .team-card { align-items: flex-start; text-align: left; }
   .team-photo { width: 100%; max-width: 150px; }

@@ -79,7 +79,7 @@ describe('Bluezone home hero', () => {
     expect(document.getElementById('page-two')).toBeInTheDocument()
     expect(document.getElementById('page-three')).toBeInTheDocument()
     expect(document.getElementById('page-four')).toBeInTheDocument()
-    expect(screen.getByText('Criamos direção para fazê-la crescer e permanecer.')).toBeInTheDocument()
+    expect(screen.getByText('Os fundadores contam por que a Bluezone existe.')).toBeInTheDocument()
     expect(screen.getByRole('img', { name: 'Espaço reservado para o vídeo' })).toBeInTheDocument()
     expect(screen.getByText('03 — quem somos')).toBeInTheDocument()
     expect(screen.getByText('02 — história')).toBeInTheDocument()

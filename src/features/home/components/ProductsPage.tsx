@@ -1,7 +1,8 @@
 import { pages } from '../config/pagesConfig'
 import { withBase } from '../../../lib/paths'
+import { BrandLogo } from './BrandLogo'
 
-type ProductItem = { title: string; text: string; badge?: string; cta?: string; href?: string }
+type ProductItem = { title: string; text: string; badge?: string; cta?: string; href?: string; brand?: 'blueprint' }
 
 /** Produtos: o curso Blueprint (disponível, com link para a página própria) e os produtos em construção. */
 export function ProductsPage() {
@@ -15,9 +16,9 @@ export function ProductsPage() {
         <p className="products-intro">{products.intro}</p>
         <ul className="solution-items products-grid" aria-label="Produtos">
           {items.map((item) => (
-            <li key={item.title} className={item.href ? 'product-available' : undefined}>
+            <li key={item.title} className={[item.href ? 'product-available' : '', item.brand ? `product-${item.brand}` : ''].filter(Boolean).join(' ') || undefined}>
               <span className="product-badge">{item.badge ?? 'em breve'}</span>
-              <strong>{item.title}</strong>
+              {item.brand === 'blueprint' ? <strong className="product-brand"><BrandLogo variant="blueprint" /><span className="sr-only">{item.title}</span></strong> : <strong>{item.title}</strong>}
               <span>{item.text}</span>
               {item.href && item.cta && <a className="product-link" href={withBase(item.href)}>{item.cta}<span aria-hidden="true"> →</span></a>}
             </li>

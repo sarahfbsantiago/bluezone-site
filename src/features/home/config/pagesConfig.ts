@@ -16,10 +16,10 @@ export const pages = {
   },
   four: {
     id: 'page-four',
-    label: '04 — direção',
-    lead: 'Não criamos conteúdo apenas para manter sua marca presente.',
-    title: 'Criamos direção para fazê-la crescer e permanecer.',
-    /** URL do vídeo (YouTube/Vimeo embed ou arquivo). Vazio = placeholder. */
+    label: '04 — fundadores',
+    lead: 'Quem faz a Blue.',
+    title: 'Os fundadores contam por que a Bluezone existe.',
+    /** Vídeo dos fundadores falando sobre a Blue (YouTube/Vimeo embed ou arquivo). Vazio = placeholder. */
     video: '',
   },
   /** História da Bluezone: as Zonas Azuis. Textos da cliente (12/09/2026); o último parágrafo, sobre os novos braços, foi redigido a pedido. */
@@ -66,7 +66,7 @@ export const pages = {
           { title: 'Direção', text: 'Para organizar prioridades, decisões e próximos passos — evitando que o empreendedor precise descobrir tudo sozinho.' },
           { title: 'Tecnologia', text: 'Para simplificar processos, ampliar possibilidades e colocar ferramentas digitais para trabalhar a favor do negócio.' },
         ],
-        closing: ['Mais do que entregar peças ou tarefas, construímos **estrutura para o negócio se comunicar e crescer melhor**.'],
+        closing: [],
       },
       {
         id: 'como-fazemos',
@@ -87,9 +87,7 @@ export const pages = {
         id: 'para-quem-fazemos',
         kicker: 'para quem fazemos',
         title: 'Para quem constrói um negócio de verdade.',
-        paragraphs: [
-          'A Bluezone existe para quem empreende sem a estrutura de uma grande empresa — mas não quer abrir mão da qualidade. Trabalhamos com **micro, pequenos e médios negócios, profissionais autônomos e empreendedores** que sabem que precisam se posicionar melhor, comunicar melhor e usar a tecnologia a seu favor, mas não sabem necessariamente por onde começar.',
-        ],
+        paragraphs: [],
         items: [
           { title: '', text: 'Para quem faz muita coisa sozinho.' },
           { title: '', text: 'Para quem tem conhecimento, mas dificuldade em transformá-lo em conteúdo.' },
@@ -97,7 +95,7 @@ export const pages = {
           { title: '', text: 'Para quem cresceu e percebeu que improvisar já não é suficiente.' },
           { title: '', text: 'E para quem está começando e quer construir uma base sólida desde o início.' },
         ],
-        closing: ['**Não importa o tamanho da estrutura. Importa o tamanho da intenção de crescer.** A Bluezone existe para colocar estratégia, comunicação e tecnologia ao alcance de quem está construindo o próximo capítulo do próprio negócio.'],
+        closing: [],
       },
     ],
   },
@@ -129,7 +127,7 @@ export const pages = {
     title: 'O que estamos construindo.',
     intro: 'Produtos para colocar estratégia, conteúdo e tecnologia na rotina de quem empreende.',
     items: [
-      { title: 'Blueprint', badge: 'curso disponível', text: 'Guia prático em vídeo para microempresas que querem parar de postar no escuro: comunicação com intenção, clareza e direção, do zero.', cta: 'conheça o Blueprint', href: '/blueprint' },
+      { title: 'Blueprint', brand: 'blueprint', badge: 'curso disponível', text: 'Guia prático em vídeo para parar de postar no escuro: comunicação com intenção, clareza e direção, do zero.', cta: 'conheça o Blueprint', href: '/blueprint' },
       { title: 'IA para automação', text: 'Ferramentas que tiram tarefas repetitivas do caminho: atendimento, organização e rotina de comunicação funcionando sem depender de você o tempo todo.' },
       { title: 'IA para criação de conteúdo', text: 'Um sistema de criação, não um chat em branco. Alimentado com o posicionamento, o público, a voz e o histórico da sua marca, ele gera conteúdo com estratégia, mantém a consistência entre as peças e lembra o que precisa ser publicado e quando.' },
       { title: 'BlueCast', text: 'O podcast da Blue. O time atualiza o micro e médio empreendedor sobre o mercado brasileiro: inovação, oportunidades, editais abertos e histórias de quem está construindo o próprio negócio. A BlueNews em áudio.' },

@@ -9,21 +9,16 @@ type QuoteItem = Extract<Item, { type: 'quote' }>
 
 const Stars = () => <span className="quote-stars" aria-label="cinco estrelas">★★★★★</span>
 
-/** Depoimento em texto: foto redonda (ou inicial), nome, serviço, estrelas e a fala; textos longos ganham "ler mais". */
+/** Depoimento em texto: foto redonda (ou inicial), nome, serviço, estrelas e a fala. Cartões têm a mesma altura; texto longo rola dentro do cartão. */
 function Quote({ item }: { item: QuoteItem }) {
-  const [open, setOpen] = useState(false)
-  const long = item.text.length > 230
   return (
-    <figure className={`carousel-quote${open ? ' open' : ''}`}>
+    <figure className="carousel-quote">
       <div className="quote-head">
         <span className="quote-photo">{item.photo ? <img src={withBase(item.photo)} alt="" loading="lazy" /> : <b>{item.name.charAt(0)}</b>}</span>
         <figcaption><strong>{item.name}</strong><span>{item.service}</span><Stars /></figcaption>
       </div>
-      <blockquote><p>{item.text}</p></blockquote>
-      <div className="quote-foot">
-        {long && <button type="button" className="quote-more" onClick={() => setOpen((v) => !v)} aria-expanded={open}>{open ? 'ler menos' : 'ler mais'}</button>}
-        {item.via === 'whatsapp' && <span className="quote-via">via WhatsApp</span>}
-      </div>
+      <blockquote tabIndex={0}><p>{item.text}</p></blockquote>
+      {item.via === 'whatsapp' && <div className="quote-foot"><span className="quote-via">via WhatsApp</span></div>}
     </figure>
   )
 }
