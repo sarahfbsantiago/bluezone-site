@@ -259,7 +259,11 @@ button { font-family: inherit; }
 .quote-foot { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
 .quote-via { margin-left: auto; font: 400 10px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; opacity: .6; }
 /* iPhones com prints de WhatsApp abaixo do carrossel: mesma peça 3D do Blueprint, brilho azul, giro preso ao scroll (vai e volta) */
-.clients-phones { --bp-glow-soft: rgba(31, 109, 255, .42); list-style: none; margin: 34px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 232px)); justify-content: center; gap: clamp(18px, 5vw, 64px); width: 100%; }
+.clients-phones { --bp-glow-soft: rgba(31, 109, 255, .42); list-style: none; margin: 34px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 164px)); justify-content: center; gap: clamp(18px, 5vw, 64px); width: 100%; }
+/* cada aparelho dá duas voltas presas ao scroll (esquerdo horário, direito anti-horário) e para de frente; depois entra a flutuação */
+.clients-phones li:nth-child(odd) { --spin: -720deg; }
+.clients-phones li:nth-child(even) { --spin: 720deg; }
+.clients-phones .bp-phone-body { transform: translateY(calc(60px * (1 - var(--sp)))) rotateY(calc(var(--spin) * (1 - var(--sp)))) scale(calc(.82 + .18 * var(--sp))); }
 .clients-phones li { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .clients-phones .bp-phone { width: 100%; }
 .clients-phone-caption { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
@@ -517,7 +521,7 @@ button { font-family: inherit; }
   .carousel-card { flex-basis: 86%; }
   .carousel-quote { padding: 18px 18px 16px; }
   .carousel-card:has(.carousel-quote) { height: 400px; }
-  .clients-phones { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; max-width: 360px; }
+  .clients-phones { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; max-width: 280px; }
   .carousel-dots { align-self: center; }
   .team-card { align-items: flex-start; text-align: left; }
   .team-photo { width: 100%; max-width: 150px; }
