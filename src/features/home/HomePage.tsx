@@ -17,6 +17,7 @@ import { SolutionsPage } from './components/SolutionsPage'
 import { StoryPage } from './components/StoryPage'
 import { TeamPage } from './components/TeamPage'
 import { TestimonialsPage } from './components/TestimonialsPage'
+import { FoundersTablet } from './components/FoundersTablet'
 import { ContactForm } from './components/ContactForm'
 import { SiteFooter } from './components/SiteFooter'
 import { VideoFrame } from './components/VideoFrame'
@@ -110,6 +111,7 @@ export function HomePage() {
         <a className="page-continue" href={`#${pages.solutions.id}`}>continuar<span className="page-continue-line" /></a>
       </section>
       <SolutionsPage />
+      <FoundersTablet />
       <TestimonialsPage />
       <ProductsPage />
       <TeamPage />

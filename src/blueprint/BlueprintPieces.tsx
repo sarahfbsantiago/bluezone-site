@@ -50,7 +50,7 @@ export function BlueprintBrand() {
  * Progresso de rolagem do elemento (0 = entrando pela base da janela, 1 = já subiu o suficiente), em `--sp`.
  * O movimento acompanha a rolagem nos dois sentidos; ao chegar a 1 ganha `is-done` (flutuação). Com reduced motion, fica em 1.
  */
-function useScrollDriven<T extends HTMLElement>(reduced: boolean, span = 0.55, start = 0.92) {
+export function useScrollDriven<T extends HTMLElement>(reduced: boolean, span = 0.55, start = 0.92) {
   const ref = useRef<T>(null)
   const [done, setDone] = useState(reduced)
   useEffect(() => {

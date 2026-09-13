@@ -99,6 +99,17 @@ export const pages = {
       },
     ],
   },
+  /** Tablet 3D entre "para quem fazemos" e "clientes": slideshow com fotos dos fundadores (as mesmas da página do Blueprint). `position` = object-position do recorte 4:3. */
+  foundersGallery: {
+    id: 'fundadores',
+    caption: 'Bela e Alisson, fundadores da Bluezone',
+    intervalMs: 3800,
+    photos: [
+      { src: '/midia/blueprint/hero.jpg', alt: 'Alisson e Bela fazendo uma selfie com o notebook', position: 'center 42%' },
+      { src: '/midia/blueprint/palco.jpg', alt: 'Alisson e Bela sorrindo no palco, com luz de LED', position: 'center 32%' },
+      { src: '/midia/blueprint/idealizadores.jpg', alt: 'Alisson sentado na cadeira e Bela ao lado, no estúdio', position: 'center 30%' },
+    ],
+  },
   testimonials: {
     id: 'clientes',
     label: '06 — clientes',
