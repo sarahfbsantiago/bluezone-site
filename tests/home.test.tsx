@@ -2,6 +2,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { HomePage } from '../src/features/home/HomePage'
 import { heroStates } from '../src/features/home/config/heroConfig'
+import { pages } from '../src/features/home/config/pagesConfig'
 
 describe('Bluezone home hero', () => {
   afterEach(() => cleanup())
@@ -108,7 +109,7 @@ describe('Bluezone home hero', () => {
     expect(nav).not.toHaveTextContent('parceiros')
     expect(document.getElementById('clientes')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'O que nossos clientes dizem sobre nós.' })).toBeInTheDocument()
-    expect(document.querySelectorAll('.carousel-card')).toHaveLength(4)
+    expect(document.querySelectorAll('.carousel-card')).toHaveLength(pages.testimonials.items.length)
     fireEvent.click(screen.getByRole('button', { name: 'Próximo depoimento' }))
     expect(screen.getByRole('tab', { name: 'Depoimento 2' })).toHaveAttribute('aria-selected', 'true')
     expect(document.getElementById('produtos')).toBeInTheDocument()

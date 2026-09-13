@@ -4,8 +4,31 @@ import { pages } from '../config/pagesConfig'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 
 type Item = (typeof pages.testimonials.items)[number]
+type MediaItem = Exclude<Item, { type: 'quote' }>
+type QuoteItem = Extract<Item, { type: 'quote' }>
 
-function Media({ item, index, onPlaying }: { item: Item; index: number; onPlaying: (playing: boolean) => void }) {
+const Stars = () => <span className="quote-stars" aria-label="cinco estrelas">★★★★★</span>
+
+/** Depoimento em texto: foto redonda (ou inicial), nome, serviço, estrelas e a fala; textos longos ganham "ler mais". */
+function Quote({ item }: { item: QuoteItem }) {
+  const [open, setOpen] = useState(false)
+  const long = item.text.length > 230
+  return (
+    <figure className={`carousel-quote${open ? ' open' : ''}`}>
+      <div className="quote-head">
+        <span className="quote-photo">{item.photo ? <img src={withBase(item.photo)} alt="" loading="lazy" /> : <b>{item.name.charAt(0)}</b>}</span>
+        <figcaption><strong>{item.name}</strong><span>{item.service}</span><Stars /></figcaption>
+      </div>
+      <blockquote><p>{item.text}</p></blockquote>
+      <div className="quote-foot">
+        {long && <button type="button" className="quote-more" onClick={() => setOpen((v) => !v)} aria-expanded={open}>{open ? 'ler menos' : 'ler mais'}</button>}
+        {item.via === 'whatsapp' && <span className="quote-via">via WhatsApp</span>}
+      </div>
+    </figure>
+  )
+}
+
+function Media({ item, index, onPlaying }: { item: MediaItem; index: number; onPlaying: (playing: boolean) => void }) {
   if (!item.src) return <span className="carousel-placeholder">{String(index + 1).padStart(2, '0')}<small>{item.type === 'video' ? 'vídeo' : item.type === 'audio' ? 'áudio' : 'foto'}</small></span>
   if (item.type === 'video') return <video src={withBase(item.src)} poster={item.poster || undefined} controls playsInline preload="metadata" onPlay={() => onPlaying(true)} onPause={() => onPlaying(false)} onEnded={() => onPlaying(false)} aria-label={item.alt} />
   if (item.type === 'audio') {
@@ -18,7 +41,7 @@ function Media({ item, index, onPlaying }: { item: Item; index: number; onPlayin
   return <img src={withBase(item.src)} alt={item.alt} loading="lazy" />
 }
 
-/** Carrossel de depoimentos (foto, vídeo ou áudio): passa sozinho, pausa com mouse, toque, mídia tocando ou aba oculta. */
+/** Carrossel de depoimentos (texto com foto, ou foto/vídeo/áudio): passa sozinho, pausa com mouse, toque, mídia tocando ou aba oculta. */
 export function TestimonialsPage() {
   const { testimonials, products } = pages
   const track = useRef<HTMLUListElement>(null)
@@ -88,8 +111,12 @@ export function TestimonialsPage() {
           <ul ref={track} className="carousel-track" aria-label="Depoimentos de clientes" aria-live="polite">
             {testimonials.items.map((item, i) => (
               <li key={i} className="carousel-card" aria-roledescription="slide" aria-label={`${i + 1} de ${total}`}>
-                <div className="carousel-square"><Media item={item} index={i} onPlaying={onPlaying} /></div>
-                {item.caption && <p className="carousel-caption">{item.caption}</p>}
+                {item.type === 'quote' ? <Quote item={item} /> : (
+                  <>
+                    <div className="carousel-square"><Media item={item} index={i} onPlaying={onPlaying} /></div>
+                    {item.caption && <p className="carousel-caption">{item.caption}</p>}
+                  </>
+                )}
               </li>
             ))}
           </ul>

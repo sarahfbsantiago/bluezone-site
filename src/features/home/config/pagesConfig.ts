@@ -1,4 +1,8 @@
 /** Conteúdo das páginas que a rolagem revela depois do hero. */
+export type TestimonialItem =
+  | { type: 'quote'; name: string; service: string; photo: string; via: 'whatsapp' | ''; text: string }
+  | { type: 'image' | 'video' | 'audio'; src: string; poster: string; alt: string; caption: string }
+
 export const pages = {
   two: { id: 'page-two', label: '01 — marca', title: 'Transformamos pequenos e médios empreendedores em negócios e marcas preparadas para crescer' },
   three: {
@@ -104,16 +108,19 @@ export const pages = {
     /** Troca automática a cada N segundos (pausa com mouse, toque, mídia tocando e aba oculta). */
     autoAdvanceMs: 7000,
     /**
-     * Cada item vira um quadrado do carrossel. `type`: 'image' | 'video' | 'audio'.
-     * `src`: caminho em public/ (ex.: /midia/clientes/01.png, /midia/clientes/02.mp4, /midia/clientes/03.mp3).
-     * `poster` (vídeo/áudio): imagem de capa opcional. Sem `src`, mostra o espaço reservado.
+     * Cada item vira um cartão do carrossel.
+     * `type: 'quote'`: depoimento em texto (name, service, text, photo em public/, via: 'whatsapp' | '' para o selo de origem).
+     * `type: 'image' | 'video' | 'audio'`: mídia com `src` em public/ (ex.: /midia/clientes/02.mp4) e `poster` opcional. Sem `src`, mostra o espaço reservado.
      */
     items: [
-      { type: 'image', src: '', poster: '', alt: 'Depoimento 1', caption: '' },
-      { type: 'image', src: '', poster: '', alt: 'Depoimento 2', caption: '' },
-      { type: 'video', src: '', poster: '', alt: 'Depoimento 3', caption: '' },
-      { type: 'audio', src: '', poster: '', alt: 'Depoimento 4', caption: '' },
-    ] as { type: 'image' | 'video' | 'audio'; src: string; poster: string; alt: string; caption: string }[],
+      { type: 'quote', name: 'Vania Abreu', service: 'redes sociais e identidade visual', photo: '/midia/clientes/vania-abreu.png', via: '', text: 'Passando para deixar registrado meu agradecimento, mas especialmente meu encantamento com a Bluezone pelas entregas maravilhosas, tanto no artístico quanto no calendário de conteúdos, análise e formas de trabalho tão cuidadosa e profissional. Estou muito feliz por vocês estarem cuidando das minhas redes, da minha identidade visual e por estarmos juntos nesse pedaço de mundo que é a internet. Adorei. Vida longa a nossa parceria e que nosso percurso seja tão bonito quanto sonhamos.' },
+      { type: 'quote', name: 'Dra. Monique', service: 'Instagram, identidade visual e vídeos', photo: '/midia/clientes/monique.png', via: '', text: 'A Blue foi o melhor investimento que fiz pro meu Instagram. Eu não fazia ideia por onde começar, quais conteúdos trazer, como mostrar o meu lado profissional e até mesmo o pessoal de forma estratégica. Eles me trouxeram uma visão de mercado, da minha área. Me explicaram passo a passo em cada reunião como eu poderia chamar a atenção exata do meu público. Criaram minha identidade visual do jeitinho que pedi. E com isso, atingimos um perfil, primeiramente, lindíssimo, refinado, elegante, com conteúdos incríveis, que ficou muito mais do que eu esperava. Os vídeos!!! Meu Deus, as edições dos vídeos, os takes, a qualidade, a atenção da Bela, do Alisson desde o primeiro dia. Só agradecer, Blue!' },
+      { type: 'quote', name: 'Bella Falconi', service: 'edição de vídeos para campanhas', photo: '/midia/clientes/bella-falconi.png', via: 'whatsapp', text: 'Adorei os vídeos.' },
+      { type: 'quote', name: 'Viviane Alecrim', service: 'estratégia e conteúdo', photo: '/midia/clientes/viviane-alecrim.png', via: '', text: 'Se tem uma coisa que eu confio, é no seu poder de convencimento e criação das melhores estratégias!!!' },
+      { type: 'quote', name: 'Rosi Thomaz', service: 'projeto e estratégia', photo: '/midia/clientes/rosi-thomaz.png', via: '', text: 'Obrigada pela apresentação do projeto elaborado, ficou incrível! Me surpreendi com a assertividade, com a compreensão que desenvolveram do meu negócio e as soluções propostas. Parabéns pelo talento e competência nessa etapa!' },
+      { type: 'quote', name: 'Darlim Miranda', service: 'identidade visual e mentoria', photo: '/midia/clientes/darlim-miranda.png', via: '', text: 'Bela e Alisson, passando para agradecer por tudo. Vocês são top demais. Arrasaram na escolha da nossa identidade, nas cores. Tudo perfeito. Sinto a dedicação e carinho em cada detalhe. Sem falar nas nossas mentorias. Foi Deus que colocou vocês em nossos caminhos. Desejo a vocês muito sucesso, pois vocês são incríveis.' },
+      { type: 'quote', name: 'Cliente Bluezone', service: 'conteúdo para redes', photo: '', via: 'whatsapp', text: 'Gente! Que trabalho lindo de vocês, Bluezone! Que posts lindos, que trazem a mensagem do nosso produto, que converte em resultado positivo e em vendas. Amei!' },
+    ] as TestimonialItem[],
   },
   products: {
     id: 'produtos',

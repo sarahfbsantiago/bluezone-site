@@ -146,3 +146,8 @@ Capturas headless com GPU: `--ignore-gpu-blocklist --use-angle=metal`. Em dev, `
 - "esqueci a senha" virou tela própria (e-mail → enviar link → volta ao login), mensagem neutra (não revela se o e-mail existe).
 - Campos de senha são não-controlados (lidos por FormData no submit): o valor não fica no atributo `value` do DOM/devtools. A senha só vai para o Firebase Auth, nunca para nosso servidor.
 - Editores de teste apagados do Firestore (dmarketingevendas, sarahsantiago100) para a cliente testar o fluxo do zero. Usuário Auth de dmarketingevendas precisa ser apagado no console (CLI não apaga usuários).
+
+## 2026-09-13 — depoimentos reais na seção clientes + OG do BlueNews
+- Seção "clientes": 7 depoimentos em texto (`type: 'quote'` em `pagesConfig.ts`: name, service, photo, via, text) com foto redonda recortada dos PNGs do Canva (em `public/midia/clientes/`), estrelas, "ler mais" acima de 230 caracteres e selo "via WhatsApp". Tipos de mídia (image/video/audio) continuam suportados no mesmo carrossel. O último item ("Cliente Bluezone", print de WhatsApp sem nome) está sem foto: trocar nome/foto quando a cliente informar.
+- Fontes: capturas em ~/Desktop/bluezone-capturas (não versionadas). Recorte feito via Puppeteer/canvas com centro e raio manuais.
+- `public/og-bluenews.png` (preto e branco, estilo do portal) é a imagem de compartilhamento do /bluenews; `og-bluezone.png` corrigido para abluezone.com.br.
