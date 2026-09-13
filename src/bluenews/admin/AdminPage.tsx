@@ -22,10 +22,8 @@ export function AdminPage() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
   const [role, setRole] = useState<'admin' | 'editor' | null>(null)
   const [loginEmail, setLoginEmail] = useState('')
-  const [loginPassword, setLoginPassword] = useState('')
   const [invite, setInvite] = useState<'none' | 'email' | 'password' | 'done'>('none')
   const [inviteEmail, setInviteEmail] = useState('')
-  const [newPassword, setNewPassword] = useState('')
   const [editors, setEditors] = useState<Array<{ email: string; name: string }>>([])
   const [newEditor, setNewEditor] = useState({ name: '', email: '' })
   const [forgotMode, setForgotMode] = useState(false)
@@ -113,9 +111,11 @@ export function AdminPage() {
   const resendInvite = async (email: string) => {
     try { await sendInvite(email); setMessage(`convite reenviado para ${email}.`) } catch (error) { setMessage('erro: ' + (error as Error).message) }
   }
-  const loginWithPassword = async (event: FormEvent) => {
+  const loginWithPassword = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault(); setMessage('')
-    try { await signInWithPassword(loginEmail, loginPassword) } catch { setMessage('e-mail ou senha incorretos.') }
+    const form = event.currentTarget
+    const password = String(new FormData(form).get('password') ?? '')
+    try { await signInWithPassword(loginEmail, password) } catch { setMessage('e-mail ou senha incorretos.') } finally { form.reset() }
   }
   const forgot = async (event: FormEvent) => {
     event.preventDefault(); setMessage('')
@@ -125,10 +125,12 @@ export function AdminPage() {
     event.preventDefault(); setMessage('')
     try { await finishInvite(inviteEmail); setInvite('password') } catch (error) { setMessage('link inválido ou expirado. peça um novo convite. (' + (error as Error).message + ')') }
   }
-  const savePassword = async (event: FormEvent) => {
+  const savePassword = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault(); setMessage('')
+    const form = event.currentTarget
+    const newPassword = String(new FormData(form).get('password') ?? '')
     if (newPassword.length < 10 || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) { setMessage('a senha precisa ter pelo menos 10 caracteres, com letra minúscula e número.'); return }
-    try { await setPassword(newPassword); setInvite('done'); setNewPassword(''); window.history.replaceState(null, '', window.location.pathname); setMessage('senha criada. bem-vindo(a) ao painel!') } catch (error) { setMessage('não foi possível criar a senha: ' + (error as Error).message) }
+    try { await setPassword(newPassword); form.reset(); setInvite('done'); window.history.replaceState(null, '', window.location.pathname); setMessage('senha criada. bem-vindo(a) ao painel!') } catch (error) { setMessage('não foi possível criar a senha: ' + (error as Error).message) }
   }
 
   const goHome = () => { setEditing(null); setPreview(null); setMessage(''); setView('inicio'); setMenuOpen(false) }
@@ -190,7 +192,7 @@ export function AdminPage() {
         <h1 className="solution-title">Crie sua senha</h1>
         <p className="admin-note">Você entrou como {user.email}. Crie uma senha para os próximos acessos (mínimo 10 caracteres, com letra e número). Também dá para entrar com Google usando este mesmo e-mail.</p>
         <form className="contact-form admin-loginform" onSubmit={savePassword}>
-          <label className="field"><span>nova senha</span><input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} minLength={10} required autoComplete="new-password" /></label>
+          <label className="field"><span>nova senha</span><input type="password" name="password" minLength={10} required autoComplete="new-password" /></label>
           <div className="contact-actions"><button type="submit" className="contact-submit">salvar senha</button></div>
         </form>
         {message && <p className="admin-note admin-error">{message}</p>}
@@ -214,7 +216,7 @@ export function AdminPage() {
           <form className="contact-form admin-loginform" onSubmit={loginWithPassword} aria-label="Entrar com e-mail e senha">
             <span className="admin-subtitle">ou com e-mail e senha</span>
             <label className="field"><span>e-mail</span><input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} autoComplete="username" required /></label>
-            <label className="field"><span>senha</span><input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} autoComplete="current-password" required /></label>
+            <label className="field"><span>senha</span><input type="password" name="password" autoComplete="current-password" required /></label>
             <div className="contact-actions"><button type="submit" className="contact-submit">entrar</button><button type="button" className="admin-link" onClick={() => { setForgotMode(true); setMessage('') }}>esqueci a senha</button></div>
           </form>
         )}
