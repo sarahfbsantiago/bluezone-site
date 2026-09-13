@@ -48,7 +48,8 @@ const INVITE_KEY = 'bluezone-convite-email'
 /** Convite: o Firebase envia um link de acesso para o e-mail; ao abrir, a pessoa entra e cria a senha. */
 export async function sendInvite(email: string): Promise<void> {
   const target = email.trim().toLowerCase()
-  await sendSignInLinkToEmail(auth(), target, { url: `${window.location.origin}/?convite=1`, handleCodeInApp: true })
+  // o e-mail vai na URL de retorno: ao abrir o link, o painel conclui o acesso sozinho e já pede a senha
+  await sendSignInLinkToEmail(auth(), target, { url: `${window.location.origin}/?convite=1&email=${encodeURIComponent(target)}`, handleCodeInApp: true })
 }
 
 export function isInviteLink(): boolean {

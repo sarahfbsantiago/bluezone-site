@@ -28,6 +28,7 @@ export function AdminPage() {
   const [newPassword, setNewPassword] = useState('')
   const [editors, setEditors] = useState<Array<{ email: string; name: string }>>([])
   const [newEditor, setNewEditor] = useState({ name: '', email: '' })
+  const [forgotMode, setForgotMode] = useState(false)
   const [posts, setPosts] = useState<Post[]>([])
   const [editing, setEditing] = useState<Post | 'new' | null>(null)
   const [form, setForm] = useState<PostInput>(EMPTY)
@@ -58,7 +59,13 @@ export function AdminPage() {
       return
     }
     if (!firebaseEnabled) { setUser(null); return }
-    if (isInviteLink()) setInvite('email')
+    if (isInviteLink()) {
+      const fromLink = new URLSearchParams(window.location.search).get('email')
+      if (fromLink) {
+        setInviteEmail(fromLink)
+        finishInvite(fromLink).then(() => setInvite('password')).catch(() => { setInvite('email'); setMessage('link inválido ou expirado. peça um novo convite.') })
+      } else setInvite('email')
+    }
     return watchUser(async (next) => {
       setUser(next)
       if (!next?.email) { setIsAdmin(null); setRole(null); return }
@@ -110,9 +117,9 @@ export function AdminPage() {
     event.preventDefault(); setMessage('')
     try { await signInWithPassword(loginEmail, loginPassword) } catch { setMessage('e-mail ou senha incorretos.') }
   }
-  const forgot = async () => {
-    if (!loginEmail) { setMessage('digite seu e-mail e clique de novo em "esqueci a senha".'); return }
-    try { await resetPassword(loginEmail); setMessage('enviamos um e-mail para redefinir a senha.') } catch { setMessage('não foi possível enviar. confira o e-mail.') }
+  const forgot = async (event: FormEvent) => {
+    event.preventDefault(); setMessage('')
+    try { await resetPassword(loginEmail); setMessage('se este e-mail tiver acesso, enviamos um link para redefinir a senha. Olhe também o spam.'); setForgotMode(false) } catch { setMessage('não foi possível enviar. confira o e-mail.') }
   }
   const completeInvite = async (event: FormEvent) => {
     event.preventDefault(); setMessage('')
@@ -168,7 +175,7 @@ export function AdminPage() {
     <main className="admin">{header}
       <section className="admin-login">
         <h1 className="solution-title">Convite para o painel</h1>
-        <p className="admin-note">Confirme o e-mail que recebeu o convite para concluir o acesso.</p>
+        <p className="admin-note">Confirme o e-mail que recebeu o convite para concluir o acesso (o link abriu sem o e-mail, provavelmente em outro navegador).</p>
         <form className="contact-form admin-loginform" onSubmit={completeInvite}>
           <label className="field"><span>e-mail</span><input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} required autoComplete="email" /></label>
           <div className="contact-actions"><button type="submit" className="contact-submit">continuar</button></div>
@@ -196,13 +203,22 @@ export function AdminPage() {
         <h1 className="solution-title">Entrar no painel da BlueNews</h1>
         <p className="admin-note">Administradores entram com Google. Editores entram com Google ou com e-mail e senha criada no convite.</p>
         <button type="button" className="contact-submit" onClick={() => signInWithGoogle().catch((error) => setMessage('não foi possível entrar: ' + error.message))}>entrar com Google</button>
-        <form className="contact-form admin-loginform" onSubmit={loginWithPassword} aria-label="Entrar com e-mail e senha">
-          <span className="admin-subtitle">ou com e-mail e senha</span>
-          <label className="field"><span>e-mail</span><input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} autoComplete="username" required /></label>
-          <label className="field"><span>senha</span><input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} autoComplete="current-password" required /></label>
-          <div className="contact-actions"><button type="submit" className="contact-submit">entrar</button><button type="button" className="admin-link" onClick={forgot}>esqueci a senha</button></div>
-        </form>
-        <p className="admin-note">Recebeu um convite? Abra o link do e-mail neste navegador para entrar e criar sua senha.</p>
+        {forgotMode ? (
+          <form className="contact-form admin-loginform" onSubmit={forgot} aria-label="Redefinir senha">
+            <span className="admin-subtitle">redefinir senha</span>
+            <p className="admin-note">Digite o e-mail do seu acesso. Você recebe um link para criar uma senha nova.</p>
+            <label className="field"><span>e-mail</span><input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} autoComplete="username" required /></label>
+            <div className="contact-actions"><button type="submit" className="contact-submit">enviar link</button><button type="button" className="admin-link" onClick={() => { setForgotMode(false); setMessage('') }}>voltar</button></div>
+          </form>
+        ) : (
+          <form className="contact-form admin-loginform" onSubmit={loginWithPassword} aria-label="Entrar com e-mail e senha">
+            <span className="admin-subtitle">ou com e-mail e senha</span>
+            <label className="field"><span>e-mail</span><input type="email" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} autoComplete="username" required /></label>
+            <label className="field"><span>senha</span><input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} autoComplete="current-password" required /></label>
+            <div className="contact-actions"><button type="submit" className="contact-submit">entrar</button><button type="button" className="admin-link" onClick={() => { setForgotMode(true); setMessage('') }}>esqueci a senha</button></div>
+          </form>
+        )}
+        <p className="admin-note">Recebeu um convite? Clique no link do e-mail: ele abre o painel direto na criação da sua senha.</p>
         {message && <p className="admin-note admin-error">{message}</p>}
       </section>
     </main>
