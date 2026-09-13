@@ -38,7 +38,7 @@ Feito em 12/09/2026 (parte A - BlueNews):
 [x] Firebase Authentication com Google (provedor ativado no console; dominios autorizados)
 [x] Painel em site separado em painel.abluezone.com.br (CNAME, certificado ok), fora do site publico, com barra lateral: login Google, lista, editor com previa, publicar/despublicar, excluir
 [x] Papeis: admins/{email} (Google apenas; tudo, inclusive pessoas e futuros leads) e editors/{email}
-    (convidados pelo painel; publicam noticias, nao excluem, nao veem leads; entram com Google ou e-mail+senha
+    (convidados pelo painel; criam, publicam e excluem noticias; nao veem leads, configuracoes nem dados sensiveis; entram com Google ou e-mail+senha
     criada no convite por link). Politica de senha forte e protecao contra enumeracao ativas no Firebase Auth
 [x] Colecao posts: titulo, slug, secao, resumo, texto (formatacao basica segura), capa (URL https), autor, status, datas
 [x] BlueNews publica le as noticias publicadas e abre cada uma em /bluenews?post=<slug>

@@ -47,7 +47,7 @@ service cloud.firestore {
       allow read: if resource.data.status == 'published' || isStaff();
       allow create: if isStaff() && validPost(request.resource.data);
       allow update: if isStaff() && validPost(request.resource.data);
-      allow delete: if isAdmin();
+      allow delete: if isStaff();
     }
 
     // Imagens das notícias (data URL reduzida no navegador, ≤ 700 KB): leitura pública, envio/exclusão só por administradores.

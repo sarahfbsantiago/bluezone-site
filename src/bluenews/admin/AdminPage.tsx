@@ -230,7 +230,7 @@ export function AdminPage() {
     { id: 'inicio', label: 'início' }, { id: 'noticias', label: 'notícias' }, { id: 'secoes', label: 'seções' },
     { id: 'newsletter', label: 'newsletter', soon: true }, { id: 'leads', label: 'leads', soon: true }, { id: 'config', label: 'configurações' },
   ] : [
-    { id: 'inicio', label: 'início' }, { id: 'noticias', label: 'notícias' }, { id: 'secoes', label: 'seções' }, { id: 'config', label: 'minha conta' },
+    { id: 'inicio', label: 'início' }, { id: 'noticias', label: 'notícias' }, { id: 'secoes', label: 'seções' },
   ]
   const sidebar = (
     <nav className={`admin-sidebar${menuOpen ? ' is-open' : ''}`} aria-label="Menu do painel">
@@ -256,7 +256,7 @@ export function AdminPage() {
               <button type="button" className="admin-link" onClick={() => setPreview({ title: post.title, slug: post.slug, category: post.category, excerpt: post.excerpt, content: post.content, coverUrl: post.coverUrl, author: post.author, status: post.status })}>pré-visualizar</button>
               <button type="button" className="admin-link" onClick={() => toggleStatus(post)} disabled={busy}>{post.status === 'published' ? 'despublicar' : 'publicar'}</button>
               {post.status === 'published' && <a className="admin-link" href={`${SITE}/bluenews?post=${post.slug}`} target="_blank" rel="noopener noreferrer">ver</a>}
-              {role === 'admin' && <button type="button" className="admin-link admin-danger" onClick={() => remove(post)} disabled={busy}>excluir</button>}
+              <button type="button" className="admin-link admin-danger" onClick={() => remove(post)} disabled={busy}>excluir</button>
             </div>
           </li>
         ))}
@@ -274,7 +274,7 @@ export function AdminPage() {
                 <button type="button" className="admin-link" onClick={() => setPreview({ title: post.title, slug: post.slug, category: post.category, excerpt: post.excerpt, content: post.content, coverUrl: post.coverUrl, author: post.author, status: post.status })}>pré-visualizar</button>
                 <button type="button" className="admin-link" onClick={() => toggleStatus(post)} disabled={busy}>{post.status === 'published' ? 'despublicar' : 'publicar'}</button>
                 {post.status === 'published' && <a className="admin-link" href={`${SITE}/bluenews?post=${post.slug}`} target="_blank" rel="noopener noreferrer">ver</a>}
-                {role === 'admin' && <button type="button" className="admin-link admin-danger" onClick={() => remove(post)} disabled={busy}>excluir</button>}
+                <button type="button" className="admin-link admin-danger" onClick={() => remove(post)} disabled={busy}>excluir</button>
               </td>
             </tr>
           ))}
@@ -282,7 +282,7 @@ export function AdminPage() {
       </table>
     </>)
   )
-  const screen = view === 'inicio' ? (
+  const screen = (role !== 'admin' && (view === 'config' || view === 'leads' || view === 'newsletter')) ? soon('Sem acesso', 'Esta área é só da administração.') : view === 'inicio' ? (
     <section className="admin-list">
       <div className="admin-toolbar"><h1 className="solution-title">Início</h1></div>
       <div className="admin-stats">
@@ -325,7 +325,7 @@ export function AdminPage() {
       <div className="admin-toolbar"><h1 className="solution-title">Configurações</h1></div>
       <dl className="admin-config">
         <dt>conta conectada</dt><dd>{user.email} · {role === 'admin' ? 'administradora' : 'editor(a)'}</dd>
-        <dt>acesso ao painel</dt><dd>{role === 'admin' ? 'administradores entram com Google e gerenciam pessoas; editores publicam notícias e entram com Google ou e-mail e senha.' : 'você publica notícias. Exclusão de notícias e gestão de pessoas ficam com a administração.'}</dd>
+        <dt>acesso ao painel</dt><dd>administradores entram com Google e gerenciam pessoas; editores criam, publicam e excluem notícias e entram com Google ou e-mail e senha.</dd>
         <dt>portal público</dt><dd><a className="admin-link" href={`${SITE}/bluenews`} target="_blank" rel="noopener noreferrer">{SITE.replace('https://', '')}/bluenews</a></dd>
         <dt>e-mail de suporte</dt><dd>contato@abluezone.com.br</dd>
       </dl>
