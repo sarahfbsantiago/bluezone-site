@@ -1,6 +1,7 @@
 // Bluezone - RESPOSTA AUTOMATICA (Resposta.gs)
-// Depois de gravar na planilha, envia para a pessoa um e-mail "recebemos sua mensagem" como noreply@abluezone.com.br,
+// Depois de gravar na planilha, envia para a pessoa um e-mail "recebemos sua mensagem" a partir de contato@ (nome "Bluezone"),
 // com botao do WhatsApp e a assinatura animada da Bluezone. O texto de cada formulario fica em reply() no arquivo dele.
+// Nao usamos o modo noReply do Workspace: ele sai por um endereco inexistente (noreply@) e a entrega e barrada/filtrada.
 // A mensagem que a pessoa escreveu NAO e repetida no e-mail (evita uso do formulario para mandar spam em nosso nome).
 
 var RESPOSTA = {
@@ -18,15 +19,7 @@ function enviarConfirmacao(d, form) {
   var primeiro = (d.name || "").split(" ")[0];
   var texto = montarTexto(primeiro, r);
   var html = montarHtml(primeiro, r);
-  var opcoes = { name: RESPOSTA.nome, htmlBody: html, noReply: true };
-  try {
-    GmailApp.sendEmail(d.email, r.subject, texto, opcoes);
-  } catch (error) {
-    // Se a conta nao permitir noReply, envia do proprio contato@ pedindo para nao responder.
-    delete opcoes.noReply;
-    opcoes.replyTo = CONFIG.to;
-    GmailApp.sendEmail(d.email, r.subject, texto, opcoes);
-  }
+  GmailApp.sendEmail(d.email, r.subject, texto, { name: RESPOSTA.nome, replyTo: CONFIG.to, htmlBody: html });
 }
 
 function montarTexto(primeiro, r) {
@@ -34,7 +27,7 @@ function montarTexto(primeiro, r) {
   var linhas = ["Oi" + (primeiro ? ", " + primeiro : "") + "!", "", r.intro, ""];
   if (r.ctaTexto && r.ctaLink) linhas.push(r.ctaTexto + ": " + r.ctaLink, "");
   linhas.push("Se preferir falar agora, chame a gente no WhatsApp: " + RESPOSTA.whatsapp, "");
-  linhas.push("At\u00e9 j\u00e1,", "Time Bluezone", RESPOSTA.site + " - @abluezone", "", "Este e-mail \u00e9 autom\u00e1tico. Para falar com a gente, use o WhatsApp ou " + CONFIG.to + ".");
+  linhas.push("At\u00e9 j\u00e1,", "Time Bluezone", RESPOSTA.site + " - @abluezone", "", "Este e-mail \u00e9 autom\u00e1tico. Se quiser, responda por aqui mesmo ou chame no WhatsApp.");
   return linhas.join(nl);
 }
 
@@ -69,10 +62,18 @@ function montarHtml(primeiro, r) {
     '<span style="color:#9aa8bb;">&nbsp;&middot;&nbsp;</span>' +
     '<a href="' + RESPOSTA.instagram + '" target="_blank" style="color:' + azul + ';text-decoration:none;">@abluezone</a>' +
     '</div></td></tr></table>' +
-    '<p style="margin:18px 0 0;font-size:10.5px;line-height:1.6;color:#9aa8bb;">Este e-mail &eacute; autom&aacute;tico e n&atilde;o recebe respostas. Para falar com a gente, use o WhatsApp ou ' + CONFIG.to + '.</p>' +
+    '<p style="margin:18px 0 0;font-size:10.5px;line-height:1.6;color:#9aa8bb;">Este e-mail &eacute; autom&aacute;tico. Se quiser, responda por aqui mesmo ou chame no WhatsApp.</p>' +
     '</td></tr></table></div>';
 }
 
 function escapeHtml(value) {
   return String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+// TESTE: rode esta funcao no editor (Executar) para autorizar o envio de e-mail e ver qualquer erro no registro de execucao.
+// Envia uma confirmacao de exemplo para CONFIG.to (contato@).
+function testarResposta() {
+  var d = { source: "bluezone-site", name: "Teste Bluezone", email: CONFIG.to };
+  enviarConfirmacao(d, formularioPara(d.source));
+  Logger.log("Confirmacao de teste enviada para " + CONFIG.to);
 }
