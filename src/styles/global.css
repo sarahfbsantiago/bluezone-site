@@ -386,7 +386,8 @@ button { font-family: inherit; }
 .site-footer nav { display: flex; gap: 28px; }
 .site-footer nav a:hover { color: var(--blue); }
 .site-footer a:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; }
-.footer-legal { margin: 0; letter-spacing: .06em; text-transform: none; }
+/* linha do copyright: sempre sozinha, centralizada e menor (o padding-right do rodapé é compensado para o centro ser o da página) */
+.footer-legal { flex-basis: 100%; margin: 6px 0 0; padding-left: 180px; text-align: center; font-size: 9px; font-weight: 400; letter-spacing: .06em; text-transform: none; opacity: .8; }
 .social-links { list-style: none; margin: 0; padding: 0; display: flex; gap: 10px; }
 .social-links a, .social-links .is-soon { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; border: 1px solid rgba(24, 94, 151, .3); background: rgba(255, 255, 255, .28); color: #17324e; transition: background var(--motion-fast), transform var(--motion-fast), color var(--motion-fast), box-shadow var(--motion-fast); }
 .social-links a:hover { background: rgba(255, 255, 255, .7); color: var(--blue); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(20, 150, 220, .18); }
@@ -423,6 +424,7 @@ button { font-family: inherit; }
   .contact-copy { align-items: center; }
   .contact-mark { height: clamp(200px, 30vh, 300px); }
   .site-footer { justify-content: center; text-align: center; padding-right: 0; }
+  .footer-legal { padding-left: 0; }
   .site-nav { gap: 22px; margin-right: 20px; }
   .site-nav a { font-size: 10px; letter-spacing: .1em; }
   .header-cta { padding: 12px 24px; font-size: 10px; }

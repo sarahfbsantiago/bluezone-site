@@ -1,5 +1,6 @@
 // Bluezone - RECEPTOR (Main.gs)
-// Recebe o envio do site (POST em JSON), descobre o formulario pela origem, grava na aba dele e envia o aviso por e-mail.
+// Recebe o envio do site (POST em JSON), descobre o formulario pela origem, grava na aba dele, envia o aviso por e-mail
+// e manda a resposta automatica para a pessoa (Resposta.gs).
 // Para criar um formulario novo: crie um arquivo como Bluezone.gs/Bluenews.gs/Blueprint.gs e inclua o objeto dele em formularios().
 
 function formularios() {
@@ -40,6 +41,7 @@ function doPost(e) {
 
     var subject = form.subjectFor ? form.subjectFor(source) : form.subject;
     MailApp.sendEmail({ to: CONFIG.to, replyTo: d.email, subject: subject + " - " + d.name, body: form.body(d) });
+    try { enviarConfirmacao(d, form); } catch (ignored) { /* a resposta automatica nunca derruba o registro */ }
     return respond({ ok: true });
   } catch (error) {
     return respond({ ok: false, error: "server" });

@@ -255,3 +255,10 @@ function formatPhone(value) {
   var split = rest.length === 9 ? 5 : 4;
   return "(" + ddd + ") " + rest.slice(0, split) + "-" + rest.slice(split);
 }
+
+=== ATUALIZACAO: RESPOSTA AUTOMATICA (Resposta.gs) ===
+1. No editor do Apps Script (conta contato@abluezone.com.br), crie o arquivo Resposta.gs e cole o conteudo de Resposta.gs.txt.
+2. Substitua o conteudo de Main.gs, Bluezone.gs, Bluenews.gs e Blueprint.gs pelos .txt novos (Config.gs e Util.gs nao mudam).
+3. Salve. Rode uma vez a funcao doGet (menu Executar) e autorize "Enviar e-mail em seu nome" quando o Google pedir.
+4. Implantar > Gerenciar implantacoes > lapis (editar) > Versao: "Nova versao" > Implantar. A URL continua a mesma; o site nao muda.
+5. Teste: envie o formulario do site com o seu e-mail. Devem chegar dois e-mails: o aviso em contato@ e a confirmacao para voce, de noreply@abluezone.com.br, com botao do WhatsApp e a assinatura animada.
