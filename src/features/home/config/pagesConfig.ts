@@ -103,7 +103,7 @@ export const pages = {
   foundersGallery: {
     id: 'fundadores',
     caption: 'Bela e Alisson, fundadores da Bluezone',
-    intervalMs: 3800,
+    intervalMs: 2200,
     photos: [
       { src: '/midia/blueprint/hero.jpg', alt: 'Alisson e Bela fazendo uma selfie com o notebook', position: 'center 42%' },
       { src: '/midia/blueprint/palco.jpg', alt: 'Alisson e Bela sorrindo no palco, com luz de LED', position: 'center 32%' },

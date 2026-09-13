@@ -6,8 +6,9 @@ import { useScrollDriven } from '../../../blueprint/BlueprintPieces'
 
 /**
  * Tablet 3D (mesma peça do Blueprint, brilho azul) entre "para quem fazemos" e "clientes".
- * Entra girando preso ao scroll (sobe e desce refaz), para de frente e flutua; na tela, as fotos dos fundadores passam
- * sozinhas com transição suave. Pausa com o mouse em cima e fica parada na primeira foto com "reduzir movimento".
+ * Entra girando preso ao scroll (sobe e desce refaz), para de frente e flutua; na tela, as fotos dos fundadores deslizam
+ * sozinhas de lado (rolagem automática, em loop) assim que o tablet está visível. Pausa com o mouse em cima e fica parada
+ * na primeira foto com "reduzir movimento".
  */
 export function FoundersTablet() {
   const { foundersGallery: gallery } = pages
@@ -17,11 +18,16 @@ export function FoundersTablet() {
   const [paused, setPaused] = useState(false)
   const total = gallery.photos.length
 
+  // avança sozinho enquanto o tablet estiver na tela (não depende de terminar o giro)
   useEffect(() => {
-    if (reduced || total < 2 || !done) return
-    const tick = window.setInterval(() => { if (!paused && !document.hidden) setIndex((i) => (i + 1) % total) }, gallery.intervalMs)
-    return () => window.clearInterval(tick)
-  }, [reduced, total, done, paused, gallery.intervalMs])
+    const element = ref.current
+    if (reduced || total < 2 || !element) return
+    let visible = typeof IntersectionObserver === 'undefined'
+    const observer = typeof IntersectionObserver === 'undefined' ? null : new IntersectionObserver(([entry]) => { visible = entry.isIntersecting }, { threshold: 0.2 })
+    observer?.observe(element)
+    const tick = window.setInterval(() => { if (visible && !paused && !document.hidden) setIndex((i) => (i + 1) % total) }, gallery.intervalMs)
+    return () => { observer?.disconnect(); window.clearInterval(tick) }
+  }, [reduced, total, paused, gallery.intervalMs, ref])
 
   return (
     <section id={gallery.id} className="page page-founders" aria-label="Fotos dos fundadores" data-scroll-section>
@@ -30,9 +36,11 @@ export function FoundersTablet() {
           <div className="bp-tablet-body">
             <span className="bp-tablet-cam" />
             <div className="bp-tablet-screen founders-screen">
-              {gallery.photos.map((photo, i) => (
-                <img key={photo.src} src={withBase(photo.src)} alt={i === index ? photo.alt : ''} style={{ objectPosition: photo.position }} className={i === index ? 'is-active' : undefined} loading="lazy" decoding="async" aria-hidden={i !== index} />
-              ))}
+              <div className="founders-track" style={{ transform: `translateX(${-index * 100}%)` }}>
+                {gallery.photos.map((photo, i) => (
+                  <img key={photo.src} src={withBase(photo.src)} alt={i === index ? photo.alt : ''} style={{ objectPosition: photo.position }} loading="lazy" decoding="async" aria-hidden={i !== index} />
+                ))}
+              </div>
               <span className="bp-phone-gloss" />
               {total > 1 && (
                 <span className="founders-dots" aria-hidden="true">
