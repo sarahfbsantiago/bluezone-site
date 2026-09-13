@@ -168,3 +168,9 @@ Feito e publicado (abluezone.com.br, painel.abluezone.com.br, GitHub sarahfbsant
 - Apps Script: Main/Bluezone/Bluenews/Blueprint/Resposta atualizados pela cliente (versão 3, mesma URL). Captação OK nos 5 formulários. Resposta automática ao lead ainda não entrega (ver pendências acima).
 Próximos (estética, ordem sugerida): tablet 3D com slideshow de fotos dos fundadores entre "para quem fazemos" e "06 — clientes" (cliente precisa mandar fotos horizontais; posso montar com placeholder); vídeo dos fundadores; nome da pessoa do 2º print de WhatsApp; idioma pt nos e-mails do Firebase Auth (Authentication → Modelos).
 - 2026-09-13: tablet 3D dos fundadores (`FoundersTablet.tsx`, seção `#fundadores` entre soluções e clientes; config `pages.foundersGallery`): peça do Blueprint com brilho azul, `useScrollDriven` exportado de BlueprintPieces, rolagem automática lateral das 3 fotos de `public/midia/blueprint/` (desliza a cada 2,2 s enquanto visível via IntersectionObserver, pausa no hover, `object-position` por foto); sem legenda (a cliente achou brega). Sem fotos novas: a cliente pediu para reaproveitar as existentes.
+
+## Resumo da sessão 2026-09-13 (madrugada) — complemento
+- Tablet 3D dos fundadores no ar entre "para quem fazemos" e "06 — clientes": fotos deslizam de lado sozinhas a cada 2,2 s enquanto visível, sem legenda. Fotos reaproveitadas de `public/midia/blueprint/` (hero, palco, idealizadores).
+- Resposta automática ao lead: continua pendente (ver "Pendências abertas"). Captação validada nos 5 formulários.
+- Ainda pendente da cliente: vídeo dos fundadores (seção 04), nome da pessoa do 2º iPhone, idioma pt nos e-mails do Firebase Auth, apagar usuário Auth antigo de dmarketingevendas (opcional), testar convite de editor com o e-mail pessoal.
+- Estado dos deploys: prod (abluezone.com.br) e painel atualizados; GitHub main em dia.
