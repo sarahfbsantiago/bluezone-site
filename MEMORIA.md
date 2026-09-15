@@ -53,6 +53,9 @@ WhatsApp flutuante: ícone em pontilhismo (no escuro: branco puro, sem degradê,
 
 - `BlueprintPopup` abre uma vez quando "quem somos" entra na tela (não abre na BlueNews nem no Blueprint). Saídas: "conhecer o Blueprint" (/blueprint), "quero receber promoções e conteúdo" (nome, e-mail, telefone → mesma planilha, origem `popup-blueprint`; assunto próprio se colar o `Code.gs` novo) ou fechar (X, Esc, clique fora). **Aparece em toda visita/atualização da página** (a cliente pediu para tirar a pausa de 7 dias em 12/09/2026); fechado, só volta ao recarregar. Visual escuro/laranja do Blueprint, independente do tema.
 
+## Favicon (15/09/2026)
+- Ícones quadrados gerados do `logo-symbol.png` (símbolo laranja #f63822, fundo transparente; apple-touch com fundo branco) via Chrome/canvas: `favicon.ico` (16/32/48), `favicon-16/32/48.png`, `icon-192.png`, `icon-512.png`, `apple-touch-icon.png`, `site.webmanifest`, em `public/` (compartilhado com o painel). Tags nas 4 páginas (`index.html`, `bluenews.html`, `blueprint.html`, `painel/index.html`). Motivo: o Google só mostra favicon nos resultados se for quadrado, ≥48px e acessível; o PNG antigo era 300×366. Aparece na busca só depois do Google recrawlar (dias a semanas); acelera pedindo indexação da home no Search Console.
+
 ## Prévia de compartilhamento e GitHub Pages
 
 - Imagens de prévia (WhatsApp/Instagram/redes) em `public/og-bluezone.png` (site e BlueNews) e `public/og-blueprint.png` (Blueprint), 1200×630, geradas com Puppeteer (marca com letreiro sobre fundo escuro). As tags `og:*`/`twitter:*` usam `%VITE_SITE_URL%` (Vite troca no build): `.env` local = http://127.0.0.1:5173; GitHub Pages = https://sarahfbsantiago.github.io/bluezone-site; Firebase = https://abluezone.com.br.
