@@ -41,9 +41,11 @@ function doPost(e) {
 
     var subject = form.subjectFor ? form.subjectFor(source) : form.subject;
     MailApp.sendEmail({ to: CONFIG.to, replyTo: d.email, subject: subject + " - " + d.name, body: form.body(d) });
-    try { enviarConfirmacao(d, form); } catch (ignored) { /* a resposta automatica nunca derruba o registro */ }
+    // A resposta automatica nunca derruba o registro: se falhar, fica anotada na aba "log" da planilha.
+    try { enviarConfirmacao(d, form); } catch (error) { logErro("resposta " + source + " -> " + d.email, error); }
     return respond({ ok: true });
   } catch (error) {
+    logErro("doPost", error);
     return respond({ ok: false, error: "server" });
   }
 }

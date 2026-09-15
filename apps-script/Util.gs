@@ -32,6 +32,20 @@ function getSheet(name) {
   return sheet;
 }
 
+// Anota um erro na aba "log" (data, onde, erro). Nunca lanca: e chamada de dentro de catch.
+function logErro(onde, error) {
+  try {
+    var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = spreadsheet.getSheetByName("log");
+    if (!sheet) {
+      sheet = spreadsheet.insertSheet("log");
+      sheet.appendRow(["data", "onde", "erro"]);
+      sheet.setFrozenRows(1);
+    }
+    sheet.appendRow([new Date(), safeCell(onde), safeCell(String(error && error.message ? error.message : error))]);
+  } catch (ignored) { /* sem planilha nao ha onde anotar */ }
+}
+
 // Remove quebras de linha, tabulacoes e caracteres de controle; limita o tamanho.
 function clean(value, max) {
   var s = String(value || "");

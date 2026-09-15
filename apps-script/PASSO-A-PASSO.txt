@@ -257,8 +257,23 @@ function formatPhone(value) {
 }
 
 === ATUALIZACAO: RESPOSTA AUTOMATICA (Resposta.gs) ===
-1. No editor do Apps Script (conta contato@abluezone.com.br), crie o arquivo Resposta.gs e cole o conteudo de Resposta.gs.txt.
-2. Substitua o conteudo de Main.gs, Bluezone.gs, Bluenews.gs e Blueprint.gs pelos .txt novos (Config.gs e Util.gs nao mudam).
-3. Salve. Rode uma vez a funcao doGet (menu Executar) e autorize "Enviar e-mail em seu nome" quando o Google pedir.
-4. Implantar > Gerenciar implantacoes > lapis (editar) > Versao: "Nova versao" > Implantar. A URL continua a mesma; o site nao muda.
-5. Teste: envie o formulario do site com o seu e-mail. Devem chegar dois e-mails: o aviso em contato@ e a confirmacao para voce, de noreply@abluezone.com.br, com botao do WhatsApp e a assinatura animada.
+0. Crie o endereco no-reply no Google Workspace (uma vez, sem custo): admin.google.com > Diretorio > Usuarios > contato@
+   > Informacoes do usuario > E-mails alternativos > adicionar "noreply" > Salvar. A resposta automatica sai de
+   noreply@abluezone.com.br; se alguem responder mesmo assim, a mensagem cai na caixa do contato@.
+1. No editor do Apps Script (conta contato@abluezone.com.br), substitua o conteudo de Config.gs, Resposta.gs, Main.gs e Util.gs
+   pelos arquivos de mesmo nome da pasta apps-script/ (Bluezone.gs, Bluenews.gs e Blueprint.gs nao mudam).
+2. No topo de Resposta.gs, em TESTE_EMAIL, coloque o seu e-mail pessoal entre aspas (ex.: "voce@gmail.com"). Salve (Cmd+S).
+3. Executar > testarResposta. Se o Google pedir permissao, autorize com contato@abluezone.com.br.
+   Abra o "Registro de execucao" (embaixo) e me mande o que apareceu: ele diz qual conta executou e se a cota de e-mail
+   diminuiu (= o envio saiu de verdade).
+4. Olhe o e-mail pessoal: caixa de entrada, Spam e a aba Promocoes. Deve chegar "Recebemos sua mensagem - Bluezone",
+   de "Bluezone" <noreply@abluezone.com.br>.
+5. Implantar > Gerenciar implantacoes > lapis (editar) > Versao: "Nova versao" > Implantar. A URL continua a mesma.
+6. Teste final, um envio por formulario, sempre com o seu e-mail pessoal:
+   - site (secao "contato")            -> aba "contatos",  aviso "Novo contato pelo site Bluezone",   resposta "Recebemos sua mensagem - Bluezone"
+   - BlueNews ("quero ser avisado")    -> aba "bluenews",  aviso "Nova inscricao na BlueNews",        resposta "Inscricao confirmada - BlueNews"
+   - BlueNews (aba contato do portal)  -> aba "bluenews",  aviso "Contato pela BlueNews",             resposta "Recebemos sua mensagem - BlueNews"
+   - pop-up do Blueprint na home       -> aba "blueprint", aviso "Novo lead do pop-up Blueprint",     resposta "Recebemos seu contato - Blueprint"
+   Cada envio gera 1 linha (coluna "origem" diz de onde veio), 1 aviso em contato@ e 1 confirmacao no seu e-mail.
+   Se a confirmacao nao chegar, abra a planilha: a aba "log" mostra o erro com data e hora.
+Obs.: os e-mails da resposta automatica NAO aparecem em "Enviados" do contato@. E normal (o MailApp nao guarda copia).

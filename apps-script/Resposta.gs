@@ -1,8 +1,14 @@
 // Bluezone - RESPOSTA AUTOMATICA (Resposta.gs)
 // Depois de gravar na planilha, envia para a pessoa um e-mail "recebemos sua mensagem" a partir de contato@ (nome "Bluezone"),
 // com botao do WhatsApp e a assinatura animada da Bluezone. O texto de cada formulario fica em reply() no arquivo dele.
-// Nao usamos o modo noReply do Workspace: ele sai por um endereco inexistente (noreply@) e a entrega e barrada/filtrada.
+// Remetente: com CONFIG.noReply = true sai de noreply@abluezone.com.br (modo no-reply do Workspace; o alias precisa existir no
+// Admin, senao o endereco e "inexistente" e a entrega e barrada/filtrada). Com false sai de contato@ com reply-to em contato@.
 // A mensagem que a pessoa escreveu NAO e repetida no e-mail (evita uso do formulario para mandar spam em nosso nome).
+//
+// Envio pelo MailApp (o mesmo servico que manda o aviso para contato@ e que comprovadamente entrega), e nao pelo GmailApp:
+// o GmailApp exige uma permissao extra (Gmail) que a implantacao do app da Web so ganha se for reautorizada; sem isso o envio
+// falhava em silencio dentro do doPost. O MailApp usa a permissao que a implantacao ja tem. Diferenca visivel: e-mails do MailApp
+// NAO aparecem em "Enviados" do contato@ (e normal); a copia fica na aba "log" da planilha quando algo da errado.
 
 var RESPOSTA = {
   nome: "Bluezone",
@@ -19,7 +25,21 @@ function enviarConfirmacao(d, form) {
   var primeiro = (d.name || "").split(" ")[0];
   var texto = montarTexto(primeiro, r);
   var html = montarHtml(primeiro, r);
-  GmailApp.sendEmail(d.email, r.subject, texto, { name: RESPOSTA.nome, replyTo: CONFIG.to, htmlBody: html });
+  var msg = { to: d.email, subject: r.subject, body: texto, htmlBody: html, name: RESPOSTA.nome };
+  if (CONFIG.noReply) msg.noReply = true; else msg.replyTo = CONFIG.to;
+  MailApp.sendEmail(msg);
+}
+
+// Rodape: no modo no-reply pede para nao responder; caso contrario convida a responder.
+function avisoAutomatico(html) {
+  if (CONFIG.noReply) {
+    return html
+      ? "Este e-mail &eacute; autom&aacute;tico e n&atilde;o recebe respostas. Para falar com a gente, use o WhatsApp ou " + CONFIG.to + "."
+      : "Este e-mail \u00e9 autom\u00e1tico e n\u00e3o recebe respostas. Para falar com a gente, use o WhatsApp ou " + CONFIG.to + ".";
+  }
+  return html
+    ? "Este e-mail &eacute; autom&aacute;tico. Se quiser, responda por aqui mesmo ou chame no WhatsApp."
+    : "Este e-mail \u00e9 autom\u00e1tico. Se quiser, responda por aqui mesmo ou chame no WhatsApp.";
 }
 
 function montarTexto(primeiro, r) {
@@ -27,7 +47,7 @@ function montarTexto(primeiro, r) {
   var linhas = ["Oi" + (primeiro ? ", " + primeiro : "") + "!", "", r.intro, ""];
   if (r.ctaTexto && r.ctaLink) linhas.push(r.ctaTexto + ": " + r.ctaLink, "");
   linhas.push("Se preferir falar agora, chame a gente no WhatsApp: " + RESPOSTA.whatsapp, "");
-  linhas.push("At\u00e9 j\u00e1,", "Time Bluezone", RESPOSTA.site + " - @abluezone", "", "Este e-mail \u00e9 autom\u00e1tico. Se quiser, responda por aqui mesmo ou chame no WhatsApp.");
+  linhas.push("At\u00e9 j\u00e1,", "Time Bluezone", RESPOSTA.site + " - @abluezone", "", avisoAutomatico(false));
   return linhas.join(nl);
 }
 
@@ -62,7 +82,7 @@ function montarHtml(primeiro, r) {
     '<span style="color:#9aa8bb;">&nbsp;&middot;&nbsp;</span>' +
     '<a href="' + RESPOSTA.instagram + '" target="_blank" style="color:' + azul + ';text-decoration:none;">@abluezone</a>' +
     '</div></td></tr></table>' +
-    '<p style="margin:18px 0 0;font-size:10.5px;line-height:1.6;color:#9aa8bb;">Este e-mail &eacute; autom&aacute;tico. Se quiser, responda por aqui mesmo ou chame no WhatsApp.</p>' +
+    '<p style="margin:18px 0 0;font-size:10.5px;line-height:1.6;color:#9aa8bb;">' + avisoAutomatico(true) + '</p>' +
     '</td></tr></table></div>';
 }
 
@@ -70,10 +90,18 @@ function escapeHtml(value) {
   return String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-// TESTE: rode esta funcao no editor (Executar) para autorizar o envio de e-mail e ver qualquer erro no registro de execucao.
-// Envia uma confirmacao de exemplo para CONFIG.to (contato@).
+// TESTE: rode esta funcao no editor (Executar) e leia o "Registro de execucao".
+// Envia uma confirmacao de exemplo para TESTE_EMAIL (troque abaixo pelo seu e-mail pessoal; vazio = contato@).
+// O registro mostra a cota diaria de e-mails antes e depois: se a cota nao diminuir, nada foi enviado.
+var TESTE_EMAIL = "";
+
 function testarResposta() {
-  var d = { source: "bluezone-site", name: "Teste Bluezone", email: CONFIG.to };
+  var destino = TESTE_EMAIL || CONFIG.to;
+  var antes = MailApp.getRemainingDailyQuota();
+  Logger.log("Conta que executa: " + Session.getEffectiveUser().getEmail() + " | cota restante hoje: " + antes);
+  if (antes < 1) throw new Error("Sem cota de e-mail hoje nesta conta (" + Session.getEffectiveUser().getEmail() + ").");
+  var d = { source: "bluezone-site", name: "Teste Bluezone", email: destino };
   enviarConfirmacao(d, formularioPara(d.source));
-  Logger.log("Confirmacao de teste enviada para " + CONFIG.to);
+  var depois = MailApp.getRemainingDailyQuota();
+  Logger.log("Confirmacao enviada para " + destino + " | cota restante agora: " + depois + (depois < antes ? " (ok, o envio contou)" : " (ATENCAO: a cota nao mudou; o envio nao saiu)"));
 }
