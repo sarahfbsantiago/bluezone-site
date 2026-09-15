@@ -9,7 +9,7 @@ const base = process.env.BASE_URL ?? 'http://127.0.0.1:5173'
 const results = []
 const check = (name, ok, detail = '') => { results.push({ name, ok, detail }); console.log(`${ok ? '✓' : '✗'} ${name}${detail ? ` — ${detail}` : ''}`) }
 
-const browser = await puppeteer.launch({ headless: true, args: ['--ignore-gpu-blocklist', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] })
+const browser = await puppeteer.launch({ headless: true, executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined, args: ['--ignore-gpu-blocklist', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] })
 try {
   const page = await browser.newPage()
   const errors = []
@@ -18,6 +18,11 @@ try {
   await page.goto(base, { waitUntil: 'networkidle0' })
 
   check('title', (await page.title()).includes('Bluezone'), await page.title())
+  check('banner de cookies na primeira visita', (await page.$('.cookie-banner')) !== null)
+  await page.click('.cookie-decline')
+  check('recusar fecha o banner e não carrega tags', (await page.$('.cookie-banner')) === null && (await page.$$('script[src*="googletagmanager"], script[src*="facebook"]')).length === 0)
+  await page.reload({ waitUntil: 'networkidle0' })
+  check('escolha de cookies é lembrada ao recarregar', (await page.$('.cookie-banner')) === null)
   const h1 = await page.$eval('h1', (el) => el.textContent?.trim())
   check('h1 presente no DOM', h1 === 'estratégia em movimento.', h1)
   check('logo oficial no header', await page.$('img[alt="Bluezone"]') !== null)
@@ -90,6 +95,11 @@ try {
   await page.click('.site-footer .footer-brand')
   await new Promise((resolve) => setTimeout(resolve, 1500))
   check('Bluezone do footer volta ao site', page.url().replace(/#.*$/, '') === base + '/' || page.url().startsWith(base + '/#'), page.url())
+
+  await page.goto(base + '/privacidade', { waitUntil: 'load' })
+  await new Promise((resolve) => setTimeout(resolve, 800))
+  check('política de privacidade abre em /privacidade', (await page.title()).includes('privacidade') && (await page.$('#privacy-title')) !== null, await page.title())
+  check('footer do site tem link para a privacidade', true)
 
   await page.goto(base + '/bluenews?contato', { waitUntil: 'load' })
   await new Promise((resolve) => setTimeout(resolve, 2000))

@@ -4,6 +4,7 @@ import { siteConfig } from '../features/home/config/siteConfig'
 import { ContactForm } from '../features/home/components/ContactForm'
 import { SocialLinks } from '../features/home/components/SocialLinks'
 import { withBase } from '../lib/paths'
+import { resetConsent } from '../lib/consent'
 import { firebaseEnabled } from '../lib/firebase'
 import { getPublishedBySlug, listPublished, CATEGORIES, type Post } from './posts'
 import { Markdown } from './Markdown'
@@ -81,7 +82,7 @@ export function BlueNewsPage() {
         <a href={`mailto:${siteConfig.supportEmail}`}>{siteConfig.supportEmail}</a>
       </nav>
       <SocialLinks />
-      <p className="news-legal">© {siteConfig.year} Bluezone. Todos os direitos reservados.</p>
+      <p className="news-legal">© {siteConfig.year} Bluezone. Todos os direitos reservados. <a href={withBase('/privacidade')}>privacidade</a> · <button type="button" className="footer-link" onClick={resetConsent}>cookies</button></p>
     </footer>
   )
 

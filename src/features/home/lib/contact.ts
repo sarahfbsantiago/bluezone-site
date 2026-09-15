@@ -1,5 +1,5 @@
 export type ContactSource = 'bluezone-site' | 'bluenews' | 'bluenews-contato' | 'popup-blueprint'
-export type ContactPayload = { name: string; email: string; phone: string; message: string; website?: string; source?: ContactSource }
+export type ContactPayload = { name: string; email: string; phone: string; message: string; website?: string; source?: ContactSource; consent?: string; campaign?: string }
 export type ContactResult = { ok: true } | { ok: false; reason: 'unconfigured' | 'invalid' | 'network' | 'server' }
 
 const EMAIL = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/
@@ -55,7 +55,7 @@ export async function sendContact(endpoint: string, payload: ContactPayload, fet
     const response = await fetchImpl(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ name: payload.name.trim(), email: payload.email.trim(), phone: formatPhone(payload.phone), message: payload.message.trim(), source: payload.source ?? 'bluezone-site' }),
+      body: JSON.stringify({ name: payload.name.trim(), email: payload.email.trim(), phone: formatPhone(payload.phone), message: payload.message.trim(), source: payload.source ?? 'bluezone-site', consent: payload.consent ?? '', campaign: payload.campaign ?? '' }),
       redirect: 'follow',
     })
     if (!response.ok) return { ok: false, reason: 'server' }

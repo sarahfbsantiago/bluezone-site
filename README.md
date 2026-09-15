@@ -77,6 +77,14 @@ Header de vidro e botão do WhatsApp são fixos em todas as páginas.
 
 Os quatro formulários (contato do site, inscrição e contato da BlueNews, pop-up do Blueprint) usam o mesmo componente `ContactForm` e enviam um único POST, com a origem no campo `source`, para um Web App do Apps Script que grava em uma planilha (uma aba por origem), avisa contato@ e manda uma resposta automática à pessoa de noreply@abluezone.com.br. Código, tabela de origens e passo a passo de atualização em `apps-script/README.md`; `npm run apps-script:bundle` gera o arquivo para colar no editor. A URL entra em `VITE_CONTACT_ENDPOINT` (`.env`, ver `.env.example`) e na variável de mesmo nome no GitHub. Sem URL, o formulário avisa que o envio não está configurado. O cliente valida os campos, usa honeypot e bloqueia envios em sequência; nenhum segredo fica no frontend.
 
+## Privacidade, cookies e medição (LGPD)
+
+- **Política** em `/privacidade` (`privacidade.html` → `src/privacidade/`, dados do controlador em `privacyConfig.ts`, versão em `POLICY_VERSION` de `src/lib/consent.ts`). Links no © de todos os footers.
+- **Banner de cookies** (`src/components/CookieBanner.tsx`, montado pelo `SiteBoot` em cada página): aceitar ou recusar, guardado em `bluezone-consent-v1`; "cookies" no footer reabre a escolha.
+- **Tags** (`src/lib/tracking.ts`): GA4, Google Ads, Meta Pixel e GTM só carregam com aceite **e** com o ID em `VITE_GA4_ID`, `VITE_GADS_ID`, `VITE_META_PIXEL_ID`, `VITE_GTM_ID` (`.env` local e variáveis do GitHub). Consent Mode v2 nasce negado. Eventos: `lead` (formulários, com `source`), `sign_up` (newsletter), `begin_checkout` (comprar no Blueprint), `view_promotion` (pop-up). O CSP do Hosting já libera os domínios do Google e do Meta.
+- **Origem da visita** (`src/lib/campaign.ts`): utm_*, gclid e fbclid da URL vão para a coluna "campanha" da planilha junto com o lead, sem cookie.
+- **Consentimento registrado**: cada envio leva a versão da política e o que a pessoa marcou (novidades, anúncios) para a coluna "consentimento".
+
 ## Segurança
 
 - **Site**: estático, sem segredos no bundle além da URL pública do Web App; React sem HTML injetado; links externos com `rel="noopener noreferrer"`; `npm audit` limpo em produção.

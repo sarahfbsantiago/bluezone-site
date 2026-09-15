@@ -138,6 +138,10 @@ Seguranca e privacidade:
   consentimento registrado com data/versao; dados pessoais nunca em texto claro nos pixels.
 - Painel: aba "campanhas" mostrando origem dos leads (utm/canal) e conversoes por periodo.
 Depende do plano Blaze para a parte server-side; o pixel/GA4 com consentimento pode entrar antes.
+Feito em 15/09/2026 (lado do site): politica de privacidade em /privacidade, banner de cookies com Consent Mode v2,
+carregador de GA4/Ads/Meta/GTM por variaveis VITE_* (vazias = desligado), eventos lead/sign_up/begin_checkout/
+view_promotion, utm/gclid/fbclid e consentimento gravados na planilha, CSP liberado. Falta: a cliente criar as
+contas (Analytics, Ads, Meta Business, opcional GTM) e colar os IDs; parte server-side (CAPI, Enhanced Conversions).
 
 
 8. ETAPA 4 - PRODUTOS E CONTEUDO

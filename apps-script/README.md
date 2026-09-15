@@ -14,7 +14,7 @@ Os quatro formulários do site (contato, inscrição e contato da BlueNews, pop-
 | BlueNews, contato do portal | `bluenews-contato` | bluenews | Contato pela BlueNews | Recebemos sua mensagem - BlueNews |
 | Pop-up do Blueprint (home) | `popup-blueprint` | blueprint | Novo lead do pop-up Blueprint | Recebemos seu contato - Blueprint |
 
-Origem desconhecida cai no formulário do site. Erros da resposta automática ficam na aba **log** da planilha (data, onde, erro).
+Origem desconhecida cai no formulário do site. Cada linha tem também **consentimento** (versão da política de privacidade + o que a pessoa marcou: novidades, anúncios) e **campanha** (utm, gclid, fbclid do link que trouxe a pessoa; vazio = visita direta). Abas antigas ganham os cabeçalhos novos sozinhas. Erros da resposta automática ficam na aba **log** da planilha (data, onde, erro).
 
 ## Arquivos
 

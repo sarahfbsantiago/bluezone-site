@@ -29,7 +29,9 @@ function doPost(e) {
       name: clean(body.name, 120),
       email: clean(body.email, 200).toLowerCase(),
       phone: formatPhone(body.phone),
-      message: clean(body.message, CONFIG.maxLength)
+      message: clean(body.message, CONFIG.maxLength),
+      consent: clean(body.consent, 200),   // versao da politica + o que a pessoa marcou (LGPD)
+      campaign: clean(body.campaign, 300)  // utm/gclid/fbclid do link que trouxe a pessoa
     };
     var minMessage = source === "bluenews-contato" ? 10 : form.minMessage;
     if (!d.name || !isEmail(d.email) || !d.phone || d.message.length < minMessage) {
@@ -37,7 +39,7 @@ function doPost(e) {
     }
     if (!allow(d.email)) return respond({ ok: false, error: "rate_limited" });
 
-    getSheet(form.sheet).appendRow([new Date(), safeCell(d.name), safeCell(d.email), safeCell(d.phone), safeCell(d.message), safeCell(source)]);
+    getSheet(form.sheet).appendRow([new Date(), safeCell(d.name), safeCell(d.email), safeCell(d.phone), safeCell(d.message), safeCell(source), safeCell(d.consent), safeCell(d.campaign)]);
 
     var subject = form.subjectFor ? form.subjectFor(source) : form.subject;
     MailApp.sendEmail({ to: CONFIG.to, replyTo: d.email, subject: subject + " - " + d.name, body: form.body(d) });

@@ -5,6 +5,7 @@ import { SiteHeader } from '../features/home/components/SiteHeader'
 import { WhatsAppButton } from '../features/home/components/WhatsAppButton'
 import { blueprint as bp } from './blueprintConfig'
 import { withBase } from '../lib/paths'
+import { track } from '../lib/tracking'
 import { BlueprintBrand, Newspaper, Phone, Tablet } from './BlueprintPieces'
 
 const BUY = siteConfig.blueprintCourse
@@ -12,7 +13,7 @@ const idx = (i: number) => ({ '--i': i } as CSSProperties)
 
 /** Botão de compra: sempre abre o checkout da Kiwify em nova aba. */
 function Buy({ label, className = '' }: { label: string; className?: string }) {
-  return <a className={`contact-submit blog-cta bp-buy ${className}`} href={BUY} target="_blank" rel="noopener noreferrer">{label}</a>
+  return <a className={`contact-submit blog-cta bp-buy ${className}`} href={BUY} target="_blank" rel="noopener noreferrer" onClick={() => track('begin_checkout', { item: 'blueprint', label })}>{label}</a>
 }
 
 /** Marca do curso: símbolo oficial + "Blue" em negrito e "print" leve, como no logotipo. */

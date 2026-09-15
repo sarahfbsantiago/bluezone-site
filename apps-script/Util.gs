@@ -20,14 +20,20 @@ function allow(email) {
   }
 }
 
-// Uma aba por caminho; cria a aba com cabecalho na primeira vez.
+// Uma aba por caminho; cria a aba com cabecalho na primeira vez e completa colunas novas em abas antigas.
+var CABECALHO = ["data", "nome", "e-mail", "telefone", "mensagem", "origem", "consentimento", "campanha"];
 function getSheet(name) {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = spreadsheet.getSheetByName(name);
   if (!sheet) {
     sheet = spreadsheet.insertSheet(name);
-    sheet.appendRow(["data", "nome", "e-mail", "telefone", "mensagem", "origem"]);
+    sheet.appendRow(CABECALHO);
     sheet.setFrozenRows(1);
+    return sheet;
+  }
+  var atual = sheet.getRange(1, 1, 1, CABECALHO.length).getValues()[0];
+  for (var i = 0; i < CABECALHO.length; i++) {
+    if (!atual[i]) sheet.getRange(1, i + 1).setValue(CABECALHO[i]);
   }
   return sheet;
 }

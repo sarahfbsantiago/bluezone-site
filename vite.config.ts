@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 import { seoFiles } from './seo/seo-files'
 
 /** Em desenvolvimento, /bluenews e /blueprint abrem os respectivos .html (em produção, o Firebase Hosting faz isso com cleanUrls). */
-const CLEAN_PAGES = ['bluenews', 'blueprint']
+const CLEAN_PAGES = ['bluenews', 'blueprint', 'privacidade']
 function cleanUrls(): Plugin {
   return {
     name: 'bluezone-clean-urls',
@@ -23,5 +23,5 @@ export default defineConfig({
   // VITE_BASE=/bluezone-site/ no GitHub Pages; vazio = raiz (dev e Firebase)
   base: process.env.VITE_BASE || '/',
   plugins: [react(), cleanUrls(), seoFiles()],
-  build: { rollupOptions: { input: { main: resolve(__dirname, 'index.html'), bluenews: resolve(__dirname, 'bluenews.html'), blueprint: resolve(__dirname, 'blueprint.html') } } },
+  build: { rollupOptions: { input: { main: resolve(__dirname, 'index.html'), bluenews: resolve(__dirname, 'bluenews.html'), blueprint: resolve(__dirname, 'blueprint.html'), privacidade: resolve(__dirname, 'privacidade.html') } } },
 })

@@ -2,6 +2,10 @@ import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { pages } from '../config/pagesConfig'
 import { siteConfig } from '../config/siteConfig'
 import { formatPhone, sanitizeEmail, sendContact, validateContact, type ContactPayload } from '../lib/contact'
+import { campaignSummary } from '../../../lib/campaign'
+import { POLICY_VERSION } from '../../../lib/consent'
+import { withBase } from '../../../lib/paths'
+import { track } from '../../../lib/tracking'
 
 type Status = 'idle' | 'sending' | 'success' | 'error' | 'unconfigured'
 
@@ -40,7 +44,9 @@ export function ContactForm({ endpoint = siteConfig.contactEndpoint, variant = '
     event.preventDefault()
     const form = event.currentTarget
     const data = new FormData(form)
-    const payload: ContactPayload = { name: String(data.get('name') ?? ''), email, phone, message: short ? short.message : String(data.get('message') ?? ''), website: String(data.get('website') ?? ''), source }
+    // Registro do consentimento (LGPD): versão da política + o que a pessoa marcou. Vai para a coluna "consentimento" da planilha.
+    const consent = ['política ' + POLICY_VERSION, ...(newsletter ? ['novidades'] : []), ...(data.get('ads') ? ['anúncios'] : [])].join('; ')
+    const payload: ContactPayload = { name: String(data.get('name') ?? ''), email, phone, message: short ? short.message : String(data.get('message') ?? ''), website: String(data.get('website') ?? ''), source, consent, campaign: campaignSummary() }
     const problems = validateContact(payload)
     setInvalid(problems)
     if (problems.length) return
@@ -49,7 +55,7 @@ export function ContactForm({ endpoint = siteConfig.contactEndpoint, variant = '
     if (!endpoint) { setStatus('unconfigured'); return }
     setStatus('sending')
     const result = await sendContact(endpoint, payload)
-    if (result.ok) { setStatus('success'); lastSentAt.current = Date.now(); form.reset(); setPhone(''); setEmail('') }
+    if (result.ok) { setStatus('success'); lastSentAt.current = Date.now(); form.reset(); setPhone(''); setEmail(''); track(variant === 'newsletter' ? 'sign_up' : 'lead', { source }) }
     else setStatus(result.reason === 'unconfigured' ? 'unconfigured' : 'error')
   }
 
@@ -86,9 +92,14 @@ export function ContactForm({ endpoint = siteConfig.contactEndpoint, variant = '
       <div className="field-honeypot" aria-hidden="true">
         <label>site<input name="website" type="text" tabIndex={-1} autoComplete="off" /></label>
       </div>
+      {newsletter && <label className="contact-check">
+        <input name="ads" type="checkbox" value="sim" />
+        <span>autorizo o uso do meu e-mail para anúncios personalizados da Bluezone (opcional)</span>
+      </label>}
       <div className="contact-actions">
         <button type="submit" className="contact-submit" disabled={status === 'sending'}>{status === 'sending' ? 'enviando' : short ? short.submit : 'enviar'}</button>
         <p id="contact-feedback" className={`contact-feedback is-${status}`} role="status" aria-live="polite">{feedback[status]}</p>
+        <p className="contact-consent">{newsletter ? 'Ao enviar, você aceita receber novidades e promoções por e-mail ou WhatsApp e concorda com a ' : 'Ao enviar, você concorda com a '}<a href={withBase('/privacidade')} target="_blank" rel="noopener noreferrer">política de privacidade</a>.{newsletter ? ' Pode sair da lista quando quiser.' : ''}</p>
       </div>
     </form>
   )

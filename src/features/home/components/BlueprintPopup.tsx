@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { BrandLogo } from './BrandLogo'
 import { ContactForm } from './ContactForm'
 import { withBase } from '../../../lib/paths'
+import { track } from '../../../lib/tracking'
 
 /**
  * Pop-up do Blueprint: abre quando "quem somos" entra na tela, em toda visita ou atualização da página (ou com `open` forçado).
@@ -23,6 +24,7 @@ export function BlueprintPopup({ triggerId = 'page-three', open: forced = false,
   }, [forced, triggerId])
   useEffect(() => {
     if (!open) return
+    track('view_promotion', { promotion: 'popup-blueprint' })
     const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') close() }
     window.addEventListener('keydown', onKey)
     dialog.current?.querySelector<HTMLElement>('a, button')?.focus({ preventScroll: true })
