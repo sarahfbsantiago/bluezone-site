@@ -101,7 +101,9 @@ function testarResposta() {
   Logger.log("Conta que executa: " + Session.getEffectiveUser().getEmail() + " | cota restante hoje: " + antes);
   if (antes < 1) throw new Error("Sem cota de e-mail hoje nesta conta (" + Session.getEffectiveUser().getEmail() + ").");
   var d = { source: "bluezone-site", name: "Teste Bluezone", email: destino };
-  enviarConfirmacao(d, formularioPara(d.source));
+  var form = formularioPara(d.source);
+  if (!form.reply) throw new Error("Bluezone.gs/Bluenews.gs/Blueprint.gs estao na versao antiga (sem reply): cole os arquivos novos da pasta apps-script.");
+  enviarConfirmacao(d, form);
   var depois = MailApp.getRemainingDailyQuota();
   Logger.log("Confirmacao enviada para " + destino + " | cota restante agora: " + depois + (depois < antes ? " (ok, o envio contou)" : " (ATENCAO: a cota nao mudou; o envio nao saiu)"));
 }
