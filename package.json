@@ -13,7 +13,8 @@
     "deploy": "VITE_SITE_URL=https://abluezone.com.br VITE_ROBOTS=index,follow vite build && firebase deploy --only hosting:prod",
     "deploy:teste": "VITE_SITE_URL=https://bluezone-teste.web.app VITE_ROBOTS=noindex,nofollow vite build && firebase deploy --only hosting:teste",
     "build:painel": "vite build --config vite.painel.config.ts",
-    "deploy:painel": "vite build --config vite.painel.config.ts && firebase deploy --only hosting:painel"
+    "deploy:painel": "vite build --config vite.painel.config.ts && firebase deploy --only hosting:painel",
+    "apps-script:bundle": "node tools/apps-script-bundle.mjs"
   },
   "dependencies": {
     "firebase": "^12.19.0",

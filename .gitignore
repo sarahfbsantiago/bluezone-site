@@ -6,3 +6,6 @@ tsconfig.tsbuildinfo
 firebase-debug.log
 media-src
 dist-painel
+
+# cache local do Firebase Hosting
+.firebase/

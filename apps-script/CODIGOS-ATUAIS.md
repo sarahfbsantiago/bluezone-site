@@ -1,8 +1,10 @@
 # Apps Script — códigos atuais para colar
 
-Gerado em 15/09/2026 a partir de `apps-script/*.gs`. No editor do Apps Script (conta contato@abluezone.com.br), para **cada** arquivo abaixo: abra o arquivo de mesmo nome, apague tudo e cole o bloco inteiro. Depois: `TESTE_EMAIL` em Resposta.gs → Executar `testarResposta` → ler o Registro de execução → Implantar > Gerenciar implantações > Nova versão.
+Gerado em 15/09/2026 por `npm run apps-script:bundle` a partir de `apps-script/*.gs`. Não edite aqui: edite os .gs e gere de novo.
 
-Ordem e nomes dos arquivos no projeto: `Config`, `Bluezone`, `Bluenews`, `Blueprint`, `Main`, `Util`, `Resposta`.
+No editor do Apps Script (conta contato@abluezone.com.br), para **cada** arquivo abaixo: abra o arquivo de mesmo nome, apague tudo e cole o bloco inteiro. Depois: `TESTE_EMAIL` em Resposta.gs → Executar `testarResposta` → ler o Registro de execução → Implantar > Gerenciar implantações > lápis > Nova versão. Passo a passo completo em `apps-script/README.md`.
+
+Arquivos do projeto: `Config`, `Bluezone`, `Bluenews`, `Blueprint`, `Main`, `Util`, `Resposta`.
 
 
 ## Config.gs

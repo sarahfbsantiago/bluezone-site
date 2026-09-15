@@ -73,9 +73,9 @@ Depois da página 4 entram **Soluções** (`#solucoes`: o que fazemos, como faze
 
 Header de vidro e botão do WhatsApp são fixos em todas as páginas.
 
-## Formulário de contato (Google Apps Script)
+## Formulários (Google Apps Script)
 
-O envio vai para um Web App do Apps Script que grava em uma planilha e avisa por e-mail. Código e passo a passo em `apps-script/`. A URL entra em `VITE_CONTACT_ENDPOINT` (`.env`, ver `.env.example`) ou em `src/features/home/config/siteConfig.ts`. Sem URL, o formulário avisa que o envio não está configurado. O cliente valida os campos, usa honeypot e bloqueia envios em sequência; nenhum segredo fica no frontend.
+Os quatro formulários (contato do site, inscrição e contato da BlueNews, pop-up do Blueprint) usam o mesmo componente `ContactForm` e enviam um único POST, com a origem no campo `source`, para um Web App do Apps Script que grava em uma planilha (uma aba por origem), avisa contato@ e manda uma resposta automática à pessoa de noreply@abluezone.com.br. Código, tabela de origens e passo a passo de atualização em `apps-script/README.md`; `npm run apps-script:bundle` gera o arquivo para colar no editor. A URL entra em `VITE_CONTACT_ENDPOINT` (`.env`, ver `.env.example`) e na variável de mesmo nome no GitHub. Sem URL, o formulário avisa que o envio não está configurado. O cliente valida os campos, usa honeypot e bloqueia envios em sequência; nenhum segredo fica no frontend.
 
 ## Segurança
 
