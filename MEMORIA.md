@@ -56,6 +56,10 @@ WhatsApp flutuante: ícone em pontilhismo (no escuro: branco puro, sem degradê,
 ## Favicon (15/09/2026)
 - Ícones quadrados gerados do `logo-symbol.png` (símbolo laranja #f63822, fundo transparente; apple-touch com fundo branco) via Chrome/canvas: `favicon.ico` (16/32/48), `favicon-16/32/48.png`, `icon-192.png`, `icon-512.png`, `apple-touch-icon.png`, `site.webmanifest`, em `public/` (compartilhado com o painel). Tags nas 4 páginas (`index.html`, `bluenews.html`, `blueprint.html`, `painel/index.html`). Motivo: o Google só mostra favicon nos resultados se for quadrado, ≥48px e acessível; o PNG antigo era 300×366. Aparece na busca só depois do Google recrawlar (dias a semanas); acelera pedindo indexação da home no Search Console.
 
+## SEO: Search Console, sitemap e robots (15/09/2026)
+- Propriedade de domínio abluezone.com.br criada no Search Console (conta contato@). Home estava indexada com último rastreio em 12/09; indexação solicitada para /, /bluenews e /blueprint. Home tem JSON-LD WebSite + Organization (nome "Bluezone", logo icon-512) para o resultado mostrar "Bluezone" em vez do domínio.
+- `seo/seo-files.ts` (plugin Vite) gera no build: produção → `robots.txt` liberando tudo + `sitemap.xml` (de `seo/sitemap.xml`, lastmod = dia do build); teste/GitHub Pages (VITE_ROBOTS ≠ index,follow) e painel (`disallow: true`) → `robots.txt` com Disallow. Nada disso fica em `public/` porque o painel compartilha essa pasta. Página nova no site = incluir em `seo/sitemap.xml`.
+
 ## Prévia de compartilhamento e GitHub Pages
 
 - Imagens de prévia (WhatsApp/Instagram/redes) em `public/og-bluezone.png` (site e BlueNews) e `public/og-blueprint.png` (Blueprint), 1200×630, geradas com Puppeteer (marca com letreiro sobre fundo escuro). As tags `og:*`/`twitter:*` usam `%VITE_SITE_URL%` (Vite troca no build): `.env` local = http://127.0.0.1:5173; GitHub Pages = https://sarahfbsantiago.github.io/bluezone-site; Firebase = https://abluezone.com.br.
