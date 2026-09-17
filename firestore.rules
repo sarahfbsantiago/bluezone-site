@@ -12,7 +12,7 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.token.email == email;
       allow write: if false;
     }
-    // Editores: convidados por administradores pelo painel. Publicam notícias; não veem leads nem gerenciam pessoas.
+    // Editores: convidados por administradores pelo painel. Publicam notícias e posts; não veem leads nem gerenciam pessoas.
     function isEditor() {
       return request.auth != null
         && request.auth.token.email != null
@@ -31,7 +31,7 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // Notícias da BlueNews: leitura pública do que está publicado; escrita só por administradores, com limites.
+    // Notícias da BlueNews: leitura pública do que está publicado; escrita só pela equipe, com limites.
     function validPost(d) {
       return d.keys().hasAll(['title', 'slug', 'category', 'excerpt', 'content', 'coverUrl', 'author', 'status', 'updatedAt'])
         && d.title is string && d.title.size() >= 3 && d.title.size() <= 140
@@ -50,7 +50,7 @@ service cloud.firestore {
       allow delete: if isStaff();
     }
 
-    // Imagens das notícias (data URL reduzida no navegador, ≤ 700 KB): leitura pública, envio/exclusão só por administradores.
+    // Imagens das notícias (data URL reduzida no navegador, ≤ 700 KB): leitura pública, envio/exclusão só pela equipe.
     match /images/{imageId} {
       allow read: if true;
       allow create: if isStaff()
@@ -59,6 +59,52 @@ service cloud.firestore {
         && request.resource.data.data.matches('^data:image/(webp|jpeg|png);base64,.*');
       allow update: if false;
       allow delete: if isStaff();
+    }
+
+    // Posts das redes (área Publicar): só a equipe lê e escreve. Mídia é um caminho no Storage (conteudo/...), nunca URL pública.
+    function validMediaPath(p) { return p is string && p.matches('^conteudo/[A-Za-z0-9._-]{1,120}$'); }
+    function validContent(d) {
+      return d.keys().hasOnly(['channel', 'format', 'topic', 'caption', 'hashtags', 'media', 'date', 'notes', 'status', 'createdBy', 'createdAt', 'updatedAt'])
+        && d.keys().hasAll(['channel', 'format', 'topic', 'caption', 'hashtags', 'media', 'date', 'notes', 'status', 'createdBy', 'updatedAt'])
+        && d.channel in ['instagram', 'tiktok', 'youtube', 'facebook', 'linkedin']
+        && d.format is string && d.format.size() >= 1 && d.format.size() <= 20 && d.format.matches('^[a-z]+$')
+        && d.topic is string && d.topic.size() >= 3 && d.topic.size() <= 140
+        && d.caption is string && d.caption.size() <= 63206
+        && d.hashtags is string && d.hashtags.size() <= 600
+        && d.media is list && d.media.size() <= 20
+        && (d.media.size() == 0 || (validMediaPath(d.media[0]) && validMediaPath(d.media[d.media.size() - 1])))
+        && d.date is string && (d.date == '' || d.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'))
+        && d.notes is string && d.notes.size() <= 2000
+        && d.status in ['ideia', 'rascunho', 'aprovado', 'postado', 'arquivado']
+        && d.createdBy is string && d.createdBy.size() <= 200;
+    }
+    match /conteudos/{contentId} {
+      allow read: if isStaff();
+      allow create: if isStaff() && validContent(request.resource.data) && request.resource.data.createdBy == request.auth.token.email;
+      allow update: if isStaff() && validContent(request.resource.data) && request.resource.data.createdBy == resource.data.createdBy;
+      allow delete: if isStaff();
+    }
+
+    // Marca (guia de voz, identidade visual, logotipos e referências): a equipe lê; só administradores editam.
+    function validBrand(d) {
+      return d.keys().hasOnly(['paleta', 'tipografia', 'logos', 'referencias', 'tom', 'usamos', 'evitamos', 'ctas', 'publico', 'exemplosBons', 'exemplosRuins', 'fontesNoticias', 'updatedBy', 'updatedAt'])
+        && d.paleta is string && d.paleta.size() <= 6000
+        && d.tipografia is string && d.tipografia.size() <= 6000
+        && d.tom is string && d.tom.size() <= 6000
+        && d.usamos is string && d.usamos.size() <= 6000
+        && d.evitamos is string && d.evitamos.size() <= 6000
+        && d.ctas is string && d.ctas.size() <= 6000
+        && d.publico is string && d.publico.size() <= 6000
+        && d.exemplosBons is string && d.exemplosBons.size() <= 6000
+        && d.exemplosRuins is string && d.exemplosRuins.size() <= 6000
+        && d.fontesNoticias is string && d.fontesNoticias.size() <= 6000
+        && d.logos is list && d.logos.size() <= 30
+        && d.referencias is list && d.referencias.size() <= 30
+        && d.updatedBy == request.auth.token.email;
+    }
+    match /marca/{docId} {
+      allow read: if isStaff();
+      allow write: if isAdmin() && docId == 'guia' && validBrand(request.resource.data);
     }
 
     // Tudo o mais: negado (leads, events, users etc. entram nas próximas etapas, sempre via backend).

@@ -79,7 +79,16 @@ Os quatro formulários (contato do site, inscrição e contato da BlueNews, pop-
 
 ## Bluezone.adm (painel da equipe)
 
-Site separado em painel.abluezone.com.br (`painel/index.html` → `src/adm/`), o centro de marketing e vendas da Bluezone. Login em `AdmPage.tsx` (Google para administradores; Google ou e-mail e senha para editores convidados; só e-mails em `admins`/`editors` no Firestore entram). Áreas na barra lateral, definidas em `src/adm/site.ts` com quem enxerga cada uma: **hoje** (pendências e últimas), **publicar** (calendário multicanal, em construção), **BlueNews** (notícias, seções, newsletter; `areas/BlueNewsArea.tsx`), **campanhas** e **clientes** (admin, em construção), **marca** (em construção) e **equipe** (admin; convites). Áreas em construção usam `areas/Scaffold.tsx` com o texto do que vai ter. Busca no topo abre a BlueNews filtrada. Modo demo em dev: `/painel/?demo`. Build e deploy: `npm run deploy:painel`.
+Site separado em painel.abluezone.com.br (`painel/index.html` → `src/adm/`), o centro de marketing e vendas da Bluezone. Login em `AdmPage.tsx` (Google para administradores; Google ou e-mail e senha para editores convidados; só e-mails em `admins`/`editors` no Firestore entram). Áreas na barra lateral, definidas em `src/adm/site.ts` com quem enxerga cada uma; toda tela interna tem "← voltar". Modo demo em dev: `/painel/?demo`. Build e deploy: `npm run deploy:painel`; regras: `firebase deploy --only firestore:rules,storage`.
+
+- **Hoje**: pendências reais (posts aprovados para hoje, atrasados, esperando aprovação, notícias em rascunho), próximos 7 dias, últimas notícias.
+- **Publicar** (`areas/PublicarArea.tsx`, modelo em `content.ts`): calendário de conteúdo multicanal (Instagram, TikTok, YouTube, Facebook, LinkedIn), cada canal com formatos, tamanho de mídia e limite de legenda. Lista com filtros, calendário mensal, editor com prévia no jeito da rede, status ideia → rascunho → aprovado → postado → arquivado, "baixar tudo" (mídia + legenda.txt) para postar pelo celular. **Moldes de imagem** (`templates.ts`): frase, título + texto, lista e capa de carrossel desenhados no navegador (canvas) no visual da marca, no tamanho do formato. Postagem manual por ora; sem API das redes.
+- **BlueNews** (`areas/BlueNewsArea.tsx`): notícias, seções, newsletter, editor com prévia. Sem mudança de comportamento.
+- **Marca** (`areas/MarcaPage.tsx`, `brand.ts`): a base que alimenta quem escreve e, depois, a geração por IA: paleta, tipografia, logotipos, referências aprovadas com nota, tom de voz, público, palavras que usamos e evitamos, chamadas, exemplos bons e ruins, fontes da BlueNews. Editores leem; admin edita. Documento `marca/guia`.
+- **Campanhas** e **Clientes**: montadas com o texto do que vai ter (`areas/Scaffold.tsx`).
+- **Equipe**: pessoas e convites.
+
+**Segurança do painel**: mídia dos posts e da marca fica em `conteudo/` e `marca/` no Storage e **nunca vira URL pública**: o painel guarda só o caminho e lê o arquivo pelo SDK com o login da pessoa (`media.ts`, `MediaThumb`). Regras do Firestore validam campo a campo (`conteudos`: chaves exatas, canal/status fechados, limites de tamanho, mídia só como caminho `conteudo/…`, `createdBy` = quem gravou; `marca/guia`: só admin, chaves exatas). Regras do Storage: `conteudo/` só equipe, imagem ≤ 5 MB ou vídeo MP4/MOV ≤ 200 MB; `marca/` equipe lê, só admin escreve, só imagem. Nada disso é público.
 
 ## Privacidade, cookies e medição (LGPD)
 

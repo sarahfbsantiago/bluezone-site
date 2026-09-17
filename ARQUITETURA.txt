@@ -38,7 +38,8 @@ Feito em 12/09/2026 (parte A - BlueNews):
 [x] Firebase Authentication com Google (provedor ativado no console; dominios autorizados)
 [x] Painel em site separado em painel.abluezone.com.br (CNAME, certificado ok), fora do site publico. Desde 16/09/2026 e o
     Bluezone.adm (src/adm/): areas hoje, publicar, BlueNews, campanhas, clientes, marca, equipe; BlueNews com lista, editor
-    com previa, publicar/despublicar, excluir. Publicar/campanhas/clientes/marca ainda em construcao (plano na MEMORIA.md).
+    com previa, publicar/despublicar, excluir. Publicar (calendario multicanal, moldes de imagem, postagem manual) e Marca (base da marca para a geracao) prontos em 16/09;
+    campanhas/clientes em construcao (plano na MEMORIA.md). Midia do painel nunca publica: caminho + leitura pela SDK.
 [x] Papeis: admins/{email} (Google apenas; tudo, inclusive pessoas e futuros leads) e editors/{email}
     (convidados pelo painel; criam, publicam e excluem noticias; nao veem leads, configuracoes nem dados sensiveis; entram com Google ou e-mail+senha
     criada no convite por link). Politica de senha forte e protecao contra enumeracao ativas no Firebase Auth

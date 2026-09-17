@@ -2,13 +2,22 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     // Equipe = e-mail verificado presente em admins ou editors no Firestore.
-    function isStaff() {
+    function isAdmin() {
       return request.auth != null
         && request.auth.token.email != null
         && request.auth.token.email_verified == true
-        && (firestore.exists(/databases/(default)/documents/admins/$(request.auth.token.email))
-            || firestore.exists(/databases/(default)/documents/editors/$(request.auth.token.email)));
+        && firestore.exists(/databases/(default)/documents/admins/$(request.auth.token.email));
     }
+    function isStaff() {
+      return isAdmin()
+        || (request.auth != null
+          && request.auth.token.email != null
+          && request.auth.token.email_verified == true
+          && firestore.exists(/databases/(default)/documents/editors/$(request.auth.token.email)));
+    }
+    function isImage() { return request.resource != null && request.resource.contentType.matches('image/(webp|jpeg|png)') && request.resource.size <= 5 * 1024 * 1024; }
+    function isVideo() { return request.resource != null && request.resource.contentType.matches('video/(mp4|quicktime)') && request.resource.size <= 200 * 1024 * 1024; }
+
     // Imagens das notícias: leitura pública; envio só pela equipe, só imagem, até 2 MB.
     match /noticias/{file} {
       allow read: if true;
@@ -18,7 +27,19 @@ service firebase.storage {
         && request.resource.contentType.matches('image/(webp|jpeg|png)');
       allow delete: if isStaff();
     }
-    // Tudo o mais: negado (materiais de cursos etc. entram nas próximas etapas, com regras próprias).
+    // Mídia dos posts das redes (área Publicar): só a equipe lê e escreve. Nada é público.
+    match /conteudo/{file} {
+      allow read: if isStaff();
+      allow write: if isStaff() && (isImage() || isVideo());
+      allow delete: if isStaff();
+    }
+    // Marca (logotipos e referências): a equipe lê; só administradores enviam e apagam; só imagem.
+    match /marca/{file} {
+      allow read: if isStaff();
+      allow write: if isAdmin() && isImage();
+      allow delete: if isAdmin();
+    }
+    // Tudo o mais: negado.
     match /{allPaths=**} {
       allow read, write: if false;
     }

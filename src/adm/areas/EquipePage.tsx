@@ -2,11 +2,12 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { collection, deleteDoc, doc, getDocs, serverTimestamp, setDoc } from 'firebase/firestore'
 import { db, sendInvite, signOutUser } from '../../lib/firebase'
 import { SITE, type Role } from '../site'
+import { BackButton } from './BackButton'
 
-type Props = { email: string; role: Role; demo: boolean }
+type Props = { email: string; role: Role; demo: boolean; onBack: () => void }
 
 /** Equipe: quem tem acesso, convites e a conta conectada. Só administradores chegam aqui. */
-export function EquipePage({ email, role, demo }: Props) {
+export function EquipePage({ email, role, demo, onBack }: Props) {
   const [editors, setEditors] = useState<Array<{ email: string; name: string }>>([])
   const [newEditor, setNewEditor] = useState({ name: '', email: '' })
   const [message, setMessage] = useState('')
@@ -41,7 +42,7 @@ export function EquipePage({ email, role, demo }: Props) {
 
   return (
     <section className="admin-list">
-      <div className="admin-toolbar"><h1 className="solution-title">Equipe</h1></div>
+      <div className="admin-toolbar"><BackButton onClick={onBack} /><h1 className="solution-title">Equipe</h1></div>
       <dl className="admin-config">
         <dt>conta conectada</dt><dd>{email} · {role === 'admin' ? 'administradora' : 'editor(a)'}</dd>
         <dt>papéis</dt><dd>administradores entram com Google e veem tudo, inclusive campanhas, clientes e equipe. Editores entram com Google ou e-mail e senha e veem hoje, publicar, BlueNews e marca.</dd>

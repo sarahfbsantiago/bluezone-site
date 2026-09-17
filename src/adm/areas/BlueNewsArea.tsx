@@ -4,6 +4,7 @@ import { Markdown } from '../../bluenews/Markdown'
 import { CoverImage } from '../../bluenews/CoverImage'
 import { compressImage, uploadImage, MAX_BYTES } from '../../bluenews/images'
 import { SITE } from '../site'
+import { BackButton } from './BackButton'
 
 const EMPTY: PostInput = { title: '', slug: '', category: CATEGORIES[0]?.id ?? '', excerpt: '', content: '', coverUrl: '', author: 'Equipe Bluezone', status: 'draft' }
 
@@ -20,13 +21,14 @@ type Props = {
   openNew?: boolean
   /** Abre uma notícia no editor ao montar (atalho do Hoje). */
   openPost?: Post
+  onBack: () => void
 }
 
 /**
  * Área BlueNews do painel: lista de notícias (busca e filtros), seções, editor com pré-visualização, publicar/despublicar
  * e excluir. Mesmo comportamento do painel antigo da BlueNews, agora como uma área do Bluezone.adm.
  */
-export function BlueNewsArea({ posts, reload, tab, onTab, initialSearch = '', initialStatus = '', openNew = false, openPost }: Props) {
+export function BlueNewsArea({ posts, reload, tab, onTab, initialSearch = '', initialStatus = '', openNew = false, openPost, onBack }: Props) {
   const [editing, setEditing] = useState<Post | 'new' | null>(openPost ?? (openNew ? 'new' : null))
   const [form, setForm] = useState<PostInput>(openPost ? toInput(openPost) : EMPTY)
   const [preview, setPreview] = useState<PostInput | null>(null)
@@ -108,7 +110,7 @@ export function BlueNewsArea({ posts, reload, tab, onTab, initialSearch = '', in
 
   if (preview) return (
     <section className="admin-previewpage">
-      <div className="admin-toolbar"><span className="admin-title">pré-visualização · assim a notícia aparece no portal</span><button type="button" className="admin-link" onClick={() => setPreview(null)}>fechar pré-visualização</button></div>
+      <div className="admin-toolbar"><BackButton onClick={() => setPreview(null)} /><span className="admin-title">pré-visualização · assim a notícia aparece no portal</span></div>
       <article className="post admin-postpreview">
         {preview.coverUrl && <CoverImage src={preview.coverUrl} className="post-cover" loading="eager" />}
         <span className="solution-kicker">{CATEGORIES.find((c) => c.id === preview.category)?.label}</span>
@@ -121,7 +123,7 @@ export function BlueNewsArea({ posts, reload, tab, onTab, initialSearch = '', in
 
   if (editing) return (
     <form className="admin-form" onSubmit={save}>
-      <div className="admin-toolbar"><h1 className="solution-title">{editing === 'new' ? 'Nova notícia' : 'Editar notícia'}</h1><button type="button" className="admin-link" onClick={() => setEditing(null)}>voltar</button></div>
+      <div className="admin-toolbar"><BackButton onClick={() => setEditing(null)} /><h1 className="solution-title">{editing === 'new' ? 'Nova notícia' : 'Editar notícia'}</h1></div>
       <div className="admin-grid">
         <div className="admin-fields">
           <label className="field"><span>título</span><input value={form.title} onChange={(e) => update({ title: e.target.value, slug: editing === 'new' ? slugify(e.target.value) : form.slug })} maxLength={140} required /></label>
@@ -161,7 +163,7 @@ export function BlueNewsArea({ posts, reload, tab, onTab, initialSearch = '', in
 
   if (tab === 'secoes') return (
     <section className="admin-list">
-      <div className="admin-toolbar"><h1 className="solution-title">BlueNews</h1><button type="button" className="contact-submit" onClick={() => startNew()}>nova notícia</button></div>
+      <div className="admin-toolbar"><BackButton onClick={() => onTab('noticias')} /><h1 className="solution-title">BlueNews</h1><button type="button" className="contact-submit" onClick={() => startNew()}>nova notícia</button></div>
       {tabs}
       <ul className="admin-sections">
         {CATEGORIES.map((c) => { const n = posts.filter((p) => p.category === c.id); const pub = n.filter((p) => p.status === 'published').length; return (
@@ -177,7 +179,7 @@ export function BlueNewsArea({ posts, reload, tab, onTab, initialSearch = '', in
 
   if (tab === 'newsletter') return (
     <section className="admin-list">
-      <div className="admin-toolbar"><h1 className="solution-title">BlueNews</h1></div>
+      <div className="admin-toolbar"><BackButton onClick={() => onTab('noticias')} /><h1 className="solution-title">BlueNews</h1></div>
       {tabs}
       <p className="admin-note">Em breve: lista de inscritos da BlueNews e envio de edições a partir das notícias publicadas. Hoje as inscrições chegam por e-mail em contato@ e na planilha de contatos, aba "bluenews".</p>
     </section>
@@ -185,7 +187,7 @@ export function BlueNewsArea({ posts, reload, tab, onTab, initialSearch = '', in
 
   return (
     <section className="admin-list">
-      <div className="admin-toolbar"><h1 className="solution-title">BlueNews</h1><button type="button" className="contact-submit" onClick={() => startNew()}>nova notícia</button></div>
+      <div className="admin-toolbar"><BackButton onClick={onBack} /><h1 className="solution-title">BlueNews</h1><button type="button" className="contact-submit" onClick={() => startNew()}>nova notícia</button></div>
       {tabs}
       <div className="admin-filters">
         <input type="search" placeholder="buscar por título" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Buscar" />

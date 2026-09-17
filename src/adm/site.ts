@@ -6,11 +6,11 @@ export type Role = 'admin' | 'editor'
 /** Áreas do Bluezone.adm, na ordem da barra lateral. `roles` diz quem enxerga. */
 export const AREAS = [
   { id: 'hoje', label: 'hoje', roles: ['admin', 'editor'] },
-  { id: 'publicar', label: 'publicar', roles: ['admin', 'editor'], soon: true },
+  { id: 'publicar', label: 'publicar', roles: ['admin', 'editor'] },
   { id: 'bluenews', label: 'BlueNews', roles: ['admin', 'editor'] },
   { id: 'campanhas', label: 'campanhas', roles: ['admin'], soon: true },
   { id: 'clientes', label: 'clientes', roles: ['admin'], soon: true },
-  { id: 'marca', label: 'marca', roles: ['admin', 'editor'], soon: true },
+  { id: 'marca', label: 'marca', roles: ['admin', 'editor'] },
   { id: 'equipe', label: 'equipe', roles: ['admin'] },
 ] as const
 
