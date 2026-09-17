@@ -77,6 +77,10 @@ Header de vidro e botão do WhatsApp são fixos em todas as páginas.
 
 Os quatro formulários (contato do site, inscrição e contato da BlueNews, pop-up do Blueprint) usam o mesmo componente `ContactForm` e enviam um único POST, com a origem no campo `source`, para um Web App do Apps Script que grava em uma planilha (uma aba por origem), avisa contato@ e manda uma resposta automática à pessoa de noreply@abluezone.com.br. Código, tabela de origens e passo a passo de atualização em `apps-script/README.md`; `npm run apps-script:bundle` gera o arquivo para colar no editor. A URL entra em `VITE_CONTACT_ENDPOINT` (`.env`, ver `.env.example`) e na variável de mesmo nome no GitHub. Sem URL, o formulário avisa que o envio não está configurado. O cliente valida os campos, usa honeypot e bloqueia envios em sequência; nenhum segredo fica no frontend.
 
+## Bluezone.adm (painel da equipe)
+
+Site separado em painel.abluezone.com.br (`painel/index.html` → `src/adm/`), o centro de marketing e vendas da Bluezone. Login em `AdmPage.tsx` (Google para administradores; Google ou e-mail e senha para editores convidados; só e-mails em `admins`/`editors` no Firestore entram). Áreas na barra lateral, definidas em `src/adm/site.ts` com quem enxerga cada uma: **hoje** (pendências e últimas), **publicar** (calendário multicanal, em construção), **BlueNews** (notícias, seções, newsletter; `areas/BlueNewsArea.tsx`), **campanhas** e **clientes** (admin, em construção), **marca** (em construção) e **equipe** (admin; convites). Áreas em construção usam `areas/Scaffold.tsx` com o texto do que vai ter. Busca no topo abre a BlueNews filtrada. Modo demo em dev: `/painel/?demo`. Build e deploy: `npm run deploy:painel`.
+
 ## Privacidade, cookies e medição (LGPD)
 
 - **Política** em `/privacidade` (`privacidade.html` → `src/privacidade/`, dados do controlador em `privacyConfig.ts`, versão em `POLICY_VERSION` de `src/lib/consent.ts`). Links no © de todos os footers.

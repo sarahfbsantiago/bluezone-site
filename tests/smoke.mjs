@@ -35,7 +35,9 @@ try {
   await page.waitForFunction(() => document.querySelector('h1')?.textContent?.includes('da marca'))
   check('teclado (ArrowRight) alcança o terceiro estado', true)
 
-  const visible = async (selector) => page.$eval(selector, (el) => { const s = getComputedStyle(el); const r = el.getBoundingClientRect(); return Number(s.opacity) > 0.6 && r.top >= 0 && r.bottom <= window.innerHeight })
+  const isVisible = (selector) => page.$eval(selector, (el) => { const s = getComputedStyle(el); const r = el.getBoundingClientRect(); return Number(s.opacity) > 0.6 && r.top >= 0 && r.bottom <= window.innerHeight }).catch(() => false)
+  // Espera até o elemento estar na tela (rolagem suave leva tempo variável); devolve false se não aparecer em 5 s.
+  const visible = async (selector, timeout = 5000) => { const t0 = Date.now(); while (Date.now() - t0 < timeout) { if (await isVisible(selector)) return true; await new Promise((resolve) => setTimeout(resolve, 150)) } return false }
   await page.evaluate(() => window.scrollTo({ top: window.innerHeight, behavior: 'instant' }))
   await new Promise((resolve) => setTimeout(resolve, 900))
   check('página 2 visível ao rolar uma tela', await visible('#page-two-title'))

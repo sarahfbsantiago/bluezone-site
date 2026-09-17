@@ -36,7 +36,9 @@ Feito em 12/09/2026 (parte A - BlueNews):
 [x] Firestore criado (southamerica-east1) com regras "nega tudo" + excecoes para posts/admins
 [x] App Web registrado no projeto (config publica em VITE_FIREBASE_* no .env e nas variaveis do GitHub)
 [x] Firebase Authentication com Google (provedor ativado no console; dominios autorizados)
-[x] Painel em site separado em painel.abluezone.com.br (CNAME, certificado ok), fora do site publico, com barra lateral: login Google, lista, editor com previa, publicar/despublicar, excluir
+[x] Painel em site separado em painel.abluezone.com.br (CNAME, certificado ok), fora do site publico. Desde 16/09/2026 e o
+    Bluezone.adm (src/adm/): areas hoje, publicar, BlueNews, campanhas, clientes, marca, equipe; BlueNews com lista, editor
+    com previa, publicar/despublicar, excluir. Publicar/campanhas/clientes/marca ainda em construcao (plano na MEMORIA.md).
 [x] Papeis: admins/{email} (Google apenas; tudo, inclusive pessoas e futuros leads) e editors/{email}
     (convidados pelo painel; criam, publicam e excluem noticias; nao veem leads, configuracoes nem dados sensiveis; entram com Google ou e-mail+senha
     criada no convite por link). Politica de senha forte e protecao contra enumeracao ativas no Firebase Auth
